@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Aura Battle</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d0d0d;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px red;
+      width: 350px;
+      margin: 50px auto;
+      text-align: center;
+    }
+    input, button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+    button {
+      cursor: pointer;
+      background: red;
+      color: white;
+      font-weight: bold;
+    }
+    .hidden { display: none; }
+    .dashboard {
+      text-align: center;
+      margin-top: 50px;
+    }
+    .dashboard a {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 250px;
+      background: #333;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+    }
+    #profilePic {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid red;
+      cursor: pointer;
+    }
+    #settingsModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 12px;
+      width: 400px;
+      display: none;
+      box-shadow: 0 0 10px red;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login Container -->
+<div class="container" id="loginContainer">
+  <h2>Admin Login</h2>
+  <input type="text" id="username" placeholder="Email or Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p><a href="#" style="color:red;" onclick="showForgot()">Forgot Password?</a></p>
+  <p id="loginMessage"></p>
+</div>
+
+<!-- Forgot Password -->
+<div class="container hidden" id="forgotContainer">
+  <h2>Reset Password</h2>
+  <input type="text" id="forgotEmail" placeholder="Enter Email/Username">
+  <button onclick="sendOtp()">Send OTP</button>
+  <div id="otpSection" class="hidden">
+    <input type="text" id="otpInput" placeholder="Enter 6-digit OTP">
+    <input type="password" id="newPass" placeholder="Enter New Password">
+    <button onclick="verifyOtp()">Verify & Change</button>
+  </div>
+  <p id="forgotMessage"></p>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="hidden">
+  <img id="profilePic" src="https://i.imghippo.com/files/Znx5053Y.jpg" onclick="openSettings()">
+  <div class="dashboard">
+    <h2>Admin Dashboard</h2>
+    <a href="match catagory.html">Manage Match Category</a>
+    <a href="ubdate.html">Manage Update</a>
+    <a href="maintenance.html">Manage Maintenance Mode</a>
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div id="settingsModal">
+  <h3>Profile Settings</h3>
+  <input type="text" id="newUsername" placeholder="New Username">
+  <input type="email" id="newEmail" placeholder="New Email">
+  <input type="password" id="newPassword" placeholder="New Password">
+  <input type="file" id="newProfilePic">
+  <button onclick="sendSettingsOtp()">Verify by Email OTP</button>
+  <div id="settingsOtpSection" class="hidden">
+    <input type="text" id="settingsOtp" placeholder="Enter OTP">
+    <button onclick="saveSettings()">Save Changes</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
+    authDomain: "aura-battle-main.firebaseapp.com",
+    databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
+    projectId: "aura-battle-main",
+    storageBucket: "aura-battle-main.firebasestorage.app",
+    messagingSenderId: "763779990289",
+    appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
+    measurementId: "G-ZZXZ00HK07"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let currentAdmin = "";
+  let generatedOtp = "";
+  let settingsOtp = "";
+  let oldImageUrl = "";
+
+  emailjs.init("Hn95Bh2Dkz54UUNZ0");
+
+  window.login = function() {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+
+    get(ref(db, "admins/" + user)).then(snapshot => {
+      if (snapshot.exists() && snapshot.val().password === pass) {
+        currentAdmin = user;
+        oldImageUrl = snapshot.val().profileImage || "https://i.imghippo.com/files/Znx5053Y.jpg";
+        document.getElementById("profilePic").src = oldImageUrl;
+        document.getElementById("loginContainer").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+        setTimeout(logout, 10 * 60 * 1000);
+      } else {
+        document.getElementById("loginMessage").innerText = "Invalid credentials!";
+      }
+    });
+  };
+
+  window.showForgot = function() {
+    document.getElementById("loginContainer").classList.add("hidden");
+    document.getElementById("forgotContainer").classList.remove("hidden");
+  };
+
+  window.sendOtp = function() {
+    const email = document.getElementById("forgotEmail").value.trim();
+    generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    emailjs.send("service_3597yeb", "template_galojrg", { to_email: email, message: generatedOtp });
+    document.getElementById("forgotMessage").innerText = "OTP sent!";
+    document.getElementById("otpSection").classList.remove("hidden");
+  };
+
+  window.verifyOtp = function() {
+    if (document.getElementById("otpInput").value.trim() === generatedOtp) {
+      update(ref(db, "admins/" + document.getElementById("forgotEmail").value.trim()), {
+        password: document.getElementById("newPass").value.trim()
+      });
+      alert("Password Updated!");
+      document.getElementById("forgotContainer").classList.add("hidden");
+      document.getElementById("loginContainer").classList.remove("hidden");
+    } else alert("Invalid OTP!");
+  };
+
+  window.openSettings = function() {
+    document.getElementById("settingsModal").style.display = "block";
+  };
+
+  window.sendSettingsOtp = function() {
+    settingsOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    emailjs.send("service_3597yeb", "template_galojrg", { to_email: currentAdmin, message: settingsOtp });
+    alert("OTP sent to registered email");
+    document.getElementById("settingsOtpSection").classList.remove("hidden");
+  };
+
+  window.saveSettings = async function() {
+    if (document.getElementById("settingsOtp").value.trim() !== settingsOtp) {
+      alert("Invalid OTP!"); return;
+    }
+    let newUser = document.getElementById("newUsername").value.trim();
+    let newEmail = document.getElementById("newEmail").value.trim();
+    let newPass = document.getElementById("newPassword").value.trim();
+    let file = document.getElementById("newProfilePic").files[0];
+
+    let updates = {};
+    if (newUser) updates.username = newUser;
+    if (newEmail) updates.email = newEmail;
+    if (newPass) updates.password = newPass;
+
+    if (file) {
+      let formData = new FormData();
+      formData.append("file", file);
+      formData.append("key", "b0cbeda84a55684948699d450f115099");
+
+      let upload = await fetch("https://api.imghippo.com/v1/upload", { method: "POST", body: formData });
+      let res = await upload.json();
+      if (res.success) {
+        updates.profileImage = res.data.view_url;
+        document.getElementById("profilePic").src = res.data.view_url;
+
+        // Delete old image
+        if (oldImageUrl && oldImageUrl.includes("imghippo.com")) {
+          await fetch("https://api.imghippo.com/v1/delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: "b0cbeda84a55684948699d450f115099", url: oldImageUrl })
+          });
+        }
+        oldImageUrl = res.data.view_url;
+      }
+    }
+
+    update(ref(db, "admins/" + currentAdmin), updates);
+    alert("Profile updated!");
+    document.getElementById("settingsModal").style.display = "none";
+  };
+
+  window.logout = function() {
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("loginContainer").classList.remove("hidden");
+  };
+</script>
+
+</body>
+</html>
