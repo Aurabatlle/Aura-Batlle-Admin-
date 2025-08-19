@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --danger: #e63946;
+            --warning: #fca311;
+            --gray: #6c757d;
+            --white: #ffffff;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 22px;
+            color: var(--primary);
+        }
+        
+        .user-profile {
+            position: relative;
+        }
+        
+        .profile-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: flex;
+            margin-top: 20px;
+            gap: 20px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            height: calc(100vh - 100px);
+            position: sticky;
+            top: 80px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--dark);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        /* Content Area */
+        .content {
+            flex: 1;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* Profile Section */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .profile-name {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--white);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+        
+        /* Card Styles */
+        .card {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        /* OTP Verification */
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .otp-input {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            text-align: center;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-bottom: 10px;
+            }
+            
+            .page-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* File Upload */
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .file-upload-label {
+            display: inline-block;
+            padding: 12px 20px;
+            background: var(--light);
+            color: var(--dark);
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .file-upload-label i {
+            margin-right: 8px;
+        }
+        
+        .upload-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px dashed #ddd;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="https://via.placeholder.com/40" alt="Company Logo">
+                    <h1>Admin Dashboard</h1>
+                </div>
+                <div class="user-profile">
+                    <img src="https://via.placeholder.com/45" alt="Profile" class="profile-img" id="profileMenuBtn">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h2>Navigation</h2>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="match-catagory.html"><i class="fas fa-list"></i> Manage Match Category</a></li>
+                    <li><a href="ubdate.html"><i class="fas fa-sync"></i> Manage Update</a></li>
+                    <li><a href="maintenance.html"><i class="fas fa-tools"></i> Maintenance Mode</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content">
+                <div class="page-title">
+                    <h2>Admin Profile</h2>
+                    <span id="login-time">Last login: Today, 10:30 AM</span>
+                </div>
+
+                <!-- Profile Section -->
+                <div class="profile-section">
+                    <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-picture" id="profileImage">
+                    <h3 class="profile-name">John Doe</h3>
+                    <p class="profile-role">Administrator</p>
+                    <button class="btn btn-primary" id="changeImageBtn">Change Profile Picture</button>
+                </div>
+
+                <!-- Profile Details -->
+                <div class="card">
+                    <h3 class="card-title">Personal Information</h3>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" value="johndoe">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" class="form-control" id="email" value="john.doe@example.com">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="updateProfileBtn">Update Profile</button>
+                    </form>
+                </div>
+
+                <!-- Change Password -->
+                <div class="card">
+                    <h3 class="card-title">Change Password</h3>
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" class="form-control" id="currentPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" class="form-control" id="newPassword">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirmPassword">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="changePasswordBtn">Change Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Profile Picture Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Change Profile Picture</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="file-upload">
+                <label for="imageUpload" class="file-upload-label">
+                    <i class="fas fa-upload"></i> Choose Image
+                </label>
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                <img src="https://via.placeholder.com/150" alt="Preview" class="upload-preview" id="imagePreview">
+                <button class="btn btn-primary" id="uploadImageBtn">Upload Image</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div class="modal" id="otpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Verify OTP</h3>
+                <span class="close">&times;</span>
+            </div>
+            <p>We've sent a 6-digit verification code to your email. Please enter it below.</p>
+            <div class="otp-container">
+                <input type="text" class="otp-input" maxlength="1" id="otp1">
+                <input type="text" class="otp-input" maxlength="1" id="otp2">
+                <input type="text" class="otp-input" maxlength="1" id="otp3">
+                <input type="text" class="otp-input" maxlength="1" id="otp4">
+                <input type="text" class="otp-input" maxlength="1" id="otp5">
+                <input type="text" class="otp-input" maxlength="1" id="otp6">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" id="verifyOtpBtn">Verify OTP</button>
+                <button class="btn btn-secondary" id="resendOtpBtn">Resend OTP</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const profileMenuBtn = document.getElementById('profileMenuBtn');
+        const changeImageBtn = document.getElementById('changeImageBtn');
+        const updateProfileBtn = document.getElementById('updateProfileBtn');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const imageModal = document.getElementById('imageModal');
+        const otpModal = document.getElementById('otpModal');
+        const closeButtons = document.querySelectorAll('.close');
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const uploadImageBtn = document.getElementById('uploadImageBtn');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const resendOtpBtn = document.getElementById('resendOtpBtn');
+        
+        // OTP Inputs
+        const otpInputs = [
+            document.getElementById('otp1'),
+            document.getElementById('otp2'),
+            document.getElementById('otp3'),
+            document.getElementById('otp4'),
+            document.getElementById('otp5'),
+            document.getElementById('otp6')
+        ];
+        
+        // Event Listeners
+        changeImageBtn.addEventListener('click', () => {
+            imageModal.style.display = 'flex';
+        });
+        
+        updateProfileBtn.addEventListener('click', () => {
+            otpModal.style.display = 'flex';
+        });
+        
+        changePasswordBtn.addEventListener('click', () => {
+            otpModal.style.display = 'flex';
+        });
+        
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                imageModal.style.display = 'none';
+                otpModal.style.display = 'none';
+            });
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                imageModal.style.display = 'none';
+            }
+            if (e.target === otpModal) {
+                otpModal.style.display = 'none';
+            }
+        });
+        
+        // Image Preview
+        imageUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // OTP Input Auto Focus
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value.length === 0 && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+        
+        // Upload Image (Simulate)
+        uploadImageBtn.addEventListener('click', () => {
+            // In a real implementation, this would upload to Imghippo API
+            alert('Image uploaded successfully!');
+            document.getElementById('profileImage').src = imagePreview.src;
+            imageModal.style.display = 'none';
+        });
+        
+        // Verify OTP (Simulate)
+        verifyOtpBtn.addEventListener('click', () => {
+            // In a real implementation, this would verify OTP via EmailJS
+            alert('OTP verified successfully! Changes saved.');
+            otpModal.style.display = 'none';
+        });
+        
+        // Resend OTP (Simulate)
+        resendOtpBtn.addEventListener('click', () => {
+            // In a real implementation, this would resend OTP via EmailJS
+            alert('New OTP sent to your email!');
+        });
+        
+        // Auto logout after 10 minutes
+        setTimeout(() => {
+            alert('Your session has expired. You will be logged out.');
+            // In a real implementation, this would redirect to login page
+        }, 600000); // 10 minutes = 600,000 milliseconds
+    </script>
+</body>
+</html>
