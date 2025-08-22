@@ -1,208 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">  
-<head>  
-  <meta charset="UTF-8">  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-  <title>Aura Battle - Reset Password</title>  
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>  
-  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>  
-  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>  
-  <style>  
-    body { margin:0; font-family:Arial, sans-serif; background:#000; color:#fff; text-align:center; }  
-    header { background:#111; padding:14px; display:flex; align-items:center; justify-content:center; position:relative; }  
-    header img { width:110px; position:absolute; left:12px; top:50%; transform:translateY(-50%); border-radius:14px; } /* Bigger logo */  
-    header h1 { font-size:22px; color:red; margin:0; }  
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #141E30, #243B55);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+    .login-container {
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 12px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    }
+    .logo {
+      width: 100px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #555;
+      background: #222;
+      color: #fff;
+    }
+    button {
+      width: 95%;
+      padding: 12px;
+      background: #ff4b2b;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #ff1e00;
+    }
+    #forgotBtn {
+      display: none;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #00d9ff;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <img src="company-logo.png" alt="Company Logo" class="logo" id="companyLogo">
+    <h2>Admin Login</h2>
+    <input type="text" id="usernameEmail" placeholder="Username or Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <button id="forgotBtn" onclick="forgotPassword()">Forgot Password?</button>
+  </div>
 
-    .page { display:none; padding:20px; }  
-    .active { display:block; }  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    h2 { color:#fff; font-size:18px; margin-bottom:15px; }  
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
+      authDomain: "aura-battle-main.firebaseapp.com",
+      databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
+      projectId: "aura-battle-main",
+      storageBucket: "aura-battle-main.firebasestorage.app",
+      messagingSenderId: "763779990289",
+      appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
+      measurementId: "G-ZZXZ00HK07"
+    };
+    firebase.initializeApp(firebaseConfig);
 
-    input, button {  
-      width:90%; max-width:340px; padding:12px; margin:8px auto; display:block;  
-      border:none; border-radius:6px; font-size:15px;  
-    }  
-    input { background:#1a1a1a; color:#fff; }  
-    input::placeholder { color:#777; }  
-    button { background:red; color:#fff; font-weight:bold; cursor:pointer; }  
+    // EmailJS init
+    emailjs.init("Hn95Bh2Dkz54UUNZ0");
 
-    /* OTP */  
-    .otp-inputs { display:flex; justify-content:center; gap:8px; margin:20px 0; }  
-    .otp-inputs input { width:26px; height:34px; font-size:16px; text-align:center; border-radius:6px; } /* Smaller boxes */  
+    // Redirect if already logged in
+    if (localStorage.getItem("username")) {
+      window.location.href = "home.html";
+    }
 
-    /* Popup */  
-    .popup { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75);  
-      display:none; align-items:center; justify-content:center; z-index:1000; }  
-    .popup-content {  
-      background:#111; color:#fff; padding:22px; border-radius:10px; width:80%; max-width:320px;  
-      text-align:center; animation:fadeIn 0.25s ease;  
-    }  
-    .popup button { background:red; padding:8px 18px; border:none; margin-top:12px; border-radius:6px; }  
-    .loading { border:3px solid #333; border-top:3px solid red; border-radius:50%; width:32px; height:32px;  
-      margin:10px auto; animation:spin 1s linear infinite; }  
+    function login() {
+      const inputVal = document.getElementById("usernameEmail").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-    @keyframes spin {100%{transform:rotate(360deg)}}  
-    @keyframes fadeIn {from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}  
-  </style>  
-</head>  
-<body>  
-<header>  
-  <img src="logo.png" alt="Logo" style="width:150px; height:auto;"> 
-  <h1>Aura Battle</h1>  
-</header>  
+      if (!inputVal || !password) {
+        alert("Please enter username/email and password");
+        return;
+      }
 
-<!-- Page 1: Search -->  
-<div class="page active" id="searchPage">  
-  <h2>Reset your Password</h2>  
-  <input type="text" id="searchInput" placeholder="Enter Email or Mobile">  
-  <button onclick="sendOTP()">Verify Account</button>  
-</div>  
+      const db = firebase.database().ref("users");
 
-<!-- Page 2: OTP -->  
-<div class="page" id="otpPage">  
-  <h2>Enter OTP</h2>  
-  <div class="otp-inputs">  
-    <input maxlength="1" oninput="moveNext(this)">  
-    <input maxlength="1" oninput="moveNext(this)">  
-    <input maxlength="1" oninput="moveNext(this)">  
-    <input maxlength="1" oninput="moveNext(this)">  
-    <input maxlength="1" oninput="moveNext(this)">  
-    <input maxlength="1" oninput="moveNext(this)">  
-  </div>  
-  <button onclick="verifyOTP()">Verify OTP</button>  
-</div>  
+      db.once("value", (snapshot) => {
+        let found = false;
+        snapshot.forEach((child) => {
+          const user = child.val();
+          if ((user.username === inputVal || user.email === inputVal) && user.password === password) {
+            found = true;
+            localStorage.setItem("username", user.username);
+            window.location.href = "home.html";
+          }
+        });
+        if (!found) {
+          alert("Invalid username/email or password!");
+        }
+      });
+    }
 
-<!-- Page 3: Reset Password -->  
-<div class="page" id="resetPage">  
-  <h2>Set New Password</h2>  
-  <input type="password" id="newPass" placeholder="New Password">  
-  <input type="password" id="confirmPass" placeholder="Confirm Password">  
-  <button onclick="resetPassword()">Change Password</button>  
-</div>  
+    // Forgot password via EmailJS OTP
+    function forgotPassword() {
+      const email = prompt("Enter your registered email:");
+      if (!email) return;
 
-<!-- Popup -->  
-<div class="popup" id="popup">  
-  <div class="popup-content">  
-    <div class="loading" id="popupLoading"></div>  
-    <p id="popupText">Loading...</p>  
-    <button onclick="hidePopup()">OK</button>  
-  </div>  
-</div>  
+      const otp = Math.floor(100000 + Math.random() * 900000);
 
-<script type="module">  
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";  
-  import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";  
+      emailjs.send("service_jq0p0la", "template_galojrg", {
+        email: email,
+        user_name: email,
+        otp_code: otp
+      }).then(() => {
+        const userOtp = prompt("Enter the OTP sent to your email:");
+        if (userOtp == otp) {
+          alert("OTP Verified. You can now reset your password.");
+        } else {
+          alert("Invalid OTP.");
+        }
+      }, (err) => {
+        alert("Error sending OTP: " + JSON.stringify(err));
+      });
+    }
 
-  // Firebase config  
-  const firebaseConfig = {  
-    apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",  
-    authDomain: "aura-battle-main.firebaseapp.com",  
-    databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",  
-    projectId: "aura-battle-main",  
-    storageBucket: "aura-battle-main.firebasestorage.app",  
-    messagingSenderId: "763779990289",  
-    appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",  
-    measurementId: "G-ZZXZ00HK07"  
-  };  
-
-  const app = initializeApp(firebaseConfig);  
-  const db = getDatabase(app);  
-
-  // EmailJS init  
-  emailjs.init("Hn95Bh2Dkz54UUNZ0");  
-
-  let generatedOTP = "";  
-  let selectedUserId = "";  
-
-  function showPage(id) {  
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));  
-    document.getElementById(id).classList.add('active');  
-  }  
-
-  function showPopup(text, loading = false) {  
-    document.getElementById("popup").style.display = "flex";  
-    document.getElementById("popupText").innerText = text;  
-    document.getElementById("popupLoading").style.display = loading ? "block" : "none";  
-  }  
-  window.hidePopup = function(){ document.getElementById("popup").style.display = "none"; };  
-
-  // Send OTP  
-  window.sendOTP = async function() {  
-    let input = document.getElementById("searchInput").value.trim();  
-    if (!input) return showPopup("Enter Email or Mobile!");  
-
-    showPopup("Searching user...", true);  
-
-    try {  
-      const snapshot = await get(child(ref(db), "users"));  
-      let foundUser = null;  
-      snapshot.forEach(userSnap => {  
-        let u = userSnap.val();  
-        if (u.email === input || u.mobile_number === input) {  
-          foundUser = {id: userSnap.key, data: u};  
-        }  
-      });  
-
-      if (!foundUser) return showPopup("User not found!");  
-
-      selectedUserId = foundUser.id;  
-      let email = foundUser.data.email;  
-      let name = foundUser.data.name;  // ✅ get name from DB  
-      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();  
-
-      // Send Email  
-      await emailjs.send("service_jq0p0la", "template_galojrg", {  
-        user_name: name,        // ✅ use name instead of email  
-        otp_code: generatedOTP,  
-        email: email  
-      });  
-
-      showPopup("Check your email OTP and verify");  
-      setTimeout(()=>{ hidePopup(); showPage("otpPage"); }, 2000);  
-
-    } catch (err) {  
-      console.error(err);  
-      showPopup("Error sending OTP!");  
-    }  
-  }  
-
-  // OTP auto move  
-  window.moveNext = function(el) {  
-    if (el.value.length == 1 && el.nextElementSibling) el.nextElementSibling.focus();  
-  }  
-
-  // Verify OTP  
-  window.verifyOTP = function() {  
-    let inputs = document.querySelectorAll(".otp-inputs input");  
-    let entered = "";  
-    inputs.forEach(i=> entered += i.value);  
-    if (entered === generatedOTP) {  
-      showPopup("OTP Verified Successfully!");  
-      setTimeout(()=>{ hidePopup(); showPage("resetPage"); },1500);  
-    } else {  
-      showPopup("Invalid OTP!");  
-    }  
-  }  
-
-  // Reset Password  
-  window.resetPassword = async function() {  
-    let newPass = document.getElementById("newPass").value;  
-    let confirmPass = document.getElementById("confirmPass").value;  
-    if (!newPass || !confirmPass) return showPopup("Enter both passwords!");  
-    if (newPass !== confirmPass) return showPopup("Passwords do not match!");  
-
-    try {  
-      await update(ref(db, "users/" + selectedUserId), {  
-        password: newPass,  
-        updated_at: new Date().toISOString()  
-      });  
-      showPopup("Password Changed Successfully!");  
-      setTimeout(()=>{ hidePopup(); showPage("searchPage"); },2000);  
-    } catch (err) {  
-      console.error(err);  
-      showPopup("Error updating password!");  
-    }  
-  }  
-</script>  
-</body>  
+    // Logo long press (2 seconds) → show forgot password
+    const logo = document.getElementById("companyLogo");
+    let pressTimer;
+    logo.addEventListener("mousedown", function () {
+      pressTimer = setTimeout(() => {
+        document.getElementById("forgotBtn").style.display = "block";
+      }, 2000);
+    });
+    logo.addEventListener("mouseup", function () {
+      clearTimeout(pressTimer);
+    });
+    logo.addEventListener("mouseleave", function () {
+      clearTimeout(pressTimer);
+    });
+  </script>
+</body>
 </html>
