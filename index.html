@@ -1,173 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Login</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #141E30, #243B55);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-    }
-    .login-container {
-      background: rgba(0,0,0,0.7);
-      padding: 30px;
-      border-radius: 12px;
-      width: 350px;
-      text-align: center;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-    }
-    .logo {
-      width: 100px;
-      margin-bottom: 20px;
-      cursor: pointer;
-    }
-    h2 {
-      margin-bottom: 20px;
-    }
-    input {
-      width: 90%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #555;
-      background: #222;
-      color: #fff;
-    }
-    button {
-      width: 95%;
-      padding: 12px;
-      background: #ff4b2b;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    button:hover {
-      background: #ff1e00;
-    }
-    #forgotBtn {
-      display: none;
-      margin-top: 10px;
-      font-size: 14px;
-      color: #00d9ff;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Aura Battle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(220, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+            border: 1px solid #ffdddd;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            background: #d70000;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-title {
+            text-align: center;
+            color: #d70000;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a00000;
+            font-weight: 500;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #d70000;
+        }
+        
+        .input-with-icon input {
+            padding-left: 45px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ffdddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #d70000;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(215, 0, 0, 0.2);
+        }
+        
+        .btn {
+            background: #d70000;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #a00000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(215, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: #ffdddd;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #d70000;
+            font-size: 14px;
+        }
+        
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .error {
+            background: #fff0f0;
+            color: #d70000;
+            border: 1px solid #ffcccc;
+        }
+        
+        .success {
+            background: #f0fff0;
+            color: #00a000;
+            border: 1px solid #ccffcc;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .loader i {
+            font-size: 20px;
+            color: #d70000;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="login-container">
-    <img src="company-logo.png" alt="Company Logo" class="logo" id="companyLogo">
-    <h2>Admin Login</h2>
-    <input type="text" id="usernameEmail" placeholder="Username or Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <button id="forgotBtn" onclick="forgotPassword()">Forgot Password?</button>
-  </div>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-fire logo-icon"></i>
+                <span>AURA BATTLE ADMIN</span>
+            </div>
+        </div>
+        
+        <div class="form-container">
+            <h2 class="form-title">Admin Login</h2>
+            
+            <div id="errorMessage" class="message error">
+                <i class="fas fa-exclamation-circle"></i> Invalid email or password
+            </div>
+            
+            <div id="successMessage" class="message success">
+                <i class="fas fa-check-circle"></i> Login successful! Redirecting...
+            </div>
+            
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            
+            <div class="loader" id="loader">
+                <i class="fas fa-spinner"></i>
+            </div>
+            
+            <div class="divider">
+                <span>Secure Admin Access</span>
+            </div>
+        </div>
+    </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- Firebase App (core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
-  <!-- EmailJS -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-      authDomain: "aura-battle-main.firebaseapp.com",
-      databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-      projectId: "aura-battle-main",
-      storageBucket: "aura-battle-main.firebasestorage.app",
-      messagingSenderId: "763779990289",
-      appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
-      measurementId: "G-ZZXZ00HK07"
-    };
-    firebase.initializeApp(firebaseConfig);
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
+            authDomain: "aura-battle-main.firebaseapp.com",
+            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
+            projectId: "aura-battle-main",
+            storageBucket: "aura-battle-main.firebasestorage.app",
+            messagingSenderId: "763779990289",
+            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
+            measurementId: "G-ZZXZ00HK07"
+        };
 
-    // EmailJS init
-    emailjs.init("Hn95Bh2Dkz54UUNZ0");
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
-    // Redirect if already logged in
-    if (localStorage.getItem("username")) {
-      window.location.href = "home.html";
-    }
+        // DOM elements
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loader = document.getElementById('loader');
 
-    function login() {
-      const inputVal = document.getElementById("usernameEmail").value.trim();
-      const password = document.getElementById("password").value.trim();
-
-      if (!inputVal || !password) {
-        alert("Please enter username/email and password");
-        return;
-      }
-
-      const db = firebase.database().ref("users");
-
-      db.once("value", (snapshot) => {
-        let found = false;
-        snapshot.forEach((child) => {
-          const user = child.val();
-          if ((user.username === inputVal || user.email === inputVal) && user.password === password) {
-            found = true;
-            localStorage.setItem("username", user.username);
-            window.location.href = "home.html";
-          }
+        // Login function
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get values from form
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Show loader, hide any previous messages
+            loader.style.display = 'block';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Sign in with Firebase
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    
+                    // Get additional user info
+                    const userName = user.displayName || user.email;
+                    const userEmail = user.email;
+                    
+                    // Save user info to localStorage
+                    localStorage.setItem('adminUserName', userName);
+                    localStorage.setItem('adminUserEmail', userEmail);
+                    
+                    // Show success message
+                    successMessage.style.display = 'block';
+                    loader.style.display = 'none';
+                    
+                    // Redirect to home page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 2000);
+                })
+                .catch((error) => {
+                    // Handle errors
+                    const errorCode = error.code;
+                    const errorMessageText = error.message;
+                    
+                    // Show error message
+                    errorMessage.style.display = 'block';
+                    loader.style.display = 'none';
+                    
+                    console.error('Login error:', errorCode, errorMessageText);
+                });
         });
-        if (!found) {
-          alert("Invalid username/email or password!");
-        }
-      });
-    }
 
-    // Forgot password via EmailJS OTP
-    function forgotPassword() {
-      const email = prompt("Enter your registered email:");
-      if (!email) return;
-
-      const otp = Math.floor(100000 + Math.random() * 900000);
-
-      emailjs.send("service_jq0p0la", "template_galojrg", {
-        email: email,
-        user_name: email,
-        otp_code: otp
-      }).then(() => {
-        const userOtp = prompt("Enter the OTP sent to your email:");
-        if (userOtp == otp) {
-          alert("OTP Verified. You can now reset your password.");
-        } else {
-          alert("Invalid OTP.");
-        }
-      }, (err) => {
-        alert("Error sending OTP: " + JSON.stringify(err));
-      });
-    }
-
-    // Logo long press (2 seconds) → show forgot password
-    const logo = document.getElementById("companyLogo");
-    let pressTimer;
-    logo.addEventListener("mousedown", function () {
-      pressTimer = setTimeout(() => {
-        document.getElementById("forgotBtn").style.display = "block";
-      }, 2000);
-    });
-    logo.addEventListener("mouseup", function () {
-      clearTimeout(pressTimer);
-    });
-    logo.addEventListener("mouseleave", function () {
-      clearTimeout(pressTimer);
-    });
-  </script>
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, redirect to home page
+                window.location.href = 'home.html';
+            }
+        });
+    </script>
 </body>
 </html>
