@@ -1,648 +1,208 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 100%;
-            padding: 0 15px;
-            margin: 0 auto;
-        }
-        
-        /* Login Page */
-        .login-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-        }
-        
-        .login-form {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            width: 100%;
-            max-width: 400px;
-        }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        
-        .logo h1 {
-            font-weight: 700;
-            color: #4a6cf7;
-            font-size: 28px;
-        }
-        
-        .logo p {
-            color: #6c757d;
-            margin-top: 5px;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #495057;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: #4a6cf7;
-            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15);
-        }
-        
-        .btn {
-            padding: 14px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-        
-        .btn-primary {
-            background-color: #4a6cf7;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #3b5be3;
-        }
-        
-        .forgot-link {
-            text-align: center;
-            margin-top: 15px;
-        }
-        
-        .forgot-link a {
-            color: #4a6cf7;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        /* Dashboard */
-        .dashboard {
-            display: none;
-            min-height: 100vh;
-        }
-        
-        .header {
-            background-color: white;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-left h2 {
-            color: #4a6cf7;
-            font-size: 20px;
-        }
-        
-        .profile-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            object-fit: cover;
-            border: 2px solid #e2e8f0;
-        }
-        
-        .profile-menu {
-            display: none;
-            position: absolute;
-            top: 60px;
-            right: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            width: 200px;
-            overflow: hidden;
-            z-index: 101;
-        }
-        
-        .profile-menu a {
-            display: block;
-            padding: 12px 20px;
-            color: #495057;
-            text-decoration: none;
-            border-bottom: 1px solid #f1f3f4;
-            transition: all 0.3s ease;
-        }
-        
-        .profile-menu a:hover {
-            background-color: #f8f9fa;
-            color: #4a6cf7;
-        }
-        
-        .profile-menu a i {
-            margin-right: 10px;
-            width: 18px;
-        }
-        
-        .main-content {
-            padding: 20px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .card h3 {
-            color: #4a6cf7;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .redirect-options {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        
-        .redirect-btn {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #495057;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .redirect-btn:hover {
-            background: #eef2ff;
-            color: #4a6cf7;
-            transform: translateY(-2px);
-        }
-        
-        .redirect-btn i {
-            margin-right: 12px;
-            font-size: 18px;
-        }
-        
-        /* Settings Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background: white;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .modal-header h3 {
-            color: #4a6cf7;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            color: #6c757d;
-        }
-        
-        /* Forgot Password */
-        .forgot-container {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-        }
-        
-        .otp-input {
-            letter-spacing: 20px;
-            font-size: 24px;
-            padding: 10px;
-            text-align: center;
-            width: 100%;
-        }
-        
-        .countdown {
-            text-align: center;
-            margin: 15px 0;
-            color: #6c757d;
-            font-size: 14px;
-        }
-        
-        /* Responsive */
-        @media (min-width: 768px) {
-            .redirect-options {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Login Page -->
-    <div class="login-container" id="loginPage">
-        <form class="login-form" id="loginForm">
-            <div class="logo">
-                <h1><i class="fas fa-crown"></i> AuraBattle</h1>
-                <p>Admin Dashboard</p>
-            </div>
-            <div class="input-group">
-                <label for="username">Username or Email</label>
-                <input type="text" id="username" placeholder="Enter your username or email" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-            <div class="forgot-link">
-                <a href="#" id="forgotPassword">Forgot Password?</a>
-            </div>
-        </form>
-    </div>
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>Aura Battle - Reset Password</title>  
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>  
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>  
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>  
+  <style>  
+    body { margin:0; font-family:Arial, sans-serif; background:#000; color:#fff; text-align:center; }  
+    header { background:#111; padding:14px; display:flex; align-items:center; justify-content:center; position:relative; }  
+    header img { width:110px; position:absolute; left:12px; top:50%; transform:translateY(-50%); border-radius:14px; } /* Bigger logo */  
+    header h1 { font-size:22px; color:red; margin:0; }  
 
-    <!-- Forgot Password Page -->
-    <div class="forgot-container" id="forgotPage">
-        <form class="login-form" id="forgotForm">
-            <div class="logo">
-                <h1><i class="fas fa-key"></i> Reset Password</h1>
-                <p>Enter your email to receive OTP</p>
-            </div>
-            <div class="input-group">
-                <label for="recoveryEmail">Email Address</label>
-                <input type="email" id="recoveryEmail" placeholder="Enter your email" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Send OTP</button>
-            <div class="forgot-link">
-                <a href="#" id="backToLogin">Back to Login</a>
-            </div>
-        </form>
+    .page { display:none; padding:20px; }  
+    .active { display:block; }  
 
-        <form class="login-form" id="otpForm" style="display: none; margin-top: 20px;">
-            <div class="input-group">
-                <label for="otpCode">Enter OTP</label>
-                <input type="text" id="otpCode" class="otp-input" placeholder="000000" maxlength="6" required>
-            </div>
-            <div class="countdown" id="countdown">OTP expires in: 10:00</div>
-            <div class="input-group">
-                <label for="newPassword">New Password</label>
-                <input type="password" id="newPassword" placeholder="Enter new password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Reset Password</button>
-        </form>
-    </div>
+    h2 { color:#fff; font-size:18px; margin-bottom:15px; }  
 
-    <!-- Dashboard -->
-    <div class="dashboard" id="dashboard">
-        <div class="header">
-            <div class="header-left">
-                <h2>Admin Dashboard</h2>
-            </div>
-            <div class="header-right">
-                <img src="https://www.imghippo.com/i/00a001111.jpg" alt="Profile" class="profile-img" id="profileImage">
-            </div>
-        </div>
+    input, button {  
+      width:90%; max-width:340px; padding:12px; margin:8px auto; display:block;  
+      border:none; border-radius:6px; font-size:15px;  
+    }  
+    input { background:#1a1a1a; color:#fff; }  
+    input::placeholder { color:#777; }  
+    button { background:red; color:#fff; font-weight:bold; cursor:pointer; }  
 
-        <div class="profile-menu" id="profileMenu">
-            <a href="#"><i class="fas fa-user"></i> Profile</a>
-            <a href="#" id="settingsBtn"><i class="fas fa-cog"></i> Settings</a>
-            <a href="#"><i class="fas fa-question-circle"></i> Help</a>
-            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </div>
+    /* OTP */  
+    .otp-inputs { display:flex; justify-content:center; gap:8px; margin:20px 0; }  
+    .otp-inputs input { width:26px; height:34px; font-size:16px; text-align:center; border-radius:6px; } /* Smaller boxes */  
 
-        <div class="main-content">
-            <div class="card">
-                <h3>Quick Redirects</h3>
-                <div class="redirect-options">
-                    <a href="managecatagory.html" class="redirect-btn">
-                        <i class="fas fa-list"></i> Manage Tournament Category
-                    </a>
-                    <a href="ubdate.html" class="redirect-btn">
-                        <i class="fas fa-sync"></i> Update Control
-                    </a>
-                    <a href="maintenance.html" class="redirect-btn">
-                        <i class="fas fa-tools"></i> Maintenance Mode
-                    </a>
-                </div>
-            </div>
+    /* Popup */  
+    .popup { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75);  
+      display:none; align-items:center; justify-content:center; z-index:1000; }  
+    .popup-content {  
+      background:#111; color:#fff; padding:22px; border-radius:10px; width:80%; max-width:320px;  
+      text-align:center; animation:fadeIn 0.25s ease;  
+    }  
+    .popup button { background:red; padding:8px 18px; border:none; margin-top:12px; border-radius:6px; }  
+    .loading { border:3px solid #333; border-top:3px solid red; border-radius:50%; width:32px; height:32px;  
+      margin:10px auto; animation:spin 1s linear infinite; }  
 
-            <div class="card">
-                <h3>Recent Activity</h3>
-                <p>No recent activity</p>
-            </div>
+    @keyframes spin {100%{transform:rotate(360deg)}}  
+    @keyframes fadeIn {from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}  
+  </style>  
+</head>  
+<body>  
+<header>  
+  <img src="logo.png" alt="Aura Battle Logo">  
+  <h1>Aura Battle</h1>  
+</header>  
 
-            <div class="card">
-                <h3>System Status</h3>
-                <p>All systems operational</p>
-            </div>
-        </div>
-    </div>
+<!-- Page 1: Search -->  
+<div class="page active" id="searchPage">  
+  <h2>Reset your Password</h2>  
+  <input type="text" id="searchInput" placeholder="Enter Email or Mobile">  
+  <button onclick="sendOTP()">Verify Account</button>  
+</div>  
 
-    <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Account Settings</h3>
-                <button class="close-btn" id="closeModal">&times;</button>
-            </div>
-            <form id="settingsForm">
-                <div class="input-group">
-                    <label for="profilePicture">Profile Picture</label>
-                    <input type="file" id="profilePicture" accept="image/*">
-                </div>
-                <div class="input-group">
-                    <label for="currentEmail">Current Email</label>
-                    <input type="email" id="currentEmail" value="admin@example.com" disabled>
-                </div>
-                <div class="input-group">
-                    <label for="newEmail">New Email</label>
-                    <input type="email" id="newEmail" placeholder="Enter new email">
-                </div>
-                <div class="input-group">
-                    <label for="currentUsername">Current Username</label>
-                    <input type="text" id="currentUsername" value="admin" disabled>
-                </div>
-                <div class="input-group">
-                    <label for="newUsername">New Username</label>
-                    <input type="text" id="newUsername" placeholder="Enter new username">
-                </div>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-            </form>
-        </div>
-    </div>
+<!-- Page 2: OTP -->  
+<div class="page" id="otpPage">  
+  <h2>Enter OTP</h2>  
+  <div class="otp-inputs">  
+    <input maxlength="1" oninput="moveNext(this)">  
+    <input maxlength="1" oninput="moveNext(this)">  
+    <input maxlength="1" oninput="moveNext(this)">  
+    <input maxlength="1" oninput="moveNext(this)">  
+    <input maxlength="1" oninput="moveNext(this)">  
+    <input maxlength="1" oninput="moveNext(this)">  
+  </div>  
+  <button onclick="verifyOTP()">Verify OTP</button>  
+</div>  
 
-    <!-- Firebase App and Realtime Database -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    
-    <!-- EmailJS -->
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
-    
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-            authDomain: "aura-battle-main.firebaseapp.com",
-            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-            projectId: "aura-battle-main",
-            storageBucket: "aura-battle-main.firebasestorage.app",
-            messagingSenderId: "763779990289",
-            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
-            measurementId: "G-ZZXZ00HK07"
-        };
+<!-- Page 3: Reset Password -->  
+<div class="page" id="resetPage">  
+  <h2>Set New Password</h2>  
+  <input type="password" id="newPass" placeholder="New Password">  
+  <input type="password" id="confirmPass" placeholder="Confirm Password">  
+  <button onclick="resetPassword()">Change Password</button>  
+</div>  
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+<!-- Popup -->  
+<div class="popup" id="popup">  
+  <div class="popup-content">  
+    <div class="loading" id="popupLoading"></div>  
+    <p id="popupText">Loading...</p>  
+    <button onclick="hidePopup()">OK</button>  
+  </div>  
+</div>  
 
-        // Initialize EmailJS
-        emailjs.init("Hn95Bh2Dkz54UUNZ0");
+<script type="module">  
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";  
+  import { getDatabase, ref, get, child, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";  
 
-        // DOM Elements
-        const loginPage = document.getElementById('loginPage');
-        const forgotPage = document.getElementById('forgotPage');
-        const dashboard = document.getElementById('dashboard');
-        const loginForm = document.getElementById('loginForm');
-        const forgotForm = document.getElementById('forgotForm');
-        const otpForm = document.getElementById('otpForm');
-        const profileImage = document.getElementById('profileImage');
-        const profileMenu = document.getElementById('profileMenu');
-        const settingsBtn = document.getElementById('settingsBtn');
-        const settingsModal = document.getElementById('settingsModal');
-        const closeModal = document.getElementById('closeModal');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const backToLogin = document.getElementById('backToLogin');
-        const forgotPassword = document.getElementById('forgotPassword');
-        const countdown = document.getElementById('countdown');
+  // Firebase config  
+  const firebaseConfig = {  
+    apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",  
+    authDomain: "aura-battle-main.firebaseapp.com",  
+    databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",  
+    projectId: "aura-battle-main",  
+    storageBucket: "aura-battle-main.firebasestorage.app",  
+    messagingSenderId: "763779990289",  
+    appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",  
+    measurementId: "G-ZZXZ00HK07"  
+  };  
 
-        // Event Listeners
-        loginForm.addEventListener('submit', handleLogin);
-        forgotForm.addEventListener('submit', handleForgotPassword);
-        otpForm.addEventListener('submit', handleOtpSubmit);
-        profileImage.addEventListener('click', toggleProfileMenu);
-        settingsBtn.addEventListener('click', openSettingsModal);
-        closeModal.addEventListener('click', closeSettingsModal);
-        logoutBtn.addEventListener('click', handleLogout);
-        backToLogin.addEventListener('click', goBackToLogin);
-        forgotPassword.addEventListener('click', showForgotPassword);
+  const app = initializeApp(firebaseConfig);  
+  const db = getDatabase(app);  
 
-        // Auto-logout timer
-        let logoutTimer;
+  // EmailJS init  
+  emailjs.init("Hn95Bh2Dkz54UUNZ0");  
 
-        function startLogoutTimer() {
-            clearTimeout(logoutTimer);
-            logoutTimer = setTimeout(() => {
-                alert('Session expired. You have been logged out for security reasons.');
-                handleLogout();
-            }, 10 * 60 * 1000); // 10 minutes
-        }
+  let generatedOTP = "";  
+  let selectedUserId = "";  
 
-        function resetLogoutTimer() {
-            startLogoutTimer();
-        }
+  function showPage(id) {  
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));  
+    document.getElementById(id).classList.add('active');  
+  }  
 
-        // Login handler
-        function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            // In a real implementation, you would check against Firebase Realtime Database
-            // This is a simplified version for demonstration
-            database.ref('admins').once('value')
-                .then((snapshot) => {
-                    const admins = snapshot.val();
-                    let authenticated = false;
-                    
-                    for (let key in admins) {
-                        if ((admins[key].username === username || admins[key].email === username) && 
-                            admins[key].password === password) {
-                            authenticated = true;
-                            break;
-                        }
-                    }
-                    
-                    if (authenticated) {
-                        loginPage.style.display = 'none';
-                        dashboard.style.display = 'block';
-                        startLogoutTimer();
-                    } else {
-                        alert('Invalid username/email or password');
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error fetching admin data:', error);
-                    alert('Login failed. Please try again later.');
-                });
-        }
+  function showPopup(text, loading = false) {  
+    document.getElementById("popup").style.display = "flex";  
+    document.getElementById("popupText").innerText = text;  
+    document.getElementById("popupLoading").style.display = loading ? "block" : "none";  
+  }  
+  window.hidePopup = function(){ document.getElementById("popup").style.display = "none"; };  
 
-        // Forgot password handler
-        function handleForgotPassword(e) {
-            e.preventDefault();
-            const email = document.getElementById('recoveryEmail').value;
-            
-            // In a real implementation, you would check if email exists in database
-            // Then send OTP via EmailJS
-            const otp = Math.floor(100000 + Math.random() * 900000).toString();
-            
-            const templateParams = {
-                to_email: email,
-                otp: otp
-            };
-            
-            emailjs.send('service_3597yeb', 'template_galojrg', templateParams)
-                .then((response) => {
-                    console.log('OTP sent successfully!', response.status, response.text);
-                    forgotForm.style.display = 'none';
-                    otpForm.style.display = 'block';
-                    
-                    // Start OTP countdown
-                    let timeLeft = 600; // 10 minutes in seconds
-                    const countdownInterval = setInterval(() => {
-                        if (timeLeft <= 0) {
-                            clearInterval(countdownInterval);
-                            countdown.textContent = 'OTP has expired';
-                        } else {
-                            const minutes = Math.floor(timeLeft / 60);
-                            const seconds = timeLeft % 60;
-                            countdown.textContent = `OTP expires in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                            timeLeft--;
-                        }
-                    }, 1000);
-                })
-                .catch((error) => {
-                    console.error('Failed to send OTP:', error);
-                    alert('Failed to send OTP. Please try again.');
-                });
-        }
+  // Send OTP  
+  window.sendOTP = async function() {  
+    let input = document.getElementById("searchInput").value.trim();  
+    if (!input) return showPopup("Enter Email or Mobile!");  
 
-        // OTP submission handler
-        function handleOtpSubmit(e) {
-            e.preventDefault();
-            const otp = document.getElementById('otpCode').value;
-            const newPassword = document.getElementById('newPassword').value;
-            
-            // In a real implementation, you would verify OTP and update password in database
-            alert('Password reset successfully!');
-            goBackToLogin();
-        }
+    showPopup("Searching user...", true);  
 
-        // Profile menu toggle
-        function toggleProfileMenu() {
-            profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
-        }
+    try {  
+      const snapshot = await get(child(ref(db), "users"));  
+      let foundUser = null;  
+      snapshot.forEach(userSnap => {  
+        let u = userSnap.val();  
+        if (u.email === input || u.mobile_number === input) {  
+          foundUser = {id: userSnap.key, data: u};  
+        }  
+      });  
 
-        // Settings modal
-        function openSettingsModal() {
-            settingsModal.style.display = 'flex';
-            profileMenu.style.display = 'none';
-        }
+      if (!foundUser) return showPopup("User not found!");  
 
-        function closeSettingsModal() {
-            settingsModal.style.display = 'none';
-        }
+      selectedUserId = foundUser.id;  
+      let email = foundUser.data.email;  
+      let name = foundUser.data.name;  // ✅ get name from DB  
+      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();  
 
-        // Logout handler
-        function handleLogout() {
-            clearTimeout(logoutTimer);
-            dashboard.style.display = 'none';
-            loginPage.style.display = 'flex';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-        }
+      // Send Email  
+      await emailjs.send("service_jq0p0la", "template_galojrg", {  
+        user_name: name,        // ✅ use name instead of email  
+        otp_code: generatedOTP,  
+        email: email  
+      });  
 
-        // Navigation functions
-        function showForgotPassword() {
-            loginPage.style.display = 'none';
-            forgotPage.style.display = 'flex';
-        }
+      showPopup("Check your email OTP and verify");  
+      setTimeout(()=>{ hidePopup(); showPage("otpPage"); }, 2000);  
 
-        function goBackToLogin() {
-            forgotPage.style.display = 'none';
-            loginPage.style.display = 'flex';
-            otpForm.style.display = 'none';
-            forgotForm.style.display = 'block';
-            document.getElementById('recoveryEmail').value = '';
-        }
+    } catch (err) {  
+      console.error(err);  
+      showPopup("Error sending OTP!");  
+    }  
+  }  
 
-        // Close profile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!profileImage.contains(e.target) && !profileMenu.contains(e.target)) {
-                profileMenu.style.display = 'none';
-            }
-        });
+  // OTP auto move  
+  window.moveNext = function(el) {  
+    if (el.value.length == 1 && el.nextElementSibling) el.nextElementSibling.focus();  
+  }  
 
-        // Reset logout timer on user activity
-        document.addEventListener('mousedown', resetLogoutTimer);
-        document.addEventListener('keypress', resetLogoutTimer);
-        document.addEventListener('touchstart', resetLogoutTimer);
-    </script>
-</body>
+  // Verify OTP  
+  window.verifyOTP = function() {  
+    let inputs = document.querySelectorAll(".otp-inputs input");  
+    let entered = "";  
+    inputs.forEach(i=> entered += i.value);  
+    if (entered === generatedOTP) {  
+      showPopup("OTP Verified Successfully!");  
+      setTimeout(()=>{ hidePopup(); showPage("resetPage"); },1500);  
+    } else {  
+      showPopup("Invalid OTP!");  
+    }  
+  }  
+
+  // Reset Password  
+  window.resetPassword = async function() {  
+    let newPass = document.getElementById("newPass").value;  
+    let confirmPass = document.getElementById("confirmPass").value;  
+    if (!newPass || !confirmPass) return showPopup("Enter both passwords!");  
+    if (newPass !== confirmPass) return showPopup("Passwords do not match!");  
+
+    try {  
+      await update(ref(db, "users/" + selectedUserId), {  
+        password: newPass,  
+        updated_at: new Date().toISOString()  
+      });  
+      showPopup("Password Changed Successfully!");  
+      setTimeout(()=>{ hidePopup(); showPage("searchPage"); },2000);  
+    } catch (err) {  
+      console.error(err);  
+      showPopup("Error updating password!");  
+    }  
+  }  
+</script>  
+</body>  
 </html>
