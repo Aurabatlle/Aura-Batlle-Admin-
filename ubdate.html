@@ -6,78 +6,159 @@
     <title>Aura Battle - Update Control</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #bb86fc;
-            --primary-variant: #3700b3;
-            --secondary-color: #03dac6;
-            --background-color: #121212;
-            --surface-color: #1e1e1e;
-            --error-color: #cf6679;
-            --on-primary: #000000;
-            --on-secondary: #000000;
-            --on-background: #ffffff;
-            --on-surface: #ffffff;
-            --on-error: #000000;
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #fca311;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
         
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             font-family: 'Roboto', sans-serif;
         }
         
         body {
-            background-color: var(--background-color);
-            color: var(--on-background);
+            background-color: #f5f7fb;
+            color: var(--dark);
             line-height: 1.6;
             padding: 20px;
+            min-height: 100vh;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
-            background-color: var(--surface-color);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
-        h1 {
-            text-align: center;
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo img {
+            height: 40px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            color: var(--primary-color);
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
         }
         
-        input, textarea {
+        input, textarea, select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            background-color: #2c2c2c;
-            color: var(--on-surface);
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            color: var(--dark);
+            background: var(--white);
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
         }
         
         textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
         }
         
         .checkbox-group {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .checkbox-group input {
@@ -85,84 +166,216 @@
             margin-right: 10px;
         }
         
-        button {
-            background-color: var(--primary-color);
-            color: var(--on-primary);
+        .btn {
+            padding: 12px 24px;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 10px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        button:hover {
-            background-color: var(--primary-variant);
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--white);
+        }
+        
+        .btn-danger {
+            background: var(--accent);
+            color: var(--white);
+        }
+        
+        .btn-danger:hover {
+            background: #d90429;
         }
         
         .status {
             margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 12px 16px;
+            border-radius: 8px;
             text-align: center;
+            font-weight: 500;
         }
         
         .success {
-            background-color: #2e7d32;
-            color: white;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
         
         .error {
-            background-color: var(--error-color);
-            color: white;
-        }
-        
-        .login-form {
-            max-width: 400px;
-            margin: 100px auto;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
         
         .hidden {
             display: none;
         }
+        
+        .access-denied {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .access-denied i {
+            font-size: 64px;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        
+        .access-denied h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .access-denied p {
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+        
+        .logout-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+        
+        .current-config {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .config-item:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container login-form" id="loginForm">
-        <h1>Admin Login</h1>
-        <div class="form-group">
-            <label for="adminKey">Admin Key</label>
-            <input type="password" id="adminKey" placeholder="Enter admin key">
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-shield-alt fa-2x" style="color: #4361ee;"></i>
+                <h1>Aura Battle Admin</h1>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div id="userName">Admin User</div>
+                    <div id="userRole" style="font-size: 12px; color: var(--gray);">Administrator</div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </header>
+        
+        <div id="accessDenied" class="access-denied hidden">
+            <i class="fas fa-exclamation-circle"></i>
+            <h2>Access Denied</h2>
+            <p>You need to log in as an administrator to access this page.</p>
+            <button class="btn btn-primary" onclick="window.location.href='admin-login.html'">Go to Login</button>
         </div>
-        <button onclick="checkAdminAccess()">Login</button>
-        <div id="loginStatus" class="status hidden"></div>
-    </div>
-
-    <div class="container hidden" id="updateControlForm">
-        <h1>Update Configuration</h1>
-        <div class="form-group">
-            <label for="minimumVersion">Minimum Version Code</label>
-            <input type="number" id="minimumVersion" min="1">
+        
+        <div id="adminContent">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Update Configuration</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="minimumVersion">Minimum Version Code</label>
+                    <input type="number" id="minimumVersion" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="currentVersion">Current Version Name</label>
+                    <input type="text" id="currentVersion" placeholder="e.g., 1.2.0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="updateMessage">Update Message</label>
+                    <textarea id="updateMessage" placeholder="Message to show users"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="updateLink">Update Link</label>
+                    <input type="url" id="updateLink" placeholder="https://play.google.com/...">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="forceUpdate">
+                    <label for="forceUpdate">Force Update</label>
+                </div>
+                
+                <button class="btn btn-primary" onclick="saveUpdateConfig()">
+                    <i class="fas fa-save"></i> Save Update Configuration
+                </button>
+                
+                <div id="updateStatus" class="status hidden"></div>
+                
+                <div class="current-config">
+                    <h3>Current Configuration</h3>
+                    <div class="config-item">
+                        <span>Minimum Version:</span>
+                        <span id="currentMinVersion">Loading...</span>
+                    </div>
+                    <div class="config-item">
+                        <span>Current Version:</span>
+                        <span id="currentVersionName">Loading...</span>
+                    </div>
+                    <div class="config-item">
+                        <span>Force Update:</span>
+                        <span id="currentForceUpdate">Loading...</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="currentVersion">Current Version Name</label>
-            <input type="text" id="currentVersion" placeholder="e.g., 1.2.0">
-        </div>
-        <div class="form-group">
-            <label for="updateMessage">Update Message</label>
-            <textarea id="updateMessage" placeholder="Message to show users"></textarea>
-        </div>
-        <div class="form-group">
-            <label for="updateLink">Update Link</label>
-            <input type="url" id="updateLink" placeholder="https://play.google.com/...">
-        </div>
-        <div class="checkbox-group">
-            <input type="checkbox" id="forceUpdate">
-            <label for="forceUpdate">Force Update</label>
-        </div>
-        <button onclick="saveUpdateConfig()">Save Update Configuration</button>
-        <div id="updateStatus" class="status hidden"></div>
     </div>
 
     <script>
@@ -181,51 +394,29 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
-        // Check if admin key is stored locally
-        function checkStoredAdminAccess() {
-            const storedKey = localStorage.getItem('adminKey');
-            if (storedKey) {
-                verifyAdminKey(storedKey);
-            }
-        }
-        
-        // Verify admin key against Firebase
-        function verifyAdminKey(key) {
-            database.ref('maintenanceConfig/adminKey').once('value')
-                .then((snapshot) => {
-                    const adminKey = snapshot.val();
-                    if (key === adminKey) {
-                        showUpdateControl();
-                    } else {
-                        showLoginError('Invalid admin key');
-                        localStorage.removeItem('adminKey');
-                    }
-                })
-                .catch((error) => {
-                    showLoginError('Error verifying admin key: ' + error.message);
-                });
-        }
-        
-        // Check admin access on login button click
-        function checkAdminAccess() {
-            const adminKey = document.getElementById('adminKey').value;
-            if (!adminKey) {
-                showLoginError('Please enter an admin key');
-                return;
-            }
-            
-            verifyAdminKey(adminKey);
-        }
-        
-        // Show update control form
-        function showUpdateControl() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('updateControlForm').classList.remove('hidden');
+        // Check admin access on page load
+        window.onload = function() {
+            checkAdminAccess();
             loadUpdateConfig();
+        };
+        
+        // Check if user has admin access
+        function checkAdminAccess() {
+            const adminRole = localStorage.getItem('adminRole');
+            const adminUsername = localStorage.getItem('adminUsername');
             
-            // Store the admin key for future use
-            const adminKey = document.getElementById('adminKey').value;
-            localStorage.setItem('adminKey', adminKey);
+            if (adminRole && adminUsername) {
+                // User is logged in as admin
+                document.getElementById('userName').textContent = adminUsername;
+                document.getElementById('userRole').textContent = adminRole;
+                document.getElementById('userAvatar').textContent = adminUsername.charAt(0).toUpperCase();
+                document.getElementById('adminContent').classList.remove('hidden');
+                document.getElementById('accessDenied').classList.add('hidden');
+            } else {
+                // User is not logged in as admin
+                document.getElementById('adminContent').classList.add('hidden');
+                document.getElementById('accessDenied').classList.remove('hidden');
+            }
         }
         
         // Load existing update configuration
@@ -239,6 +430,11 @@
                         document.getElementById('updateMessage').value = config.updateMessage || '';
                         document.getElementById('updateLink').value = config.updateLink || '';
                         document.getElementById('forceUpdate').checked = config.forceUpdate || false;
+                        
+                        // Update current config display
+                        document.getElementById('currentMinVersion').textContent = config.minimumVersion || 'Not set';
+                        document.getElementById('currentVersionName').textContent = config.currentVersion || 'Not set';
+                        document.getElementById('currentForceUpdate').textContent = config.forceUpdate ? 'Yes' : 'No';
                     }
                 })
                 .catch((error) => {
@@ -259,18 +455,14 @@
             database.ref('updateConfig').set(updateConfig)
                 .then(() => {
                     showUpdateStatus('Update configuration saved successfully!', 'success');
+                    // Update current config display
+                    document.getElementById('currentMinVersion').textContent = updateConfig.minimumVersion;
+                    document.getElementById('currentVersionName').textContent = updateConfig.currentVersion || 'Not set';
+                    document.getElementById('currentForceUpdate').textContent = updateConfig.forceUpdate ? 'Yes' : 'No';
                 })
                 .catch((error) => {
                     showUpdateStatus('Error saving configuration: ' + error.message, 'error');
                 });
-        }
-        
-        // Show login error
-        function showLoginError(message) {
-            const statusElement = document.getElementById('loginStatus');
-            statusElement.textContent = message;
-            statusElement.className = 'status error';
-            statusElement.classList.remove('hidden');
         }
         
         // Show update status
@@ -286,8 +478,14 @@
             }, 3000);
         }
         
-        // Check for stored admin access on page load
-        window.onload = checkStoredAdminAccess;
+        // Logout function
+        function logout() {
+            localStorage.removeItem('adminRole');
+            localStorage.removeItem('adminUsername');
+            localStorage.removeItem('adminEmail');
+            localStorage.removeItem('loginTime');
+            window.location.href = 'admin-login.html';
+        }
     </script>
 </body>
 </html>
