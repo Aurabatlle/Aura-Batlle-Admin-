@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Control - Aura Battle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --danger: #e63946;
+            --warning: #fca311;
+            --gray: #6c757d;
+            --white: #ffffff;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 22px;
+            color: var(--primary);
+        }
+        
+        .back-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Content Area */
+        .content {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .page-title i {
+            color: var(--primary);
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--white);
+        }
+        
+        /* Alert Styles */
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        /* Login prompt */
+        .login-prompt {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .login-prompt i {
+            font-size: 60px;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .login-prompt h2 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .login-prompt p {
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+        
+        /* Loader */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* API Status */
+        .api-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        
+        .api-status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .api-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Mobile-first responsive styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header-left {
+                margin-bottom: 10px;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .back-btn {
+                margin-top: 10px;
+            }
+        }
+    </style>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo">
+                        <img src="https://via.placeholder.com/40" alt="Company Logo">
+                        <h1>Aura Battle Admin</h1>
+                    </div>
+                </div>
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div id="updateContent" style="display: none;">
+            <div class="content">
+                <h2 class="page-title"><i class="fas fa-sync-alt"></i> Update Version Control</h2>
+                
+                <!-- API Status Indicator -->
+                <div class="api-status" id="apiStatus"></div>
+                
+                <div class="alert alert-success" id="updateSuccess"></div>
+                <div class="alert alert-danger" id="updateError"></div>
+                
+                <form id="updateForm">
+                    <div class="form-group">
+                        <label for="currentVersion">Current Version</label>
+                        <input type="text" class="form-control" id="currentVersion" placeholder="e.g., 1.2.0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="minimumVersion">Minimum Required Version</label>
+                        <input type="number" class="form-control" id="minimumVersion" placeholder="e.g., 2">
+                        <small>Users with versions below this will be forced to update</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateMessage">Update Message</label>
+                        <textarea class="form-control" id="updateMessage" rows="3" placeholder="Message to show to users"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateLink">Update Link</label>
+                        <input type="url" class="form-control" id="updateLink" placeholder="https://play.google.com/store/apps/details?id=com.aura.battle">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="forceUpdate">
+                        <label for="forceUpdate">Force Update</label>
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" id="saveUpdateBtn">Save Update Configuration</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="loginPrompt" class="login-prompt">
+            <i class="fas fa-lock"></i>
+            <h2>Authentication Required</h2>
+            <p>Please login to access the update control panel</p>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">Go to Login</button>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
+            authDomain: "aura-battle-main.firebaseapp.com",
+            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
+            projectId: "aura-battle-main",
+            storageBucket: "aura-battle-main.firebasestorage.app",
+            messagingSenderId: "763779990289",
+            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
+            measurementId: "G-ZZXZ00HK07"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // DOM Elements
+        const updateContent = document.getElementById('updateContent');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const saveUpdateBtn = document.getElementById('saveUpdateBtn');
+        
+        // Check if user is logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const adminRole = localStorage.getItem('adminRole');
+            const adminUsername = localStorage.getItem('adminUsername');
+            const adminEmail = localStorage.getItem('adminEmail');
+            const loginTime = localStorage.getItem('loginTime');
+            const currentTime = new Date().getTime();
+            
+            // If user was logged in less than 10 minutes ago
+            if (adminRole && adminUsername && loginTime && (currentTime - parseInt(loginTime)) < 600000) {
+                // Verify admin still exists in database
+                verifyAdminInDatabase(adminUsername, adminEmail);
+                loadUpdateConfig();
+            } else {
+                showLoginPrompt();
+            }
+        });
+        
+        // Go back to dashboard
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+        
+        // Show API status
+        function showApiStatus(message, type) {
+            const apiStatus = document.getElementById('apiStatus');
+            apiStatus.textContent = message;
+            apiStatus.className = `api-status ${type}`;
+            apiStatus.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                apiStatus.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Verify admin exists in database
+        function verifyAdminInDatabase(username, email) {
+            const adminsRef = database.ref('admins');
+            
+            adminsRef.once('value')
+                .then(snapshot => {
+                    let adminFound = false;
+                    
+                    snapshot.forEach(childSnapshot => {
+                        const admin = childSnapshot.val();
+                        
+                        // Check if username/email matches
+                        if (admin.username === username || admin.email === email) {
+                            adminFound = true;
+                            return true;
+                        }
+                    });
+                    
+                    if (adminFound) {
+                        showUpdateContent();
+                    } else {
+                        showLoginPrompt();
+                    }
+                })
+                .catch(error => {
+                    console.error('Database error:', error);
+                    showLoginPrompt();
+                });
+        }
+        
+        // Show update content
+        function showUpdateContent() {
+            updateContent.style.display = 'block';
+            loginPrompt.style.display = 'none';
+        }
+        
+        // Show login prompt
+        function showLoginPrompt() {
+            updateContent.style.display = 'none';
+            loginPrompt.style.display = 'block';
+            
+            // Clear localStorage
+            localStorage.removeItem('adminRole');
+            localStorage.removeItem('adminUsername');
+            localStorage.removeItem('adminEmail');
+            localStorage.removeItem('loginTime');
+        }
+        
+        // Load update configuration from Firebase
+        function loadUpdateConfig() {
+            const updateConfigRef = database.ref('updateConfig');
+            
+            updateConfigRef.once('value')
+                .then(snapshot => {
+                    const updateConfig = snapshot.val();
+                    
+                    if (updateConfig) {
+                        document.getElementById('currentVersion').value = updateConfig.currentVersion || '';
+                        document.getElementById('minimumVersion').value = updateConfig.minimumVersion || '';
+                        document.getElementById('updateMessage').value = updateConfig.updateMessage || '';
+                        document.getElementById('updateLink').value = updateConfig.updateLink || '';
+                        document.getElementById('forceUpdate').checked = updateConfig.forceUpdate || false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading update config:', error);
+                    showAlert('updateError', 'Failed to load update configuration');
+                });
+        }
+        
+        // Save update configuration to Firebase
+        saveUpdateBtn.addEventListener('click', function() {
+            const currentVersion = document.getElementById('currentVersion').value.trim();
+            const minimumVersion = document.getElementById('minimumVersion').value.trim();
+            const updateMessage = document.getElementById('updateMessage').value.trim();
+            const updateLink = document.getElementById('updateLink').value.trim();
+            const forceUpdate = document.getElementById('forceUpdate').checked;
+            
+            if (!currentVersion || !minimumVersion || !updateMessage || !updateLink) {
+                showAlert('updateError', 'Please fill in all fields');
+                return;
+            }
+            
+            // Show loading state
+            const originalText = this.innerHTML;
+            this.innerHTML = 'Saving... <div class="loader"></div>';
+            this.disabled = true;
+            
+            // Prepare update config
+            const updateConfig = {
+                currentVersion,
+                minimumVersion: parseInt(minimumVersion),
+                updateMessage,
+                updateLink,
+                forceUpdate
+            };
+            
+            // Save to Firebase
+            const updateConfigRef = database.ref('updateConfig');
+            updateConfigRef.set(updateConfig)
+                .then(() => {
+                    showAlert('updateSuccess', 'Update configuration saved successfully!');
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error saving update config:', error);
+                    showAlert('updateError', 'Failed to save update configuration: ' + error.message);
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                });
+        });
+        
+        // Helper function to show alerts
+        function showAlert(elementId, message) {
+            const alertElement = document.getElementById(elementId);
+            alertElement.textContent = message;
+            alertElement.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
