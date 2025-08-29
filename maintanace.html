@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Battle - Update Management</title>
+    <title>Aura Battle - Version Update Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -293,6 +293,28 @@
             font-size: 14px;
         }
         
+        .version-test {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .test-btn {
+            padding: 8px 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -308,6 +330,10 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            
+            .test-controls {
+                flex-direction: column;
+            }
         }
     </style>
     <!-- Firebase App (the core Firebase SDK) -->
@@ -320,7 +346,7 @@
         <div class="header">
             <div class="logo">
                 <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo">
-                <h1>Aura Battle - Update Management</h1>
+                <h1>Aura Battle - Version Update Management</h1>
             </div>
             <div class="user-info">
                 <span id="adminUsername">Admin User</span>
@@ -334,27 +360,37 @@
         <div class="dashboard">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Update Configuration</div>
+                    <div class="card-title">Version Configuration</div>
                     <div class="card-icon">
-                        <i class="fas fa-sync-alt"></i>
+                        <i class="fas fa-code-branch"></i>
                     </div>
                 </div>
                 
                 <div class="version-info">
-                    <p><strong>Current App Version:</strong> 1.9 (code: 9)</p>
-                    <p><strong>Next Version:</strong> 2.0 (code: 10)</p>
-                    <p><strong>Version Logic:</strong> If user's version code is less than Minimum Version Code, update will be required</p>
+                    <p><strong>Version Logic:</strong> Update will be required if user's version code is less than Minimum Version Code</p>
+                    <p><strong>Version Name:</strong> Human-readable version (e.g., 2.0.1)</p>
+                    <p><strong>Version Code:</strong> Numeric value used for comparison (e.g., 10)</p>
                 </div>
                 
                 <div class="form-group">
-                    <label for="minVersion">Minimum Version Code</label>
-                    <input type="number" class="form-control" id="minVersion" placeholder="e.g., 10">
-                    <small>Set to 10 to require update from version 1.9 to 2.0</small>
+                    <label for="versionName">Version Name</label>
+                    <input type="text" class="form-control" id="versionName" placeholder="e.g., 2.0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="versionCode">Version Code</label>
+                    <input type="number" class="form-control" id="versionCode" placeholder="e.g., 10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="minVersionCode">Minimum Version Code</label>
+                    <input type="number" class="form-control" id="minVersionCode" placeholder="e.g., 9">
+                    <small>Users with version code less than this will be prompted to update</small>
                 </div>
                 
                 <div class="form-group">
                     <label for="updateMessage">Update Message</label>
-                    <textarea class="form-control" id="updateMessage" rows="3" placeholder="Message shown to users">Version 2.0 is available with new features!</textarea>
+                    <textarea class="form-control" id="updateMessage" rows="3" placeholder="Message shown to users">A new version is available with exciting new features and improvements!</textarea>
                 </div>
                 
                 <div class="form-group">
@@ -362,13 +398,21 @@
                     <input type="url" class="form-control" id="updateLink" placeholder="https://play.google.com/store/apps/details?id=com.aura.battle" value="https://play.google.com/store/apps/details?id=com.aura.battle">
                 </div>
                 
-                <button class="btn btn-primary" id="saveUpdateConfig">Save Update Configuration</button>
+                <button class="btn btn-primary" id="saveVersionConfig">Save Version Configuration</button>
                 
-                <div class="current-config" id="currentUpdateConfig">
+                <div class="current-config" id="currentVersionConfig">
                     <h4>Current Configuration:</h4>
                     <div class="config-item">
+                        <span>Version Name:</span>
+                        <span id="currentVersionName">Not set</span>
+                    </div>
+                    <div class="config-item">
+                        <span>Version Code:</span>
+                        <span id="currentVersionCode">Not set</span>
+                    </div>
+                    <div class="config-item">
                         <span>Minimum Version Code:</span>
-                        <span id="currentMinVersion">Not set</span>
+                        <span id="currentMinVersionCode">Not set</span>
                     </div>
                     <div class="config-item">
                         <span>Update Message:</span>
@@ -379,52 +423,42 @@
                         <span id="currentUpdateLink">Not set</span>
                     </div>
                 </div>
+                
+                <div class="version-test">
+                    <h4>Test Update Functionality</h4>
+                    <p>Simulate different app versions to test the update flow</p>
+                    <div class="test-controls">
+                        <input type="number" class="form-control" id="testVersionCode" placeholder="Test version code" value="8">
+                        <button class="test-btn" id="testUpdateBtn">Test Update Check</button>
+                    </div>
+                </div>
             </div>
             
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Maintenance Mode</div>
+                    <div class="card-title">Update Preview</div>
                     <div class="card-icon">
-                        <i class="fas fa-tools"></i>
+                        <i class="fas fa-eye"></i>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="maintenanceToggle">Maintenance Mode</label>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <label class="switch">
-                            <input type="checkbox" id="maintenanceToggle">
-                            <span class="slider"></span>
-                        </label>
-                        <span id="maintenanceStatus">Inactive</span>
+                <div id="updatePreview">
+                    <p style="margin-bottom: 15px; text-align: center;">This is how the update dialog will appear to users:</p>
+                    <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        <h3 style="color: #e74c3c; text-align: center; margin-bottom: 15px;">Update Required</h3>
+                        <p id="previewMessage" style="margin-bottom: 20px; line-height: 1.5;">A new version is available with exciting new features and improvements!</p>
+                        <button style="background: #e74c3c; color: white; width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Update Now</button>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="maintenanceMessage">Maintenance Message</label>
-                    <textarea class="form-control" id="maintenanceMessage" rows="3" placeholder="Message shown during maintenance"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="adminKey">Admin Key</label>
-                    <input type="text" class="form-control" id="adminKey" placeholder="Secret key for admin access">
-                </div>
-                
-                <button class="btn btn-primary" id="saveMaintenanceConfig">Save Maintenance Configuration</button>
-                
-                <div class="current-config" id="currentMaintenanceConfig">
-                    <h4>Current Configuration:</h4>
-                    <div class="config-item">
-                        <span>Status:</span>
-                        <span id="currentMaintenanceStatus" class="status-inactive">Inactive</span>
-                    </div>
-                    <div class="config-item">
-                        <span>Message:</span>
-                        <span id="currentMaintenanceMessage">Not set</span>
-                    </div>
-                    <div class="config-item">
-                        <span>Admin Key:</span>
-                        <span id="currentAdminKey">Not set</span>
+                    
+                    <div style="margin-top: 20px;">
+                        <h4>Update Logic Explanation</h4>
+                        <p style="margin-top: 10px;">When a user opens the app:</p>
+                        <ol style="margin-left: 20px; margin-top: 10px;">
+                            <li>App checks its version code (e.g., 8)</li>
+                            <li>Compares with the minimum version code from database (e.g., 9)</li>
+                            <li>If app version is lower, shows update dialog</li>
+                            <li>User must update to continue using the app</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -454,24 +488,25 @@
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
         
-        // Update Config Elements
-        const minVersion = document.getElementById('minVersion');
+        // Version Config Elements
+        const versionName = document.getElementById('versionName');
+        const versionCode = document.getElementById('versionCode');
+        const minVersionCode = document.getElementById('minVersionCode');
         const updateMessage = document.getElementById('updateMessage');
         const updateLink = document.getElementById('updateLink');
-        const saveUpdateConfig = document.getElementById('saveUpdateConfig');
-        const currentMinVersion = document.getElementById('currentMinVersion');
+        const saveVersionConfig = document.getElementById('saveVersionConfig');
+        
+        // Current Config Display Elements
+        const currentVersionName = document.getElementById('currentVersionName');
+        const currentVersionCode = document.getElementById('currentVersionCode');
+        const currentMinVersionCode = document.getElementById('currentMinVersionCode');
         const currentUpdateMessage = document.getElementById('currentUpdateMessage');
         const currentUpdateLink = document.getElementById('currentUpdateLink');
         
-        // Maintenance Config Elements
-        const maintenanceToggle = document.getElementById('maintenanceToggle');
-        const maintenanceStatus = document.getElementById('maintenanceStatus');
-        const maintenanceMessage = document.getElementById('maintenanceMessage');
-        const adminKey = document.getElementById('adminKey');
-        const saveMaintenanceConfig = document.getElementById('saveMaintenanceConfig');
-        const currentMaintenanceStatus = document.getElementById('currentMaintenanceStatus');
-        const currentMaintenanceMessage = document.getElementById('currentMaintenanceMessage');
-        const currentAdminKey = document.getElementById('currentAdminKey');
+        // Test Elements
+        const testVersionCode = document.getElementById('testVersionCode');
+        const testUpdateBtn = document.getElementById('testUpdateBtn');
+        const previewMessage = document.getElementById('previewMessage');
         
         // Check authentication
         window.addEventListener('DOMContentLoaded', () => {
@@ -489,93 +524,90 @@
             
             // Set username and load configurations
             adminUsername.textContent = adminUser;
-            loadUpdateConfig();
-            loadMaintenanceConfig();
+            loadVersionConfig();
         });
         
-        // Load Update Configuration
-        function loadUpdateConfig() {
-            database.ref('updateConfig').once('value')
+        // Load Version Configuration
+        function loadVersionConfig() {
+            database.ref('versionConfig').once('value')
                 .then(snapshot => {
                     if (snapshot.exists()) {
                         const config = snapshot.val();
-                        minVersion.value = config.minimumVersion || '';
+                        versionName.value = config.versionName || '';
+                        versionCode.value = config.versionCode || '';
+                        minVersionCode.value = config.minVersionCode || '';
                         updateMessage.value = config.updateMessage || '';
                         updateLink.value = config.updateLink || '';
                         
                         // Update current config display
-                        currentMinVersion.textContent = config.minimumVersion || 'Not set';
+                        currentVersionName.textContent = config.versionName || 'Not set';
+                        currentVersionCode.textContent = config.versionCode || 'Not set';
+                        currentMinVersionCode.textContent = config.minVersionCode || 'Not set';
                         currentUpdateMessage.textContent = config.updateMessage || 'Not set';
                         currentUpdateLink.textContent = config.updateLink || 'Not set';
-                    }
-                })
-                .catch(error => {
-                    showError('Error loading update configuration: ' + error.message);
-                });
-        }
-        
-        // Load Maintenance Configuration
-        function loadMaintenanceConfig() {
-            database.ref('maintenanceConfig').once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const config = snapshot.val();
-                        maintenanceToggle.checked = config.maintenanceActive || false;
-                        maintenanceStatus.textContent = config.maintenanceActive ? 'Active' : 'Inactive';
-                        maintenanceMessage.value = config.maintenanceMessage || '';
-                        adminKey.value = config.adminKey || '';
                         
-                        // Update current config display
-                        currentMaintenanceStatus.textContent = config.maintenanceActive ? 'Active' : 'Inactive';
-                        currentMaintenanceStatus.className = config.maintenanceActive ? 'status-badge status-active' : 'status-badge status-inactive';
-                        currentMaintenanceMessage.textContent = config.maintenanceMessage || 'Not set';
-                        currentAdminKey.textContent = config.adminKey ? '••••••••' : 'Not set';
+                        // Update preview
+                        previewMessage.textContent = config.updateMessage || 'A new version is available with exciting new features and improvements!';
                     }
                 })
                 .catch(error => {
-                    showError('Error loading maintenance configuration: ' + error.message);
+                    showError('Error loading version configuration: ' + error.message);
                 });
         }
         
-        // Save Update Configuration
-        saveUpdateConfig.addEventListener('click', () => {
+        // Save Version Configuration
+        saveVersionConfig.addEventListener('click', () => {
             const config = {
-                minimumVersion: parseInt(minVersion.value) || 1,
+                versionName: versionName.value,
+                versionCode: parseInt(versionCode.value) || 0,
+                minVersionCode: parseInt(minVersionCode.value) || 0,
                 updateMessage: updateMessage.value,
                 updateLink: updateLink.value
             };
             
-            database.ref('updateConfig').set(config)
-                .then(() => {
-                    showSuccess('Update configuration saved successfully!');
-                    loadUpdateConfig(); // Reload to show current values
-                })
-                .catch(error => {
-                    showError('Error saving update configuration: ' + error.message);
-                });
-        });
-        
-        // Save Maintenance Configuration
-        saveMaintenanceConfig.addEventListener('click', () => {
-            const config = {
-                maintenanceActive: maintenanceToggle.checked,
-                maintenanceMessage: maintenanceMessage.value,
-                adminKey: adminKey.value
-            };
+            // Validate inputs
+            if (!config.versionName || !config.versionCode || !config.minVersionCode) {
+                showError('Please fill in all version fields');
+                return;
+            }
             
-            database.ref('maintenanceConfig').set(config)
+            database.ref('versionConfig').set(config)
                 .then(() => {
-                    showSuccess('Maintenance configuration saved successfully!');
-                    loadMaintenanceConfig(); // Reload to show current values
+                    showSuccess('Version configuration saved successfully!');
+                    loadVersionConfig(); // Reload to show current values
                 })
                 .catch(error => {
-                    showError('Error saving maintenance configuration: ' + error.message);
+                    showError('Error saving version configuration: ' + error.message);
                 });
         });
         
-        // Maintenance toggle change
-        maintenanceToggle.addEventListener('change', () => {
-            maintenanceStatus.textContent = maintenanceToggle.checked ? 'Active' : 'Inactive';
+        // Test Update Check
+        testUpdateBtn.addEventListener('click', () => {
+            const testCode = parseInt(testVersionCode.value) || 0;
+            
+            database.ref('versionConfig').once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const config = snapshot.val();
+                        const minCode = config.minVersionCode || 0;
+                        
+                        if (testCode < minCode) {
+                            showSuccess(`Update required! Test version (${testCode}) is less than minimum version (${minCode})`);
+                        } else {
+                            showSuccess(`No update required. Test version (${testCode}) meets minimum requirement (${minCode})`);
+                        }
+                    } else {
+                        showError('No version configuration found in database');
+                    }
+                })
+                .catch(error => {
+                    showError('Error testing update: ' + error.message);
+                });
+        });
+        
+        // Update preview when message changes
+        updateMessage.addEventListener('input', () => {
+            previewMessage.textContent = updateMessage.value || 'A new version is available with exciting new features and improvements!';
         });
         
         // Logout
