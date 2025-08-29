@@ -244,76 +244,9 @@
         
         .status-badge {
             display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-active {
-            background: var(--success);
-            color: var(--white);
-        }
-        
-        .status-inactive {
-            background: var(--gray);
-            color: var(--white);
-        }
-        
-        .current-config {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .config-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .config-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .version-info {
-            background: #e9ecef;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .version-info p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .user-info {
-                flex-direction: column;
-                gap: 10px;
-            }
+            padding: 5px极
         }
     </style>
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Database -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
@@ -340,21 +273,10 @@
                     </div>
                 </div>
                 
-                <div class="version-info">
-                    <p><strong>Current App Version:</strong> <span id="currentAppVersion">1.6 (code: 6)</span></p>
-                    <p><strong>Version Logic:</strong> If user's version code is less than Minimum Version Code OR version name is older, update will be required</p>
-                </div>
-                
                 <div class="form-group">
-                    <label for="minVersionCode">Minimum Version Code</label>
-                    <input type="number" class="form-control" id="minVersionCode" placeholder="e.g., 7">
-                    <small>Integer value (e.g., 7 for version 2.0)</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="minVersionName">Minimum Version Name</label>
-                    <input type="text" class="form-control" id="minVersionName" placeholder="e.g., 2.0">
-                    <small>String value (e.g., 2.0)</small>
+                    <label for="minVersion">Minimum Version Code</label>
+                    <input type="number" class="form-control" id="minVersion" placeholder="e.g., 7">
+                    <small>Current app version: 6</small>
                 </div>
                 
                 <div class="form-group">
@@ -372,12 +294,8 @@
                 <div class="current-config" id="currentUpdateConfig">
                     <h4>Current Configuration:</h4>
                     <div class="config-item">
-                        <span>Minimum Version Code:</span>
-                        <span id="currentMinVersionCode">Not set</span>
-                    </div>
-                    <div class="config-item">
-                        <span>Minimum Version Name:</span>
-                        <span id="currentMinVersionName">Not set</span>
+                        <span>Minimum Version:</span>
+                        <span id="currentMinVersion">Not set</span>
                     </div>
                     <div class="config-item">
                         <span>Update Message:</span>
@@ -462,16 +380,13 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
-        const currentAppVersion = document.getElementById('currentAppVersion');
         
         // Update Config Elements
-        const minVersionCode = document.getElementById('minVersionCode');
-        const minVersionName = document.getElementById('minVersionName');
+        const minVersion = document.getElementById('minVersion');
         const updateMessage = document.getElementById('updateMessage');
         const updateLink = document.getElementById('updateLink');
         const saveUpdateConfig = document.getElementById('saveUpdateConfig');
-        const currentMinVersionCode = document.getElementById('currentMinVersionCode');
-        const currentMinVersionName = document.getElementById('currentMinVersionName');
+        const currentMinVersion = document.getElementById('currentMinVersion');
         const currentUpdateMessage = document.getElementById('currentUpdateMessage');
         const currentUpdateLink = document.getElementById('currentUpdateLink');
         
@@ -511,14 +426,12 @@
                 .then(snapshot => {
                     if (snapshot.exists()) {
                         const config = snapshot.val();
-                        minVersionCode.value = config.minimumVersionCode || '';
-                        minVersionName.value = config.minimumVersionName || '';
+                        minVersion.value = config.minimumVersion || '';
                         updateMessage.value = config.updateMessage || '';
                         updateLink.value = config.updateLink || '';
                         
                         // Update current config display
-                        currentMinVersionCode.textContent = config.minimumVersionCode || 'Not set';
-                        currentMinVersionName.textContent = config.minimumVersionName || 'Not set';
+                        currentMinVersion.textContent = config.minimumVersion || 'Not set';
                         currentUpdateMessage.textContent = config.updateMessage || 'Not set';
                         currentUpdateLink.textContent = config.updateLink || 'Not set';
                     }
@@ -554,8 +467,7 @@
         // Save Update Configuration
         saveUpdateConfig.addEventListener('click', () => {
             const config = {
-                minimumVersionCode: parseInt(minVersionCode.value) || 1,
-                minimumVersionName: minVersionName.value || "1.0",
+                minimumVersion: parseInt(minVersion.value) || 1,
                 updateMessage: updateMessage.value,
                 updateLink: updateLink.value
             };
