@@ -244,9 +244,76 @@
         
         .status-badge {
             display: inline-block;
-            padding: 5px极
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: var(--success);
+            color: var(--white);
+        }
+        
+        .status-inactive {
+            background: var(--gray);
+            color: var(--white);
+        }
+        
+        .current-config {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .config-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .version-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .version-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
@@ -273,20 +340,26 @@
                     </div>
                 </div>
                 
+                <div class="version-info">
+                    <p><strong>Current App Version:</strong> 1.9 (code: 9)</p>
+                    <p><strong>Next Version:</strong> 2.0 (code: 10)</p>
+                    <p><strong>Version Logic:</strong> If user's version code is less than Minimum Version Code, update will be required</p>
+                </div>
+                
                 <div class="form-group">
                     <label for="minVersion">Minimum Version Code</label>
-                    <input type="number" class="form-control" id="minVersion" placeholder="e.g., 7">
-                    <small>Current app version: 6</small>
+                    <input type="number" class="form-control" id="minVersion" placeholder="e.g., 10">
+                    <small>Set to 10 to require update from version 1.9 to 2.0</small>
                 </div>
                 
                 <div class="form-group">
                     <label for="updateMessage">Update Message</label>
-                    <textarea class="form-control" id="updateMessage" rows="3" placeholder="Message shown to users"></textarea>
+                    <textarea class="form-control" id="updateMessage" rows="3" placeholder="Message shown to users">Version 2.0 is available with new features!</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="updateLink">Update Link</label>
-                    <input type="url" class="form-control" id="updateLink" placeholder="https://play.google.com/store/apps/details?id=com.aura.battle">
+                    <input type="url" class="form-control" id="updateLink" placeholder="https://play.google.com/store/apps/details?id=com.aura.battle" value="https://play.google.com/store/apps/details?id=com.aura.battle">
                 </div>
                 
                 <button class="btn btn-primary" id="saveUpdateConfig">Save Update Configuration</button>
@@ -294,7 +367,7 @@
                 <div class="current-config" id="currentUpdateConfig">
                     <h4>Current Configuration:</h4>
                     <div class="config-item">
-                        <span>Minimum Version:</span>
+                        <span>Minimum Version Code:</span>
                         <span id="currentMinVersion">Not set</span>
                     </div>
                     <div class="config-item">
