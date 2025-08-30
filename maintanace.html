@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Aura Battle</title>
+    <title>Aura Battle - Version Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -28,95 +28,123 @@
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 15px;
         }
         
         .container {
-            width: 100%;
-            max-width: 400px;
+            max-width: 100%;
+            margin: 0 auto;
         }
         
-        .login-card {
+        .header {
             background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        
-        .login-header {
-            background: var(--primary);
-            padding: 25px;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            color: var(--white);
+            position: relative;
         }
         
         .logo {
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: center;
+            margin-bottom: 10px;
         }
         
         .logo img {
-            height: 50px;
+            height: 35px;
             margin-right: 10px;
         }
         
         .logo h1 {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 20px;
+            color: var(--dark);
         }
         
-        .login-header p {
+        .user-info {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info span {
             font-size: 14px;
-            opacity: 0.9;
+            color: var(--dark);
         }
         
-        .login-body {
-            padding: 25px;
+        .logout-btn {
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .card-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 14px;
         }
         
         .form-group {
-            margin-bottom: 20px;
-            position: relative;
+            margin-bottom: 15px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
             color: var(--dark);
-        }
-        
-        .input-group {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .input-group-prepend {
-            padding: 0 15px;
-            background: #f8f9fa;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            border-right: 1px solid #ddd;
-        }
-        
-        .input-group-prepend i {
-            color: var(--gray);
+            font-size: 14px;
         }
         
         .form-control {
             width: 100%;
-            padding: 12px 15px;
-            border: none;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             font-size: 16px;
             color: var(--dark);
             background: var(--white);
@@ -124,17 +152,18 @@
         
         .form-control:focus {
             outline: none;
+            border-color: var(--primary);
         }
         
         .btn {
-            width: 100%;
-            padding: 14px;
+            padding: 12px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            width: 100%;
         }
         
         .btn-primary {
@@ -146,29 +175,12 @@
             background: var(--secondary);
         }
         
-        .login-footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #eee;
-        }
-        
-        .login-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
-        
         .alert {
-            padding: 12px 15px;
+            padding: 10px 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: none;
+            font-size: 14px;
         }
         
         .alert-danger {
@@ -181,6 +193,53 @@
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
+        }
+        
+        .current-config {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .current-config h4 {
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .config-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .version-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        
+        .version-info p {
+            margin: 4px 0;
+        }
+        
+        small {
+            font-size: 12px;
+            color: var(--gray);
+            display: block;
+            margin-top: 4px;
         }
         
         .loader {
@@ -198,26 +257,46 @@
             to { transform: rotate(360deg); }
         }
         
+        /* Mobile-specific optimizations */
         @media (max-width: 480px) {
-            .login-card {
-                border-radius: 10px;
+            body {
+                padding: 10px;
             }
             
-            .login-header {
-                padding: 20px;
-            }
-            
-            .logo img {
-                height: 40px;
+            .header {
+                padding: 12px;
             }
             
             .logo h1 {
-                font-size: 20px;
+                font-size: 18px;
             }
             
-            .login-body {
-                padding: 20px;
+            .user-info {
+                position: static;
+                justify-content: center;
+                margin-top: 10px;
             }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .card-title {
+                font-size: 15px;
+            }
+            
+            .form-control, .btn {
+                padding: 10px;
+            }
+        }
+        
+        /* Improved touch targets for mobile */
+        input, textarea, button {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        button:active {
+            transform: scale(0.98);
         }
     </style>
     <!-- Firebase App (the core Firebase SDK) -->
@@ -227,46 +306,86 @@
 </head>
 <body>
     <div class="container">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="logo">
-                    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo">
-                    <h1>Aura Battle</h1>
-                </div>
-                <p>Admin Login Portal</p>
+        <div class="header">
+            <div class="logo">
+                <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo">
+                <h1>Aura Battle - Version Management</h1>
             </div>
-            
-            <div class="login-body">
-                <div class="alert alert-danger" id="errorMessage"></div>
-                <div class="alert alert-success" id="successMessage"></div>
-                
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <input type="text" class="form-control" id="username" placeholder="Enter admin username">
+            <div class="user-info">
+                <span id="adminUsername">Loading...</span>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+        
+        <div class="alert alert-danger" id="errorMessage"></div>
+        <div class="alert alert-success" id="successMessage"></div>
+        
+        <div id="authChecking">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Verifying Access</div>
+                    <div class="card-icon">
+                        <i class="fas fa-lock"></i>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        <input type="password" class="form-control" id="password" placeholder="Enter password">
-                    </div>
+                <div style="text-align: center; padding: 20px;">
+                    <div class="loader" id="authLoader"></div>
+                    <p style="margin-top: 15px;">Checking your credentials...</p>
                 </div>
-                
-                <button class="btn btn-primary" id="loginBtn">
-                    <span>Login</span>
-                    <div class="loader" id="loginLoader"></div>
-                </button>
-                
-                <div class="login-footer">
-                    <a href="#" id="forgotPassword">Forgot Password?</a>
+            </div>
+        </div>
+        
+        <div id="dashboardContent" style="display: none;">
+            <div class="dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Version Configuration</div>
+                        <div class="card-icon">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="version-info">
+                        <p><strong>Update Logic:</strong> Update required if version name is smaller than minimum version</p>
+                        <p><strong>Version Format:</strong> Major.Minor.Patch (e.g., 1.6.2)</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="minVersionName">Minimum Version Name</label>
+                        <input type="text" class="form-control" id="minVersionName" placeholder="e.g., 1.6.2">
+                        <small>Users with version smaller than this will be prompted to update</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateMessage">Update Message</label>
+                        <textarea class="form-control" id="updateMessage" rows="2" placeholder="Message shown to users">A new version is available with exciting new features and improvements!</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateLink">Update Link</label>
+                        <input type="url" class="form-control" id="updateLink" placeholder="https://play.google.com/store/apps/details?id=com.aura.battle" value="https://play.google.com/store/apps/details?id=com.aura.battle">
+                    </div>
+                    
+                    <button class="btn btn-primary" id="saveVersionConfig">
+                        <span>Save Version Configuration</span>
+                        <div class="loader" id="saveLoader"></div>
+                    </button>
+                    
+                    <div class="current-config" id="currentVersionConfig">
+                        <h4>Current Configuration:</h4>
+                        <div class="config-item">
+                            <span>Minimum Version:</span>
+                            <span id="currentMinVersionName">Not set</span>
+                        </div>
+                        <div class="config-item">
+                            <span>Update Message:</span>
+                            <span id="currentUpdateMessage">Not set</span>
+                        </div>
+                        <div class="config-item">
+                            <span>Update Link:</span>
+                            <span id="currentUpdateLink">Not set</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -290,136 +409,163 @@
         const database = firebase.database();
         
         // DOM Elements
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const loginBtn = document.getElementById('loginBtn');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
-        const loginLoader = document.getElementById('loginLoader');
-        const forgotPasswordLink = document.getElementById('forgotPassword');
+        const adminUsername = document.getElementById('adminUsername');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authChecking = document.getElementById('authChecking');
+        const dashboardContent = document.getElementById('dashboardContent');
+        const authLoader = document.getElementById('authLoader');
         
-        // Check if user is already logged in and verify with database
+        // Version Config Elements
+        const minVersionName = document.getElementById('minVersionName');
+        const updateMessage = document.getElementById('updateMessage');
+        const updateLink = document.getElementById('updateLink');
+        const saveVersionConfig = document.getElementById('saveVersionConfig');
+        const saveLoader = document.getElementById('saveLoader');
+        
+        // Current Config Display Elements
+        const currentMinVersionName = document.getElementById('currentMinVersionName');
+        const currentUpdateMessage = document.getElementById('currentUpdateMessage');
+        const currentUpdateLink = document.getElementById('currentUpdateLink');
+        
+        // Show loader during authentication check
+        authLoader.style.display = 'block';
+        
+        // Check authentication on page load
         window.addEventListener('DOMContentLoaded', () => {
-            const adminUsername = localStorage.getItem('adminUsername');
-            const adminPassword = localStorage.getItem('adminPassword');
+            const adminUser = localStorage.getItem('adminUsername');
+            const adminEmail = localStorage.getItem('adminEmail');
             const loginTime = localStorage.getItem('loginTime');
             const currentTime = new Date().getTime();
             
-            // If user was logged in and it's been less than 1 hour
-            if (adminUsername && adminPassword && loginTime && (currentTime - parseInt(loginTime)) < 3600000) {
-                // Verify credentials with database first
-                verifyAdminCredentials(adminUsername, adminPassword, true);
-            } else if (adminUsername) {
-                // Clear expired login
-                clearLocalStorage();
-            }
-        });
-        
-        // Login function
-        loginBtn.addEventListener('click', loginUser);
-        
-        // Also allow login with Enter key
-        passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                loginUser();
-            }
-        });
-        
-        function loginUser() {
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            // Validate inputs
-            if (!username || !password) {
-                showError('Please enter both username and password');
+            // Redirect to login if not authenticated or session expired
+            if (!adminUser || !adminEmail || !loginTime || (currentTime - parseInt(loginTime)) > 3600000) {
+                localStorage.clear();
+                window.location.href = 'index.html';
                 return;
             }
             
-            // Verify credentials with database
-            verifyAdminCredentials(username, password, false);
-        }
-        
-        function verifyAdminCredentials(username, password, isAutoLogin) {
-            // Show loading state
-            if (!isAutoLogin) {
-                loginBtn.querySelector('span').textContent = 'Verifying...';
-                loginLoader.style.display = 'block';
-                loginBtn.disabled = true;
-            }
+            // Set username while we verify credentials
+            adminUsername.textContent = adminUser;
             
-            // Reference to the admins node in Firebase
+            // Verify credentials against database
+            verifyAdminCredentials(adminUser, adminEmail);
+        });
+        
+        // Verify admin credentials against database
+        function verifyAdminCredentials(username, email) {
             const adminsRef = database.ref('admins');
             
-            // Check if the user exists and credentials are valid
             adminsRef.once('value')
                 .then(snapshot => {
-                    let userFound = false;
-                    let userData = null;
+                    let isValidAdmin = false;
                     
                     snapshot.forEach(childSnapshot => {
                         const admin = childSnapshot.val();
                         
-                        // Check if username and password match
-                        if (admin.username === username && admin.password === password) {
-                            userFound = true;
-                            userData = admin;
-                            userData.key = childSnapshot.key;
+                        // Check if username/email matches
+                        if (admin.username === username && admin.email === email) {
+                            isValidAdmin = true;
                             return true; // Break out of forEach
                         }
                     });
                     
-                    if (userFound) {
-                        // Login successful
-                        if (!isAutoLogin) {
-                            showSuccess('Login successful! Redirecting...');
-                        }
-                        
-                        // Save user data to localStorage
-                        localStorage.setItem('adminRole', userData.role);
-                        localStorage.setItem('adminUsername', userData.username);
-                        localStorage.setItem('adminPassword', userData.password); // Note: Storing password is generally not recommended
-                        localStorage.setItem('loginTime', new Date().getTime());
-                        
-                        // Redirect to dashboard after a short delay
-                        setTimeout(() => {
-                            window.location.href = 'dashboard.html';
-                        }, isAutoLogin ? 100 : 1500);
+                    if (isValidAdmin) {
+                        // Credentials are valid, show dashboard
+                        authChecking.style.display = 'none';
+                        dashboardContent.style.display = 'block';
+                        loadVersionConfig();
                     } else {
-                        // Login failed
-                        if (!isAutoLogin) {
-                            showError('Invalid username or password');
-                            loginBtn.querySelector('span').textContent = 'Login';
-                            loginLoader.style.display = 'none';
-                            loginBtn.disabled = false;
-                        } else {
-                            // Auto-login failed, clear local storage
-                            clearLocalStorage();
-                        }
+                        // Invalid credentials, redirect to login
+                        showError('Invalid admin credentials. Please login again.');
+                        setTimeout(() => {
+                            localStorage.clear();
+                            window.location.href = 'index.html';
+                        }, 2000);
                     }
                 })
                 .catch(error => {
-                    if (!isAutoLogin) {
-                        showError('Error connecting to database: ' + error.message);
-                        loginBtn.querySelector('span').textContent = 'Login';
-                        loginLoader.style.display = 'none';
-                        loginBtn.disabled = false;
-                    }
+                    showError('Error verifying credentials: ' + error.message);
+                    setTimeout(() => {
+                        localStorage.clear();
+                        window.location.href = 'index.html';
+                    }, 2000);
                 });
         }
         
-        // Forgot password handler
-        forgotPasswordLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showError('Please contact system administrator to reset your password');
+        // Load Version Configuration
+        function loadVersionConfig() {
+            database.ref('updateConfig').once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const config = snapshot.val();
+                        minVersionName.value = config.minimumVersionName || '';
+                        updateMessage.value = config.updateMessage || '';
+                        updateLink.value = config.updateLink || '';
+                        
+                        // Update current config display
+                        currentMinVersionName.textContent = config.minimumVersionName || 'Not set';
+                        currentUpdateMessage.textContent = config.updateMessage || 'Not set';
+                        currentUpdateLink.textContent = config.updateLink || 'Not set';
+                    }
+                })
+                .catch(error => {
+                    showError('Error loading version configuration: ' + error.message);
+                });
+        }
+        
+        // Save Version Configuration
+        saveVersionConfig.addEventListener('click', () => {
+            const config = {
+                minimumVersionName: minVersionName.value,
+                updateMessage: updateMessage.value,
+                updateLink: updateLink.value
+            };
+            
+            // Validate inputs
+            if (!config.minimumVersionName) {
+                showError('Please enter a minimum version name');
+                return;
+            }
+            
+            // Validate version name format (should be x.y.z)
+            const versionRegex = /^\d+(\.\d+)*$/;
+            if (!versionRegex.test(config.minimumVersionName)) {
+                showError('Version name should be in format like 1.6.2 (numbers separated by dots)');
+                return;
+            }
+            
+            // Show loading state
+            saveVersionConfig.querySelector('span').textContent = 'Saving...';
+            saveLoader.style.display = 'block';
+            saveVersionConfig.disabled = true;
+            
+            database.ref('updateConfig').set(config)
+                .then(() => {
+                    showSuccess('Version configuration saved successfully!');
+                    loadVersionConfig(); // Reload to show current values
+                    
+                    // Reset button state
+                    saveVersionConfig.querySelector('span').textContent = 'Save Version Configuration';
+                    saveLoader.style.display = 'none';
+                    saveVersionConfig.disabled = false;
+                })
+                .catch(error => {
+                    showError('Error saving version configuration: ' + error.message);
+                    
+                    // Reset button state
+                    saveVersionConfig.querySelector('span').textContent = 'Save Version Configuration';
+                    saveLoader.style.display = 'none';
+                    saveVersionConfig.disabled = false;
+                });
         });
         
-        // Helper function to clear local storage
-        function clearLocalStorage() {
-            localStorage.removeItem('adminRole');
-            localStorage.removeItem('adminUsername');
-            localStorage.removeItem('adminPassword');
-            localStorage.removeItem('loginTime');
-        }
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        });
         
         // Helper functions for showing messages
         function showError(message) {
@@ -431,6 +577,9 @@
             setTimeout(() => {
                 errorMessage.style.display = 'none';
             }, 5000);
+            
+            // Scroll to error message
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         
         function showSuccess(message) {
@@ -442,6 +591,9 @@
             setTimeout(() => {
                 successMessage.style.display = 'none';
             }, 3000);
+            
+            // Scroll to success message
+            successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     </script>
 </body>
