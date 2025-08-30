@@ -293,26 +293,31 @@
             font-size: 14px;
         }
         
-        .version-test {
-            background: #e9ecef;
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
             padding: 15px;
             border-radius: 8px;
             margin-top: 20px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
         }
         
-        .test-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+        .code-key {
+            color: #ff79c6;
         }
         
-        .test-btn {
-            padding: 8px 15px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .code-comment {
+            color: #6272a4;
+        }
+        
+        .code-string {
+            color: #f1fa8c;
+        }
+        
+        .code-number {
+            color: #bd93f9;
         }
         
         @media (max-width: 768px) {
@@ -329,10 +334,6 @@
             .user-info {
                 flex-direction: column;
                 gap: 10px;
-            }
-            
-            .test-controls {
-                flex-direction: column;
             }
         }
     </style>
@@ -367,25 +368,19 @@
                 </div>
                 
                 <div class="version-info">
-                    <p><strong>Version Logic:</strong> Update will be required if user's version code is less than Minimum Version Code</p>
-                    <p><strong>Version Name:</strong> Human-readable version (e.g., 2.0.1)</p>
-                    <p><strong>Version Code:</strong> Numeric value used for comparison (e.g., 10)</p>
+                    <p><strong>Update Logic:</strong> Update will be required if BOTH version code AND version name are smaller than the minimum values</p>
+                    <p><strong>Version Name Format:</strong> Major.Minor.Patch (e.g., 1.6.2)</p>
+                    <p><strong>Version Code:</strong> Numeric value (e.g., 10)</p>
                 </div>
                 
                 <div class="form-group">
-                    <label for="versionName">Version Name</label>
-                    <input type="text" class="form-control" id="versionName" placeholder="e.g., 2.0.1">
-                </div>
-                
-                <div class="form-group">
-                    <label for="versionCode">Version Code</label>
-                    <input type="number" class="form-control" id="versionCode" placeholder="e.g., 10">
+                    <label for="minVersionName">Minimum Version Name</label>
+                    <input type="text" class="form-control" id="minVersionName" placeholder="e.g., 1.6.2">
                 </div>
                 
                 <div class="form-group">
                     <label for="minVersionCode">Minimum Version Code</label>
-                    <input type="number" class="form-control" id="minVersionCode" placeholder="e.g., 9">
-                    <small>Users with version code less than this will be prompted to update</small>
+                    <input type="number" class="form-control" id="minVersionCode" placeholder="e.g., 10">
                 </div>
                 
                 <div class="form-group">
@@ -403,12 +398,8 @@
                 <div class="current-config" id="currentVersionConfig">
                     <h4>Current Configuration:</h4>
                     <div class="config-item">
-                        <span>Version Name:</span>
-                        <span id="currentVersionName">Not set</span>
-                    </div>
-                    <div class="config-item">
-                        <span>Version Code:</span>
-                        <span id="currentVersionCode">Not set</span>
+                        <span>Minimum Version Name:</span>
+                        <span id="currentMinVersionName">Not set</span>
                     </div>
                     <div class="config-item">
                         <span>Minimum Version Code:</span>
@@ -423,43 +414,87 @@
                         <span id="currentUpdateLink">Not set</span>
                     </div>
                 </div>
-                
-                <div class="version-test">
-                    <h4>Test Update Functionality</h4>
-                    <p>Simulate different app versions to test the update flow</p>
-                    <div class="test-controls">
-                        <input type="number" class="form-control" id="testVersionCode" placeholder="Test version code" value="8">
-                        <button class="test-btn" id="testUpdateBtn">Test Update Check</button>
-                    </div>
-                </div>
             </div>
             
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Update Preview</div>
+                    <div class="card-title">Android Code Update</div>
                     <div class="card-icon">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-code"></i>
                     </div>
                 </div>
                 
-                <div id="updatePreview">
-                    <p style="margin-bottom: 15px; text-align: center;">This is how the update dialog will appear to users:</p>
-                    <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                        <h3 style="color: #e74c3c; text-align: center; margin-bottom: 15px;">Update Required</h3>
-                        <p id="previewMessage" style="margin-bottom: 20px; line-height: 1.5;">A new version is available with exciting new features and improvements!</p>
-                        <button style="background: #e74c3c; color: white; width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Update Now</button>
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <h4>Update Logic Explanation</h4>
-                        <p style="margin-top: 10px;">When a user opens the app:</p>
-                        <ol style="margin-left: 20px; margin-top: 10px;">
-                            <li>App checks its version code (e.g., 8)</li>
-                            <li>Compares with the minimum version code from database (e.g., 9)</li>
-                            <li>If app version is lower, shows update dialog</li>
-                            <li>User must update to continue using the app</li>
-                        </ol>
-                    </div>
+                <div class="version-info">
+                    <p><strong>Required Changes:</strong> Update your SplashActivity.kt with this code to check both version name and code</p>
+                </div>
+                
+                <div class="code-block">
+                    <pre><span class="code-comment">/** --------- UPDATE CHECK --------- */</span>
+<span class="code-key">private fun</span> checkUpdate() {
+    db.child(<span class="code-string">"updateConfig"</span>).get().addOnSuccessListener { snap ->
+        <span class="code-key">val</span> minVersionName = snap.child(<span class="code-string">"minimumVersionName"</span>).getValue(String::<span class="code-key">class</span>.java) ?: <span class="code-string">"1.0.0"</span>
+        <span class="code-key">val</span> minVersionCode = snap.child(<span class="code-string">"minimumVersionCode"</span>).getValue(Int::<span class="code-key">class</span>.java) ?: <span class="code-number">1</span>
+        <span class="code-key">val</span> updateMsg = snap.child(<span class="code-string">"updateMessage"</span>).getValue(String::<span class="code-key">class</span>.java) ?: <span class="code-string">"Update required."</span>
+        <span class="code-key">val</span> updateLink = snap.child(<span class="code-string">"updateLink"</span>).getValue(String::<span class="code-key">class</span>.java) ?: <span class="code-string">"https://play.google.com/"</span>
+
+        <span class="code-key">val</span> currentVersionName = <span class="code-key">try</span> {
+            packageManager.getPackageInfo(packageName, <span class="code-number">0</span>).versionName
+        } <span class="code-key">catch</span> (e: Exception) {
+            <span class="code-string">"1.0.0"</span>
+        }
+        
+        <span class="code-key">val</span> currentVersionCode = <span class="code-key">try</span> {
+            <span class="code-key">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                packageManager.getPackageInfo(packageName, <span class="code-number">0</span>).longVersionCode.toInt()
+            } <span class="code-key">else</span> {
+                @Suppress(<span class="code-string">"DEPRECATION"</span>)
+                packageManager.getPackageInfo(packageName, <span class="code-number">0</span>).versionCode
+            }
+        } <span class="code-key">catch</span> (e: Exception) {
+            <span class="code-number">1</span>
+        }
+
+        <span class="code-comment">// Compare both version name and code</span>
+        <span class="code-key">val</span> isVersionNameOutdated = compareVersions(currentVersionName, minVersionName) < <span class="code-number">0</span>
+        <span class="code-key">val</span> isVersionCodeOutdated = currentVersionCode < minVersionCode
+        
+        <span class="code-key">if</span> (isVersionNameOutdated && isVersionCodeOutdated) {
+            showUpdateDialog(updateMsg, updateLink)
+        } <span class="code-key">else</span> {
+            checkMaintenance()
+        }
+    }.addOnFailureListener {
+        checkMaintenance()
+    }
+}
+
+<span class="code-comment">/** --------- VERSION COMPARISON --------- */</span>
+<span class="code-key">private fun</span> compareVersions(version1: String, version2: String): Int {
+    <span class="code-key">val</span> parts1 = version1.split(<span class="code-string">"."</span>)
+    <span class="code-key">val</span> parts2 = version2.split(<span class="code-string">"."</span>)
+    
+    <span class="code-key">val</span> maxLength = maxOf(parts1.size, parts2.size)
+    
+    <span class="code-key">for</span> (i in <span class="code-number">0</span> until maxLength) {
+        <span class="code-key">val</span> part1 = <span class="code-key">if</span> (i < parts1.size) parts1[i].toInt() <span class="code-key">else</span> <span class="code-number">0</span>
+        <span class="code-key">val</span> part2 = <span class="code-key">if</span> (i < parts2.size) parts2[i].toInt() <span class="code-key">else</span> <span class="code-number">0</span>
+        
+        <span class="code-key">if</span> (part1 < part2) <span class="code-key">return</span> -1
+        <span class="code-key">if</span> (part1 > part2) <span class="code-key">return</span> 1
+    }
+    
+    <span class="code-key">return</span> <span class="code-number">0</span>
+}</pre>
+                </div>
+                
+                <div class="version-info" style="margin-top: 15px;">
+                    <p><strong>Database Structure:</strong> Make sure your Firebase updateConfig node has these fields:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>minimumVersionName (string)</li>
+                        <li>minimumVersionCode (number)</li>
+                        <li>updateMessage (string)</li>
+                        <li>updateLink (string)</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -489,24 +524,17 @@
         const successMessage = document.getElementById('successMessage');
         
         // Version Config Elements
-        const versionName = document.getElementById('versionName');
-        const versionCode = document.getElementById('versionCode');
+        const minVersionName = document.getElementById('minVersionName');
         const minVersionCode = document.getElementById('minVersionCode');
         const updateMessage = document.getElementById('updateMessage');
         const updateLink = document.getElementById('updateLink');
         const saveVersionConfig = document.getElementById('saveVersionConfig');
         
         // Current Config Display Elements
-        const currentVersionName = document.getElementById('currentVersionName');
-        const currentVersionCode = document.getElementById('currentVersionCode');
+        const currentMinVersionName = document.getElementById('currentMinVersionName');
         const currentMinVersionCode = document.getElementById('currentMinVersionCode');
         const currentUpdateMessage = document.getElementById('currentUpdateMessage');
         const currentUpdateLink = document.getElementById('currentUpdateLink');
-        
-        // Test Elements
-        const testVersionCode = document.getElementById('testVersionCode');
-        const testUpdateBtn = document.getElementById('testUpdateBtn');
-        const previewMessage = document.getElementById('previewMessage');
         
         // Check authentication
         window.addEventListener('DOMContentLoaded', () => {
@@ -529,25 +557,20 @@
         
         // Load Version Configuration
         function loadVersionConfig() {
-            database.ref('versionConfig').once('value')
+            database.ref('updateConfig').once('value')
                 .then(snapshot => {
                     if (snapshot.exists()) {
                         const config = snapshot.val();
-                        versionName.value = config.versionName || '';
-                        versionCode.value = config.versionCode || '';
-                        minVersionCode.value = config.minVersionCode || '';
+                        minVersionName.value = config.minimumVersionName || '';
+                        minVersionCode.value = config.minimumVersionCode || '';
                         updateMessage.value = config.updateMessage || '';
                         updateLink.value = config.updateLink || '';
                         
                         // Update current config display
-                        currentVersionName.textContent = config.versionName || 'Not set';
-                        currentVersionCode.textContent = config.versionCode || 'Not set';
-                        currentMinVersionCode.textContent = config.minVersionCode || 'Not set';
+                        currentMinVersionName.textContent = config.minimumVersionName || 'Not set';
+                        currentMinVersionCode.textContent = config.minimumVersionCode || 'Not set';
                         currentUpdateMessage.textContent = config.updateMessage || 'Not set';
                         currentUpdateLink.textContent = config.updateLink || 'Not set';
-                        
-                        // Update preview
-                        previewMessage.textContent = config.updateMessage || 'A new version is available with exciting new features and improvements!';
                     }
                 })
                 .catch(error => {
@@ -558,20 +581,26 @@
         // Save Version Configuration
         saveVersionConfig.addEventListener('click', () => {
             const config = {
-                versionName: versionName.value,
-                versionCode: parseInt(versionCode.value) || 0,
-                minVersionCode: parseInt(minVersionCode.value) || 0,
+                minimumVersionName: minVersionName.value,
+                minimumVersionCode: parseInt(minVersionCode.value) || 0,
                 updateMessage: updateMessage.value,
                 updateLink: updateLink.value
             };
             
             // Validate inputs
-            if (!config.versionName || !config.versionCode || !config.minVersionCode) {
+            if (!config.minimumVersionName || !config.minimumVersionCode) {
                 showError('Please fill in all version fields');
                 return;
             }
             
-            database.ref('versionConfig').set(config)
+            // Validate version name format (should be x.y.z)
+            const versionRegex = /^\d+(\.\d+)*$/;
+            if (!versionRegex.test(config.minimumVersionName)) {
+                showError('Version name should be in format like 1.6.2 (numbers separated by dots)');
+                return;
+            }
+            
+            database.ref('updateConfig').set(config)
                 .then(() => {
                     showSuccess('Version configuration saved successfully!');
                     loadVersionConfig(); // Reload to show current values
@@ -579,35 +608,6 @@
                 .catch(error => {
                     showError('Error saving version configuration: ' + error.message);
                 });
-        });
-        
-        // Test Update Check
-        testUpdateBtn.addEventListener('click', () => {
-            const testCode = parseInt(testVersionCode.value) || 0;
-            
-            database.ref('versionConfig').once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const config = snapshot.val();
-                        const minCode = config.minVersionCode || 0;
-                        
-                        if (testCode < minCode) {
-                            showSuccess(`Update required! Test version (${testCode}) is less than minimum version (${minCode})`);
-                        } else {
-                            showSuccess(`No update required. Test version (${testCode}) meets minimum requirement (${minCode})`);
-                        }
-                    } else {
-                        showError('No version configuration found in database');
-                    }
-                })
-                .catch(error => {
-                    showError('Error testing update: ' + error.message);
-                });
-        });
-        
-        // Update preview when message changes
-        updateMessage.addEventListener('input', () => {
-            previewMessage.textContent = updateMessage.value || 'A new version is available with exciting new features and improvements!';
         });
         
         // Logout
