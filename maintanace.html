@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Battle - Version Update Management</title>
+    <title>Admin Login - Aura Battle</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -28,103 +28,61 @@
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 400px;
         }
         
-        .header {
+        .login-card {
             background: var(--white);
             border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .login-header {
+            background: var(--primary);
+            padding: 25px;
+            text-align: center;
+            color: var(--white);
         }
         
         .logo {
             display: flex;
+            justify-content: center;
             align-items: center;
+            margin-bottom: 15px;
         }
         
         .logo img {
-            height: 40px;
-            margin-right: 15px;
+            height: 50px;
+            margin-right: 10px;
         }
         
         .logo h1 {
             font-size: 24px;
-            color: var(--dark);
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .user-info span {
-            font-weight: 500;
-            color: var(--dark);
-        }
-        
-        .logout-btn {
-            background: var(--danger);
-            color: var(--white);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .card {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .card-title {
-            font-size: 18px;
             font-weight: 600;
-            color: var(--dark);
         }
         
-        .card-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
+        .login-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .login-body {
+            padding: 25px;
         }
         
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
         
         .form-group label {
@@ -134,11 +92,31 @@
             color: var(--dark);
         }
         
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .input-group-prepend {
+            padding: 0 15px;
+            background: #f8f9fa;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid #ddd;
+        }
+        
+        .input-group-prepend i {
+            color: var(--gray);
+        }
+        
         .form-control {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: none;
             font-size: 16px;
             color: var(--dark);
             background: var(--white);
@@ -146,11 +124,11 @@
         
         .form-control:focus {
             outline: none;
-            border-color: var(--primary);
         }
         
         .btn {
-            padding: 12px 20px;
+            width: 100%;
+            padding: 14px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
@@ -168,59 +146,22 @@
             background: var(--secondary);
         }
         
-        .btn-danger {
-            background: var(--danger);
-            color: var(--white);
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
         }
         
-        .btn-success {
-            background: var(--success);
-            color: var(--white);
+        .login-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
         }
         
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-        
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: var(--success);
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(30px);
+        .login-footer a:hover {
+            text-decoration: underline;
         }
         
         .alert {
@@ -242,98 +183,40 @@
             border: 1px solid #c3e6cb;
         }
         
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
         }
         
-        .status-active {
-            background: var(--success);
-            color: var(--white);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
-        .status-inactive {
-            background: var(--gray);
-            color: var(--white);
-        }
-        
-        .current-config {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .config-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .config-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .version-info {
-            background: #e9ecef;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .version-info p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-        
-        .code-block {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-        }
-        
-        .code-key {
-            color: #ff79c6;
-        }
-        
-        .code-comment {
-            color: #6272a4;
-        }
-        
-        .code-string {
-            color: #f1fa8c;
-        }
-        
-        .code-number {
-            color: #bd93f9;
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
+        @media (max-width: 480px) {
+            .login-card {
+                border-radius: 10px;
             }
             
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
+            .login-header {
+                padding: 20px;
             }
             
-            .user-info {
-                flex-direction: column;
-                gap: 10px;
+            .logo img {
+                height: 40px;
+            }
+            
+            .logo h1 {
+                font-size: 20px;
+            }
+            
+            .login-body {
+                padding: 20px;
             }
         }
     </style>
@@ -344,157 +227,46 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="logo">
-                <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo">
-                <h1>Aura Battle - Version Update Management</h1>
-            </div>
-            <div class="user-info">
-                <span id="adminUsername">Admin User</span>
-                <button class="logout-btn" id="logoutBtn">Logout</button>
-            </div>
-        </div>
-        
-        <div class="alert alert-danger" id="errorMessage"></div>
-        <div class="alert alert-success" id="successMessage"></div>
-        
-        <div class="dashboard">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Version Configuration</div>
-                    <div class="card-icon">
-                        <i class="fas fa-code-branch"></i>
-                    </div>
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo">
+                    <h1>Aura Battle</h1>
                 </div>
-                
-                <div class="version-info">
-                    <p><strong>Update Logic:</strong> Update will be required if BOTH version code AND version name are smaller than the minimum values</p>
-                    <p><strong>Version Name Format:</strong> Major.Minor.Patch (e.g., 1.6.2)</p>
-                    <p><strong>Version Code:</strong> Numeric value (e.g., 10)</p>
-                </div>
-                
-                <div class="form-group">
-                    <label for="minVersionName">Minimum Version Name</label>
-                    <input type="text" class="form-control" id="minVersionName" placeholder="e.g., 1.6.2">
-                </div>
-                
-                <div class="form-group">
-                    <label for="minVersionCode">Minimum Version Code</label>
-                    <input type="number" class="form-control" id="minVersionCode" placeholder="e.g., 10">
-                </div>
-                
-                <div class="form-group">
-                    <label for="updateMessage">Update Message</label>
-                    <textarea class="form-control" id="updateMessage" rows="3" placeholder="Message shown to users">A new version is available with exciting new features and improvements!</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="updateLink">Update Link</label>
-                    <input type="url" class="form-control" id="updateLink" placeholder="https://play.google.com/store/apps/details?id=com.aura.battle" value="https://play.google.com/store/apps/details?id=com.aura.battle">
-                </div>
-                
-                <button class="btn btn-primary" id="saveVersionConfig">Save Version Configuration</button>
-                
-                <div class="current-config" id="currentVersionConfig">
-                    <h4>Current Configuration:</h4>
-                    <div class="config-item">
-                        <span>Minimum Version Name:</span>
-                        <span id="currentMinVersionName">Not set</span>
-                    </div>
-                    <div class="config-item">
-                        <span>Minimum Version Code:</span>
-                        <span id="currentMinVersionCode">Not set</span>
-                    </div>
-                    <div class="config-item">
-                        <span>Update Message:</span>
-                        <span id="currentUpdateMessage">Not set</span>
-                    </div>
-                    <div class="config-item">
-                        <span>Update Link:</span>
-                        <span id="currentUpdateLink">Not set</span>
-                    </div>
-                </div>
+                <p>Admin Login Portal</p>
             </div>
             
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Android Code Update</div>
-                    <div class="card-icon">
-                        <i class="fas fa-code"></i>
+            <div class="login-body">
+                <div class="alert alert-danger" id="errorMessage"></div>
+                <div class="alert alert-success" id="successMessage"></div>
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="text" class="form-control" id="username" placeholder="Enter admin username">
                     </div>
                 </div>
                 
-                <div class="version-info">
-                    <p><strong>Required Changes:</strong> Update your SplashActivity.kt with this code to check both version name and code</p>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password">
+                    </div>
                 </div>
                 
-                <div class="code-block">
-                    <pre><span class="code-comment">/** --------- UPDATE CHECK --------- */</span>
-<span class="code-key">private fun</span> checkUpdate() {
-    db.child(<span class="code-string">"updateConfig"</span>).get().addOnSuccessListener { snap ->
-        <span class="code-key">val</span> minVersionName = snap.child(<span class="code-string">"minimumVersionName"</span>).getValue(String::<span class="code-key">class</span>.java) ?: <span class="code-string">"1.0.0"</span>
-        <span class="code-key">val</span> minVersionCode = snap.child(<span class="code-string">"minimumVersionCode"</span>).getValue(Int::<span class="code-key">class</span>.java) ?: <span class="code-number">1</span>
-        <span class="code-key">val</span> updateMsg = snap.child(<span class="code-string">"updateMessage"</span>).getValue(String::<span class="code-key">class</span>.java) ?: <span class="code-string">"Update required."</span>
-        <span class="code-key">val</span> updateLink = snap.child(<span class="code-string">"updateLink"</span>).getValue(String::<span class="code-key">class</span>.java) ?: <span class="code-string">"https://play.google.com/"</span>
-
-        <span class="code-key">val</span> currentVersionName = <span class="code-key">try</span> {
-            packageManager.getPackageInfo(packageName, <span class="code-number">0</span>).versionName
-        } <span class="code-key">catch</span> (e: Exception) {
-            <span class="code-string">"1.0.0"</span>
-        }
-        
-        <span class="code-key">val</span> currentVersionCode = <span class="code-key">try</span> {
-            <span class="code-key">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                packageManager.getPackageInfo(packageName, <span class="code-number">0</span>).longVersionCode.toInt()
-            } <span class="code-key">else</span> {
-                @Suppress(<span class="code-string">"DEPRECATION"</span>)
-                packageManager.getPackageInfo(packageName, <span class="code-number">0</span>).versionCode
-            }
-        } <span class="code-key">catch</span> (e: Exception) {
-            <span class="code-number">1</span>
-        }
-
-        <span class="code-comment">// Compare both version name and code</span>
-        <span class="code-key">val</span> isVersionNameOutdated = compareVersions(currentVersionName, minVersionName) < <span class="code-number">0</span>
-        <span class="code-key">val</span> isVersionCodeOutdated = currentVersionCode < minVersionCode
-        
-        <span class="code-key">if</span> (isVersionNameOutdated && isVersionCodeOutdated) {
-            showUpdateDialog(updateMsg, updateLink)
-        } <span class="code-key">else</span> {
-            checkMaintenance()
-        }
-    }.addOnFailureListener {
-        checkMaintenance()
-    }
-}
-
-<span class="code-comment">/** --------- VERSION COMPARISON --------- */</span>
-<span class="code-key">private fun</span> compareVersions(version1: String, version2: String): Int {
-    <span class="code-key">val</span> parts1 = version1.split(<span class="code-string">"."</span>)
-    <span class="code-key">val</span> parts2 = version2.split(<span class="code-string">"."</span>)
-    
-    <span class="code-key">val</span> maxLength = maxOf(parts1.size, parts2.size)
-    
-    <span class="code-key">for</span> (i in <span class="code-number">0</span> until maxLength) {
-        <span class="code-key">val</span> part1 = <span class="code-key">if</span> (i < parts1.size) parts1[i].toInt() <span class="code-key">else</span> <span class="code-number">0</span>
-        <span class="code-key">val</span> part2 = <span class="code-key">if</span> (i < parts2.size) parts2[i].toInt() <span class="code-key">else</span> <span class="code-number">0</span>
-        
-        <span class="code-key">if</span> (part1 < part2) <span class="code-key">return</span> -1
-        <span class="code-key">if</span> (part1 > part2) <span class="code-key">return</span> 1
-    }
-    
-    <span class="code-key">return</span> <span class="code-number">0</span>
-}</pre>
-                </div>
+                <button class="btn btn-primary" id="loginBtn">
+                    <span>Login</span>
+                    <div class="loader" id="loginLoader"></div>
+                </button>
                 
-                <div class="version-info" style="margin-top: 15px;">
-                    <p><strong>Database Structure:</strong> Make sure your Firebase updateConfig node has these fields:</p>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
-                        <li>minimumVersionName (string)</li>
-                        <li>minimumVersionCode (number)</li>
-                        <li>updateMessage (string)</li>
-                        <li>updateLink (string)</li>
-                    </ul>
+                <div class="login-footer">
+                    <a href="#" id="forgotPassword">Forgot Password?</a>
                 </div>
             </div>
         </div>
@@ -518,103 +290,136 @@
         const database = firebase.database();
         
         // DOM Elements
-        const adminUsername = document.getElementById('adminUsername');
-        const logoutBtn = document.getElementById('logoutBtn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
+        const loginLoader = document.getElementById('loginLoader');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
         
-        // Version Config Elements
-        const minVersionName = document.getElementById('minVersionName');
-        const minVersionCode = document.getElementById('minVersionCode');
-        const updateMessage = document.getElementById('updateMessage');
-        const updateLink = document.getElementById('updateLink');
-        const saveVersionConfig = document.getElementById('saveVersionConfig');
-        
-        // Current Config Display Elements
-        const currentMinVersionName = document.getElementById('currentMinVersionName');
-        const currentMinVersionCode = document.getElementById('currentMinVersionCode');
-        const currentUpdateMessage = document.getElementById('currentUpdateMessage');
-        const currentUpdateLink = document.getElementById('currentUpdateLink');
-        
-        // Check authentication
+        // Check if user is already logged in and verify with database
         window.addEventListener('DOMContentLoaded', () => {
-            const adminUser = localStorage.getItem('adminUsername');
-            const adminRole = localStorage.getItem('adminRole');
+            const adminUsername = localStorage.getItem('adminUsername');
+            const adminPassword = localStorage.getItem('adminPassword');
             const loginTime = localStorage.getItem('loginTime');
             const currentTime = new Date().getTime();
             
-            // Redirect to login if not authenticated or session expired
-            if (!adminUser || !adminRole || !loginTime || (currentTime - parseInt(loginTime)) > 3600000) {
-                localStorage.clear();
-                window.location.href = 'index.html';
+            // If user was logged in and it's been less than 1 hour
+            if (adminUsername && adminPassword && loginTime && (currentTime - parseInt(loginTime)) < 3600000) {
+                // Verify credentials with database first
+                verifyAdminCredentials(adminUsername, adminPassword, true);
+            } else if (adminUsername) {
+                // Clear expired login
+                clearLocalStorage();
+            }
+        });
+        
+        // Login function
+        loginBtn.addEventListener('click', loginUser);
+        
+        // Also allow login with Enter key
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginUser();
+            }
+        });
+        
+        function loginUser() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            // Validate inputs
+            if (!username || !password) {
+                showError('Please enter both username and password');
                 return;
             }
             
-            // Set username and load configurations
-            adminUsername.textContent = adminUser;
-            loadVersionConfig();
-        });
+            // Verify credentials with database
+            verifyAdminCredentials(username, password, false);
+        }
         
-        // Load Version Configuration
-        function loadVersionConfig() {
-            database.ref('updateConfig').once('value')
+        function verifyAdminCredentials(username, password, isAutoLogin) {
+            // Show loading state
+            if (!isAutoLogin) {
+                loginBtn.querySelector('span').textContent = 'Verifying...';
+                loginLoader.style.display = 'block';
+                loginBtn.disabled = true;
+            }
+            
+            // Reference to the admins node in Firebase
+            const adminsRef = database.ref('admins');
+            
+            // Check if the user exists and credentials are valid
+            adminsRef.once('value')
                 .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const config = snapshot.val();
-                        minVersionName.value = config.minimumVersionName || '';
-                        minVersionCode.value = config.minimumVersionCode || '';
-                        updateMessage.value = config.updateMessage || '';
-                        updateLink.value = config.updateLink || '';
+                    let userFound = false;
+                    let userData = null;
+                    
+                    snapshot.forEach(childSnapshot => {
+                        const admin = childSnapshot.val();
                         
-                        // Update current config display
-                        currentMinVersionName.textContent = config.minimumVersionName || 'Not set';
-                        currentMinVersionCode.textContent = config.minimumVersionCode || 'Not set';
-                        currentUpdateMessage.textContent = config.updateMessage || 'Not set';
-                        currentUpdateLink.textContent = config.updateLink || 'Not set';
+                        // Check if username and password match
+                        if (admin.username === username && admin.password === password) {
+                            userFound = true;
+                            userData = admin;
+                            userData.key = childSnapshot.key;
+                            return true; // Break out of forEach
+                        }
+                    });
+                    
+                    if (userFound) {
+                        // Login successful
+                        if (!isAutoLogin) {
+                            showSuccess('Login successful! Redirecting...');
+                        }
+                        
+                        // Save user data to localStorage
+                        localStorage.setItem('adminRole', userData.role);
+                        localStorage.setItem('adminUsername', userData.username);
+                        localStorage.setItem('adminPassword', userData.password); // Note: Storing password is generally not recommended
+                        localStorage.setItem('loginTime', new Date().getTime());
+                        
+                        // Redirect to dashboard after a short delay
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, isAutoLogin ? 100 : 1500);
+                    } else {
+                        // Login failed
+                        if (!isAutoLogin) {
+                            showError('Invalid username or password');
+                            loginBtn.querySelector('span').textContent = 'Login';
+                            loginLoader.style.display = 'none';
+                            loginBtn.disabled = false;
+                        } else {
+                            // Auto-login failed, clear local storage
+                            clearLocalStorage();
+                        }
                     }
                 })
                 .catch(error => {
-                    showError('Error loading version configuration: ' + error.message);
+                    if (!isAutoLogin) {
+                        showError('Error connecting to database: ' + error.message);
+                        loginBtn.querySelector('span').textContent = 'Login';
+                        loginLoader.style.display = 'none';
+                        loginBtn.disabled = false;
+                    }
                 });
         }
         
-        // Save Version Configuration
-        saveVersionConfig.addEventListener('click', () => {
-            const config = {
-                minimumVersionName: minVersionName.value,
-                minimumVersionCode: parseInt(minVersionCode.value) || 0,
-                updateMessage: updateMessage.value,
-                updateLink: updateLink.value
-            };
-            
-            // Validate inputs
-            if (!config.minimumVersionName || !config.minimumVersionCode) {
-                showError('Please fill in all version fields');
-                return;
-            }
-            
-            // Validate version name format (should be x.y.z)
-            const versionRegex = /^\d+(\.\d+)*$/;
-            if (!versionRegex.test(config.minimumVersionName)) {
-                showError('Version name should be in format like 1.6.2 (numbers separated by dots)');
-                return;
-            }
-            
-            database.ref('updateConfig').set(config)
-                .then(() => {
-                    showSuccess('Version configuration saved successfully!');
-                    loadVersionConfig(); // Reload to show current values
-                })
-                .catch(error => {
-                    showError('Error saving version configuration: ' + error.message);
-                });
+        // Forgot password handler
+        forgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showError('Please contact system administrator to reset your password');
         });
         
-        // Logout
-        logoutBtn.addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        });
+        // Helper function to clear local storage
+        function clearLocalStorage() {
+            localStorage.removeItem('adminRole');
+            localStorage.removeItem('adminUsername');
+            localStorage.removeItem('adminPassword');
+            localStorage.removeItem('loginTime');
+        }
         
         // Helper functions for showing messages
         function showError(message) {
