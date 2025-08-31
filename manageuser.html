@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Battle - Version Management</title>
+    <title>Admin Dashboard - Premium Plans</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -28,7 +28,8 @@
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 15px;
+            padding: 20px;
+            color: var(--dark);
         }
         
         .container {
@@ -37,117 +38,121 @@
         }
         
         .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: var(--white);
-            border-radius: 12px;
             padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            position: relative;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
         .logo {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
         }
         
         .logo img {
-            height: 35px;
+            height: 40px;
             margin-right: 10px;
         }
         
         .logo h1 {
             font-size: 20px;
-            color: var(--dark);
+            font-weight: 600;
         }
         
         .user-info {
-            position: absolute;
-            top: 15px;
-            right: 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
         }
         
         .user-info span {
-            font-size: 14px;
-            color: var(--dark);
+            margin-right: 10px;
+            font-weight: 500;
         }
         
-        .logout-btn {
-            background: var(--danger);
-            color: var(--white);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
+        .role-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 12px;
-        }
-        
-        .dashboard {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .card-title {
-            font-size: 16px;
             font-weight: 600;
+        }
+        
+        .admin {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .founder {
+            background: var(--warning);
             color: var(--dark);
         }
         
-        .card-icon {
-            width: 35px;
-            height: 35px;
-            background: var(--primary);
-            border-radius: 8px;
+        .nav-tabs {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            background: var(--white);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-tab.active {
+            background: var(--primary);
             color: var(--white);
-            font-size: 14px;
+        }
+        
+        .content {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
-            color: var(--dark);
-            font-size: 14px;
         }
         
         .form-control {
             width: 100%;
-            padding: 12px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
-            color: var(--dark);
-            background: var(--white);
         }
         
         .form-control:focus {
@@ -156,14 +161,13 @@
         }
         
         .btn {
-            padding: 12px;
+            padding: 12px 20px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 100%;
         }
         
         .btn-primary {
@@ -175,12 +179,98 @@
             background: var(--secondary);
         }
         
-        .alert {
-            padding: 10px 12px;
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--white);
+        }
+        
+        .game-mode-tabs {
+            display: flex;
+            margin-bottom: 20px;
             border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+        
+        .game-mode-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .game-mode-tab.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .premium-plans {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .plan-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .plan-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .plan-category {
+            background: var(--primary);
+            color: var(--white);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .plan-details {
+            margin-bottom: 10px;
+        }
+        
+        .plan-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
             font-size: 14px;
+        }
+        
+        .plan-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
         }
         
         .alert-danger {
@@ -193,53 +283,6 @@
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
-        }
-        
-        .current-config {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        
-        .current-config h4 {
-            font-size: 15px;
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-        
-        .config-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
-        
-        .config-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .version-info {
-            background: #e9ecef;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 13px;
-        }
-        
-        .version-info p {
-            margin: 4px 0;
-        }
-        
-        small {
-            font-size: 12px;
-            color: var(--gray);
-            display: block;
-            margin-top: 4px;
         }
         
         .loader {
@@ -257,46 +300,39 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Mobile-specific optimizations */
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px;
             }
             
+            .premium-plans {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
             .header {
-                padding: 12px;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-info {
+                margin-top: 10px;
             }
             
             .logo h1 {
                 font-size: 18px;
             }
-            
-            .user-info {
-                position: static;
-                justify-content: center;
-                margin-top: 10px;
-            }
-            
-            .card {
-                padding: 15px;
-            }
-            
-            .card-title {
-                font-size: 15px;
-            }
-            
-            .form-control, .btn {
-                padding: 10px;
-            }
-        }
-        
-        /* Improved touch targets for mobile */
-        input, textarea, button {
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        button:active {
-            transform: scale(0.98);
         }
     </style>
     <!-- Firebase App (the core Firebase SDK) -->
@@ -308,84 +344,103 @@
     <div class="container">
         <div class="header">
             <div class="logo">
-                <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo">
-                <h1>Aura Battle - Version Management</h1>
+                <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo">
+                <h1>Admin Dashboard</h1>
             </div>
             <div class="user-info">
-                <span id="adminUsername">Loading...</span>
+                <span id="adminUsername">Admin</span>
+                <div class="role-badge admin" id="adminRole">Admin</div>
                 <button class="logout-btn" id="logoutBtn">Logout</button>
             </div>
         </div>
         
-        <div class="alert alert-danger" id="errorMessage"></div>
-        <div class="alert alert-success" id="successMessage"></div>
-        
-        <div id="authChecking">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Verifying Access</div>
-                    <div class="card-icon">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                </div>
-                <div style="text-align: center; padding: 20px;">
-                    <div class="loader" id="authLoader"></div>
-                    <p style="margin-top: 15px;">Checking your credentials...</p>
-                </div>
-            </div>
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="premium">Premium Plans</div>
+            <div class="nav-tab" data-tab="categories">Categories</div>
         </div>
         
-        <div id="dashboardContent" style="display: none;">
-            <div class="dashboard">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Version Configuration</div>
-                        <div class="card-icon">
-                            <i class="fas fa-code-branch"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="version-info">
-                        <p><strong>Update Logic:</strong> Update required if version name is smaller than minimum version</p>
-                        <p><strong>Version Format:</strong> Major.Minor.Patch (e.g., 1.6.2)</p>
+        <div class="content">
+            <!-- Premium Plans Section -->
+            <div class="content-section active" id="premiumSection">
+                <h2 class="section-title">Manage Premium Plans</h2>
+                
+                <div class="game-mode-tabs">
+                    <div class="game-mode-tab active" data-mode="lw">Lone Wolf (LW)</div>
+                    <div class="game-mode-tab" data-mode="cs">Clash Squad (CS)</div>
+                    <div class="game-mode-tab" data-mode="br">Battle Royal (BR)</div>
+                </div>
+                
+                <form id="premiumPlanForm">
+                    <div class="form-group">
+                        <label for="planTitle">Plan Title</label>
+                        <input type="text" class="form-control" id="planTitle" placeholder="Enter plan title" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="minVersionName">Minimum Version Name</label>
-                        <input type="text" class="form-control" id="minVersionName" placeholder="e.g., 1.6.2">
-                        <small>Users with version smaller than this will be prompted to update</small>
+                        <label for="planCategory">Category</label>
+                        <select class="form-control" id="planCategory" required>
+                            <option value="">Select Category</option>
+                            <!-- Categories will be loaded dynamically -->
+                        </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="updateMessage">Update Message</label>
-                        <textarea class="form-control" id="updateMessage" rows="2" placeholder="Message shown to users">A new version is available with exciting new features and improvements!</textarea>
+                        <label for="planPrice">Price ($)</label>
+                        <input type="number" class="form-control" id="planPrice" placeholder="Enter price" min="0" step="0.01" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="updateLink">Update Link</label>
-                        <input type="url" class="form-control" id="updateLink" placeholder="https://play.google.com/store/apps/details?id=com.aura.battle" value="https://play.google.com/store/apps/details?id=com.aura.battle">
+                        <label for="silverPrice">Silver Price</label>
+                        <input type="number" class="form-control" id="silverPrice" placeholder="Enter silver price" min="0" required>
                     </div>
                     
-                    <button class="btn btn-primary" id="saveVersionConfig">
-                        <span>Save Version Configuration</span>
-                        <div class="loader" id="saveLoader"></div>
+                    <div class="form-group">
+                        <label for="validity">Validity (Days)</label>
+                        <input type="number" class="form-control" id="validity" placeholder="Enter validity in days" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="totalMatches">Total Matches</label>
+                        <input type="number" class="form-control" id="totalMatches" placeholder="Enter total matches" min="1" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span>Create Plan</span>
+                        <div class="loader" id="planLoader"></div>
                     </button>
-                    
-                    <div class="current-config" id="currentVersionConfig">
-                        <h4>Current Configuration:</h4>
-                        <div class="config-item">
-                            <span>Minimum Version:</span>
-                            <span id="currentMinVersionName">Not set</span>
-                        </div>
-                        <div class="config-item">
-                            <span>Update Message:</span>
-                            <span id="currentUpdateMessage">Not set</span>
-                        </div>
-                        <div class="config-item">
-                            <span>Update Link:</span>
-                            <span id="currentUpdateLink">Not set</span>
-                        </div>
+                </form>
+                
+                <div class="alert alert-danger" id="planError"></div>
+                <div class="alert alert-success" id="planSuccess"></div>
+                
+                <h3 class="section-title" style="margin-top: 30px;">Existing Plans</h3>
+                <div class="premium-plans" id="plansContainer">
+                    <!-- Plans will be loaded dynamically -->
+                </div>
+            </div>
+            
+            <!-- Categories Section -->
+            <div class="content-section" id="categoriesSection">
+                <h2 class="section-title">Manage Categories</h2>
+                
+                <form id="categoryForm">
+                    <div class="form-group">
+                        <label for="categoryName">Category Name</label>
+                        <input type="text" class="form-control" id="categoryName" placeholder="Enter category name" required>
                     </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span>Create Category</span>
+                        <div class="loader" id="categoryLoader"></div>
+                    </button>
+                </form>
+                
+                <div class="alert alert-danger" id="categoryError"></div>
+                <div class="alert alert-success" id="categorySuccess"></div>
+                
+                <h3 class="section-title" style="margin-top: 30px;">Existing Categories</h3>
+                <div id="categoriesContainer">
+                    <!-- Categories will be loaded dynamically -->
                 </div>
             </div>
         </div>
@@ -409,192 +464,372 @@
         const database = firebase.database();
         
         // DOM Elements
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
         const adminUsername = document.getElementById('adminUsername');
+        const adminRole = document.getElementById('adminRole');
         const logoutBtn = document.getElementById('logoutBtn');
-        const authChecking = document.getElementById('authChecking');
-        const dashboardContent = document.getElementById('dashboardContent');
-        const authLoader = document.getElementById('authLoader');
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const contentSections = document.querySelectorAll('.content-section');
+        const gameModeTabs = document.querySelectorAll('.game-mode-tab');
         
-        // Version Config Elements
-        const minVersionName = document.getElementById('minVersionName');
-        const updateMessage = document.getElementById('updateMessage');
-        const updateLink = document.getElementById('updateLink');
-        const saveVersionConfig = document.getElementById('saveVersionConfig');
-        const saveLoader = document.getElementById('saveLoader');
+        // Form elements
+        const premiumPlanForm = document.getElementById('premiumPlanForm');
+        const categoryForm = document.getElementById('categoryForm');
+        const planCategory = document.getElementById('planCategory');
         
-        // Current Config Display Elements
-        const currentMinVersionName = document.getElementById('currentMinVersionName');
-        const currentUpdateMessage = document.getElementById('currentUpdateMessage');
-        const currentUpdateLink = document.getElementById('currentUpdateLink');
+        // Alert elements
+        const planError = document.getElementById('planError');
+        const planSuccess = document.getElementById('planSuccess');
+        const categoryError = document.getElementById('categoryError');
+        const categorySuccess = document.getElementById('categorySuccess');
         
-        // Show loader during authentication check
-        authLoader.style.display = 'block';
+        // Containers
+        const plansContainer = document.getElementById('plansContainer');
+        const categoriesContainer = document.getElementById('categoriesContainer');
         
-        // Check authentication on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            const adminUser = localStorage.getItem('adminUsername');
-            const adminEmail = localStorage.getItem('adminEmail');
+        // Current state
+        let currentGameMode = 'lw';
+        let categories = [];
+        let plans = { lw: [], cs: [], br: [] };
+        
+        // Check authentication and load data
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthentication();
+            loadCategories();
+            loadPlans();
+            setupEventListeners();
+        });
+        
+        function checkAuthentication() {
+            const adminRoleValue = localStorage.getItem('adminRole');
+            const adminUsernameValue = localStorage.getItem('adminUsername');
             const loginTime = localStorage.getItem('loginTime');
             const currentTime = new Date().getTime();
             
-            // Redirect to login if not authenticated or session expired
-            if (!adminUser || !adminEmail || !loginTime || (currentTime - parseInt(loginTime)) > 3600000) {
-                localStorage.clear();
+            if (!adminRoleValue || !adminUsernameValue || !loginTime || (currentTime - parseInt(loginTime)) > 600000) {
+                // Not authenticated or session expired
                 window.location.href = 'index.html';
                 return;
             }
             
-            // Set username while we verify credentials
-            adminUsername.textContent = adminUser;
+            // Show admin info
+            adminUsername.textContent = adminUsernameValue;
+            adminRole.textContent = adminRoleValue;
+            adminRole.className = 'role-badge ' + (adminRoleValue.toLowerCase() === 'founder' ? 'founder' : 'admin');
             
-            // Verify credentials against database
-            verifyAdminCredentials(adminUser, adminEmail);
-        });
+            // Verify admin exists in database
+            verifyAdminInDatabase(adminUsernameValue);
+        }
         
-        // Verify admin credentials against database
-        function verifyAdminCredentials(username, email) {
+        function verifyAdminInDatabase(username) {
             const adminsRef = database.ref('admins');
             
             adminsRef.once('value')
                 .then(snapshot => {
-                    let isValidAdmin = false;
+                    let adminExists = false;
                     
                     snapshot.forEach(childSnapshot => {
                         const admin = childSnapshot.val();
-                        
-                        // Check if username/email matches
-                        if (admin.username === username && admin.email === email) {
-                            isValidAdmin = true;
-                            return true; // Break out of forEach
+                        if (admin.username === username) {
+                            adminExists = true;
+                            return true;
                         }
                     });
                     
-                    if (isValidAdmin) {
-                        // Credentials are valid, show dashboard
-                        authChecking.style.display = 'none';
-                        dashboardContent.style.display = 'block';
-                        loadVersionConfig();
-                    } else {
-                        // Invalid credentials, redirect to login
-                        showError('Invalid admin credentials. Please login again.');
-                        setTimeout(() => {
-                            localStorage.clear();
-                            window.location.href = 'index.html';
-                        }, 2000);
-                    }
-                })
-                .catch(error => {
-                    showError('Error verifying credentials: ' + error.message);
-                    setTimeout(() => {
+                    if (!adminExists) {
+                        // Admin not found in database
                         localStorage.clear();
                         window.location.href = 'index.html';
-                    }, 2000);
-                });
-        }
-        
-        // Load Version Configuration
-        function loadVersionConfig() {
-            database.ref('updateConfig').once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const config = snapshot.val();
-                        minVersionName.value = config.minimumVersionName || '';
-                        updateMessage.value = config.updateMessage || '';
-                        updateLink.value = config.updateLink || '';
-                        
-                        // Update current config display
-                        currentMinVersionName.textContent = config.minimumVersionName || 'Not set';
-                        currentUpdateMessage.textContent = config.updateMessage || 'Not set';
-                        currentUpdateLink.textContent = config.updateLink || 'Not set';
                     }
                 })
                 .catch(error => {
-                    showError('Error loading version configuration: ' + error.message);
+                    console.error('Error verifying admin:', error);
+                    showError(planError, 'Error verifying admin privileges');
                 });
         }
         
-        // Save Version Configuration
-        saveVersionConfig.addEventListener('click', () => {
-            const config = {
-                minimumVersionName: minVersionName.value,
-                updateMessage: updateMessage.value,
-                updateLink: updateLink.value
+        function setupEventListeners() {
+            // Navigation tabs
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    contentSections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(tabName + 'Section').classList.add('active');
+                });
+            });
+            
+            // Game mode tabs
+            gameModeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const mode = this.getAttribute('data-mode');
+                    
+                    // Update active tab
+                    gameModeTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update current game mode and refresh plans
+                    currentGameMode = mode;
+                    displayPlans();
+                });
+            });
+            
+            // Form submissions
+            premiumPlanForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                createPremiumPlan();
+            });
+            
+            categoryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                createCategory();
+            });
+            
+            // Logout button
+            logoutBtn.addEventListener('click', function() {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            });
+        }
+        
+        function loadCategories() {
+            const categoriesRef = database.ref('categories');
+            
+            categoriesRef.on('value', function(snapshot) {
+                categories = [];
+                snapshot.forEach(childSnapshot => {
+                    const category = childSnapshot.val();
+                    category.id = childSnapshot.key;
+                    categories.push(category);
+                });
+                
+                displayCategories();
+                populateCategoryDropdown();
+            });
+        }
+        
+        function loadPlans() {
+            const plansRef = database.ref('premiumPlans');
+            
+            plansRef.on('value', function(snapshot) {
+                plans = { lw: [], cs: [], br: [] };
+                snapshot.forEach(childSnapshot => {
+                    const plan = childSnapshot.val();
+                    plan.id = childSnapshot.key;
+                    
+                    if (plans[plan.gameMode]) {
+                        plans[plan.gameMode].push(plan);
+                    }
+                });
+                
+                displayPlans();
+            });
+        }
+        
+        function displayCategories() {
+            categoriesContainer.innerHTML = '';
+            
+            if (categories.length === 0) {
+                categoriesContainer.innerHTML = '<p>No categories found. Create your first category!</p>';
+                return;
+            }
+            
+            categories.forEach(category => {
+                const categoryEl = document.createElement('div');
+                categoryEl.className = 'plan-card';
+                categoryEl.innerHTML = `
+                    <div class="plan-header">
+                        <div class="plan-title">${category.name}</div>
+                    </div>
+                    <div class="plan-actions">
+                        <button class="btn btn-danger btn-sm" onclick="deleteCategory('${category.id}')">Delete</button>
+                    </div>
+                `;
+                
+                categoriesContainer.appendChild(categoryEl);
+            });
+        }
+        
+        function displayPlans() {
+            plansContainer.innerHTML = '';
+            
+            const currentPlans = plans[currentGameMode] || [];
+            
+            if (currentPlans.length === 0) {
+                plansContainer.innerHTML = '<p>No plans found for this game mode. Create your first plan!</p>';
+                return;
+            }
+            
+            currentPlans.forEach(plan => {
+                const planEl = document.createElement('div');
+                planEl.className = 'plan-card';
+                planEl.innerHTML = `
+                    <div class="plan-header">
+                        <div class="plan-title">${plan.title}</div>
+                        <div class="plan-category">${plan.category}</div>
+                    </div>
+                    <div class="plan-details">
+                        <div class="plan-detail">
+                            <span>Price:</span>
+                            <span>$${plan.price} | ${plan.silverPrice} Silver</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span>Validity:</span>
+                            <span>${plan.validity} days</span>
+                        </div>
+                        <div class="plan-detail">
+                            <span>Matches:</span>
+                            <span>${plan.totalMatches}</span>
+                        </div>
+                    </div>
+                    <div class="plan-actions">
+                        <button class="btn btn-danger btn-sm" onclick="deletePlan('${plan.id}', '${plan.gameMode}')">Delete</button>
+                    </div>
+                `;
+                
+                plansContainer.appendChild(planEl);
+            });
+        }
+        
+        function populateCategoryDropdown() {
+            planCategory.innerHTML = '<option value="">Select Category</option>';
+            
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                planCategory.appendChild(option);
+            });
+        }
+        
+        function createPremiumPlan() {
+            const title = document.getElementById('planTitle').value.trim();
+            const category = planCategory.value;
+            const price = parseFloat(document.getElementById('planPrice').value);
+            const silverPrice = parseInt(document.getElementById('silverPrice').value);
+            const validity = parseInt(document.getElementById('validity').value);
+            const totalMatches = parseInt(document.getElementById('totalMatches').value);
+            
+            if (!title || !category || isNaN(price) || isNaN(silverPrice) || isNaN(validity) || isNaN(totalMatches)) {
+                showError(planError, 'Please fill all fields with valid values');
+                return;
+            }
+            
+            const planData = {
+                title,
+                category,
+                price,
+                silverPrice,
+                validity,
+                totalMatches,
+                gameMode: currentGameMode,
+                createdAt: new Date().toISOString()
             };
             
-            // Validate inputs
-            if (!config.minimumVersionName) {
-                showError('Please enter a minimum version name');
-                return;
-            }
+            const plansRef = database.ref('premiumPlans');
+            const newPlanRef = plansRef.push();
             
-            // Validate version name format (should be x.y.z)
-            const versionRegex = /^\d+(\.\d+)*$/;
-            if (!versionRegex.test(config.minimumVersionName)) {
-                showError('Version name should be in format like 1.6.2 (numbers separated by dots)');
-                return;
-            }
-            
-            // Show loading state
-            saveVersionConfig.querySelector('span').textContent = 'Saving...';
-            saveLoader.style.display = 'block';
-            saveVersionConfig.disabled = true;
-            
-            database.ref('updateConfig').set(config)
+            newPlanRef.set(planData)
                 .then(() => {
-                    showSuccess('Version configuration saved successfully!');
-                    loadVersionConfig(); // Reload to show current values
-                    
-                    // Reset button state
-                    saveVersionConfig.querySelector('span').textContent = 'Save Version Configuration';
-                    saveLoader.style.display = 'none';
-                    saveVersionConfig.disabled = false;
+                    showSuccess(planSuccess, 'Plan created successfully!');
+                    premiumPlanForm.reset();
                 })
                 .catch(error => {
-                    showError('Error saving version configuration: ' + error.message);
-                    
-                    // Reset button state
-                    saveVersionConfig.querySelector('span').textContent = 'Save Version Configuration';
-                    saveLoader.style.display = 'none';
-                    saveVersionConfig.disabled = false;
+                    showError(planError, 'Error creating plan: ' + error.message);
                 });
-        });
+        }
         
-        // Logout
-        logoutBtn.addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        });
+        function createCategory() {
+            const name = document.getElementById('categoryName').value.trim();
+            
+            if (!name) {
+                showError(categoryError, 'Please enter a category name');
+                return;
+            }
+            
+            // Check if category already exists
+            if (categories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+                showError(categoryError, 'Category already exists');
+                return;
+            }
+            
+            const categoryData = {
+                name,
+                createdAt: new Date().toISOString()
+            };
+            
+            const categoriesRef = database.ref('categories');
+            const newCategoryRef = categoriesRef.push();
+            
+            newCategoryRef.set(categoryData)
+                .then(() => {
+                    showSuccess(categorySuccess, 'Category created successfully!');
+                    categoryForm.reset();
+                })
+                .catch(error => {
+                    showError(categoryError, 'Error creating category: ' + error.message);
+                });
+        }
         
-        // Helper functions for showing messages
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
+        function deletePlan(planId, gameMode) {
+            if (!confirm('Are you sure you want to delete this plan?')) {
+                return;
+            }
+            
+            const planRef = database.ref('premiumPlans/' + planId);
+            
+            planRef.remove()
+                .then(() => {
+                    showSuccess(planSuccess, 'Plan deleted successfully!');
+                })
+                .catch(error => {
+                    showError(planError, 'Error deleting plan: ' + error.message);
+                });
+        }
+        
+        function deleteCategory(categoryId) {
+            if (!confirm('Are you sure you want to delete this category? This may affect existing plans.')) {
+                return;
+            }
+            
+            const categoryRef = database.ref('categories/' + categoryId);
+            
+            categoryRef.remove()
+                .then(() => {
+                    showSuccess(categorySuccess, 'Category deleted successfully!');
+                })
+                .catch(error => {
+                    showError(categoryError, 'Error deleting category: ' + error.message);
+                });
+        }
+        
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
             
             // Auto hide after 5 seconds
             setTimeout(() => {
-                errorMessage.style.display = 'none';
+                element.style.display = 'none';
             }, 5000);
-            
-            // Scroll to error message
-            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
+        function showSuccess(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
             
             // Auto hide after 3 seconds
             setTimeout(() => {
-                successMessage.style.display = 'none';
+                element.style.display = 'none';
             }, 3000);
-            
-            // Scroll to success message
-            successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+        
+        // Make functions available globally for onclick handlers
+        window.deletePlan = deletePlan;
+        window.deleteCategory = deleteCategory;
     </script>
 </body>
 </html>
