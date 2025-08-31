@@ -190,10 +190,12 @@
             border-radius: 8px;
             overflow: hidden;
             background: #f8f9fa;
+            flex-wrap: wrap;
         }
         
         .game-mode-tab {
             flex: 1;
+            min-width: 120px;
             text-align: center;
             padding: 12px;
             cursor: pointer;
@@ -210,6 +212,7 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 15px;
+            margin-bottom: 20px;
         }
         
         .plan-card {
@@ -266,6 +269,26 @@
             color: var(--white);
         }
         
+        .add-plan-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .add-plan-btn i {
+            margin-right: 8px;
+        }
+        
         .alert {
             padding: 12px 15px;
             border-radius: 8px;
@@ -310,6 +333,18 @@
             font-weight: 500;
         }
         
+        .add-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
         @media (min-width: 768px) {
             .container {
                 max-width: 750px;
@@ -332,6 +367,10 @@
             
             .logo h1 {
                 font-size: 18px;
+            }
+            
+            .game-mode-tab {
+                min-width: 50%;
             }
         }
     </style>
@@ -368,54 +407,76 @@
                     <div class="game-mode-tab active" data-mode="lw">Lone Wolf (LW)</div>
                     <div class="game-mode-tab" data-mode="cs">Clash Squad (CS)</div>
                     <div class="game-mode-tab" data-mode="br">Battle Royal (BR)</div>
+                    <div class="game-mode-tab" data-mode="cd">Craftland Racing (CD)</div>
                 </div>
                 
-                <form id="premiumPlanForm">
-                    <div class="form-group">
-                        <label for="planTitle">Plan Title</label>
-                        <input type="text" class="form-control" id="planTitle" placeholder="Enter plan title" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="planCategory">Category</label>
-                        <select class="form-control" id="planCategory" required>
-                            <option value="">Select Category</option>
-                            <!-- Categories will be loaded dynamically -->
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="planPrice">Price ($)</label>
-                        <input type="number" class="form-control" id="planPrice" placeholder="Enter price" min="0" step="0.01" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="silverPrice">Silver Price</label>
-                        <input type="number" class="form-control" id="silverPrice" placeholder="Enter silver price" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="validity">Validity (Days)</label>
-                        <input type="number" class="form-control" id="validity" placeholder="Enter validity in days" min="1" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="totalMatches">Total Matches</label>
-                        <input type="number" class="form-control" id="totalMatches" placeholder="Enter total matches" min="1" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <span>Create Plan</span>
-                        <div class="loader" id="planLoader"></div>
-                    </button>
-                </form>
-                
-                <div class="alert alert-danger" id="planError"></div>
-                <div class="alert alert-success" id="planSuccess"></div>
-                
-                <h3 class="section-title" style="margin-top: 30px;">Existing Plans</h3>
                 <div class="premium-plans" id="plansContainer">
                     <!-- Plans will be loaded dynamically -->
+                </div>
+                
+                <button class="add-plan-btn" id="showPlanForm">
+                    <i class="fas fa-plus"></i> Add New Premium Plan
+                </button>
+                
+                <div id="planFormContainer" style="display: none;">
+                    <h3 class="section-title">Create New Premium Plan</h3>
+                    <form id="premiumPlanForm">
+                        <div class="form-group">
+                            <label for="gameMode">Game Mode</label>
+                            <select class="form-control" id="gameMode" required>
+                                <option value="">Select Game Mode</option>
+                                <option value="lw">Lone Wolf (LW)</option>
+                                <option value="cs">Clash Squad (CS)</option>
+                                <option value="br">Battle Royal (BR)</option>
+                                <option value="cd">Craftland Racing (CD)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planTitle">Plan Title</label>
+                            <input type="text" class="form-control" id="planTitle" placeholder="Enter plan title" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planCategory">Category</label>
+                            <select class="form-control" id="planCategory" required>
+                                <option value="">Select Category</option>
+                                <!-- Categories will be loaded dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="planPrice">Price (₹)</label>
+                            <input type="number" class="form-control" id="planPrice" placeholder="Enter price in rupees" min="0" step="0.01" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="silverPrice">Silver Price</label>
+                            <input type="number" class="form-control" id="silverPrice" placeholder="Enter silver price" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="validity">Validity (Days)</label>
+                            <input type="number" class="form-control" id="validity" placeholder="Enter validity in days" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="totalMatches">Total Matches</label>
+                            <input type="number" class="form-control" id="totalMatches" placeholder="Enter total matches" min="1" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <span>Create Plan</span>
+                            <div class="loader" id="planLoader"></div>
+                        </button>
+                        
+                        <button type="button" class="btn btn-secondary" id="cancelPlanForm" style="margin-left: 10px;">
+                            Cancel
+                        </button>
+                    </form>
+                    
+                    <div class="alert alert-danger" id="planError"></div>
+                    <div class="alert alert-success" id="planSuccess"></div>
                 </div>
             </div>
             
@@ -423,24 +484,34 @@
             <div class="content-section" id="categoriesSection">
                 <h2 class="section-title">Manage Categories</h2>
                 
-                <form id="categoryForm">
-                    <div class="form-group">
-                        <label for="categoryName">Category Name</label>
-                        <input type="text" class="form-control" id="categoryName" placeholder="Enter category name" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <span>Create Category</span>
-                        <div class="loader" id="categoryLoader"></div>
-                    </button>
-                </form>
-                
-                <div class="alert alert-danger" id="categoryError"></div>
-                <div class="alert alert-success" id="categorySuccess"></div>
-                
-                <h3 class="section-title" style="margin-top: 30px;">Existing Categories</h3>
                 <div id="categoriesContainer">
                     <!-- Categories will be loaded dynamically -->
+                </div>
+                
+                <button class="add-plan-btn" id="showCategoryForm">
+                    <i class="fas fa-plus"></i> Add New Category
+                </button>
+                
+                <div id="categoryFormContainer" style="display: none;">
+                    <h3 class="section-title">Create New Category</h3>
+                    <form id="categoryForm">
+                        <div class="form-group">
+                            <label for="categoryName">Category Name</label>
+                            <input type="text" class="form-control" id="categoryName" placeholder="Enter category name" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <span>Create Category</span>
+                            <div class="loader" id="categoryLoader"></div>
+                        </button>
+                        
+                        <button type="button" class="btn btn-secondary" id="cancelCategoryForm" style="margin-left: 10px;">
+                            Cancel
+                        </button>
+                    </form>
+                    
+                    <div class="alert alert-danger" id="categoryError"></div>
+                    <div class="alert alert-success" id="categorySuccess"></div>
                 </div>
             </div>
         </div>
@@ -472,8 +543,17 @@
         const gameModeTabs = document.querySelectorAll('.game-mode-tab');
         
         // Form elements
+        const showPlanForm = document.getElementById('showPlanForm');
+        const planFormContainer = document.getElementById('planFormContainer');
         const premiumPlanForm = document.getElementById('premiumPlanForm');
+        const gameModeSelect = document.getElementById('gameMode');
+        const cancelPlanForm = document.getElementById('cancelPlanForm');
+        
+        const showCategoryForm = document.getElementById('showCategoryForm');
+        const categoryFormContainer = document.getElementById('categoryFormContainer');
         const categoryForm = document.getElementById('categoryForm');
+        const cancelCategoryForm = document.getElementById('cancelCategoryForm');
+        
         const planCategory = document.getElementById('planCategory');
         
         // Alert elements
@@ -489,7 +569,7 @@
         // Current state
         let currentGameMode = 'lw';
         let categories = [];
-        let plans = { lw: [], cs: [], br: [] };
+        let plans = { lw: [], cs: [], br: [], cd: [] };
         
         // Check authentication and load data
         document.addEventListener('DOMContentLoaded', function() {
@@ -578,10 +658,36 @@
                 });
             });
             
+            // Show plan form
+            showPlanForm.addEventListener('click', function() {
+                planFormContainer.style.display = 'block';
+                showPlanForm.style.display = 'none';
+            });
+            
+            // Hide plan form
+            cancelPlanForm.addEventListener('click', function() {
+                planFormContainer.style.display = 'none';
+                showPlanForm.style.display = 'flex';
+                premiumPlanForm.reset();
+            });
+            
             // Form submissions
             premiumPlanForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 createPremiumPlan();
+            });
+            
+            // Show category form
+            showCategoryForm.addEventListener('click', function() {
+                categoryFormContainer.style.display = 'block';
+                showCategoryForm.style.display = 'none';
+            });
+            
+            // Hide category form
+            cancelCategoryForm.addEventListener('click', function() {
+                categoryFormContainer.style.display = 'none';
+                showCategoryForm.style.display = 'flex';
+                categoryForm.reset();
             });
             
             categoryForm.addEventListener('submit', function(e) {
@@ -616,7 +722,7 @@
             const plansRef = database.ref('premiumPlans');
             
             plansRef.on('value', function(snapshot) {
-                plans = { lw: [], cs: [], br: [] };
+                plans = { lw: [], cs: [], br: [], cd: [] };
                 snapshot.forEach(childSnapshot => {
                     const plan = childSnapshot.val();
                     plan.id = childSnapshot.key;
@@ -644,6 +750,12 @@
                 categoryEl.innerHTML = `
                     <div class="plan-header">
                         <div class="plan-title">${category.name}</div>
+                    </div>
+                    <div class="plan-details">
+                        <div class="plan-detail">
+                            <span>Created:</span>
+                            <span>${new Date(category.createdAt).toLocaleDateString()}</span>
+                        </div>
                     </div>
                     <div class="plan-actions">
                         <button class="btn btn-danger btn-sm" onclick="deleteCategory('${category.id}')">Delete</button>
@@ -675,7 +787,7 @@
                     <div class="plan-details">
                         <div class="plan-detail">
                             <span>Price:</span>
-                            <span>$${plan.price} | ${plan.silverPrice} Silver</span>
+                            <span>₹${plan.price} | ${plan.silverPrice} Silver</span>
                         </div>
                         <div class="plan-detail">
                             <span>Validity:</span>
@@ -685,6 +797,10 @@
                             <span>Matches:</span>
                             <span>${plan.totalMatches}</span>
                         </div>
+                        <div class="plan-detail">
+                            <span>Game Mode:</span>
+                            <span>${getGameModeFullName(plan.gameMode)}</span>
+                        </div>
                     </div>
                     <div class="plan-actions">
                         <button class="btn btn-danger btn-sm" onclick="deletePlan('${plan.id}', '${plan.gameMode}')">Delete</button>
@@ -693,6 +809,16 @@
                 
                 plansContainer.appendChild(planEl);
             });
+        }
+        
+        function getGameModeFullName(mode) {
+            switch(mode) {
+                case 'lw': return 'Lone Wolf (LW)';
+                case 'cs': return 'Clash Squad (CS)';
+                case 'br': return 'Battle Royal (BR)';
+                case 'cd': return 'Craftland Racing (CD)';
+                default: return mode;
+            }
         }
         
         function populateCategoryDropdown() {
@@ -707,6 +833,7 @@
         }
         
         function createPremiumPlan() {
+            const gameMode = gameModeSelect.value;
             const title = document.getElementById('planTitle').value.trim();
             const category = planCategory.value;
             const price = parseFloat(document.getElementById('planPrice').value);
@@ -714,7 +841,7 @@
             const validity = parseInt(document.getElementById('validity').value);
             const totalMatches = parseInt(document.getElementById('totalMatches').value);
             
-            if (!title || !category || isNaN(price) || isNaN(silverPrice) || isNaN(validity) || isNaN(totalMatches)) {
+            if (!gameMode || !title || !category || isNaN(price) || isNaN(silverPrice) || isNaN(validity) || isNaN(totalMatches)) {
                 showError(planError, 'Please fill all fields with valid values');
                 return;
             }
@@ -726,7 +853,7 @@
                 silverPrice,
                 validity,
                 totalMatches,
-                gameMode: currentGameMode,
+                gameMode,
                 createdAt: new Date().toISOString()
             };
             
@@ -737,6 +864,13 @@
                 .then(() => {
                     showSuccess(planSuccess, 'Plan created successfully!');
                     premiumPlanForm.reset();
+                    
+                    // Switch to the game mode tab of the created plan
+                    gameModeTabs.forEach(tab => {
+                        if (tab.getAttribute('data-mode') === gameMode) {
+                            tab.click();
+                        }
+                    });
                 })
                 .catch(error => {
                     showError(planError, 'Error creating plan: ' + error.message);
