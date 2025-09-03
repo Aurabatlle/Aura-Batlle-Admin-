@@ -715,13 +715,16 @@
         const searchResults = document.getElementById('searchResults');
         const headerLogo = document.getElementById('headerLogo');
         
-        // Card data for search functionality
-        const cardData = [
-            { title: "Manage Admins", description: "Add, edit or remove admin accounts", icon: "fas fa-users-cog", link: "admin.html" },
-            { title: "Update Version", description: "Manage application updates", icon: "fas fa-sync-alt", link: "ubdate.html" },
-            { title: "Maintenance Control", description: "Enable/disable maintenance mode", icon: "fas fa-tools", link: "maintanace.html" },
-            { title: "Manage Users", description: "View and manage user accounts", icon: "fas fa-user-friends", link: "manageuser.html" }
-        ];
+  // Card data for search functionality
+const cardData = [
+    { title: "Manage Admins", description: "Add, edit or remove admin accounts", icon: "fas fa-users-cog", link: "admin.html" },
+    { title: "Update Version", description: "Manage application updates", icon: "fas fa-sync-alt", link: "ubdate.html" },
+    { title: "Maintenance Control", description: "Enable/disable maintenance mode", icon: "fas fa-tools", link: "maintanace.html" },
+    { title: "Manage Users", description: "View and manage user accounts", icon: "fas fa-user-friends", link: "manageuser.html" },
+    // Add these two new entries
+    { title: "Manage Tournament", description: "Create and manage tournaments", icon: "fas fa-trophy", link: "mantch.html" },
+    { title: "Manage Premium", description: "Configure premium features and subscriptions", icon: "fas fa-crown", link: "premium.html" }
+];
         
         // Check if user is logged in
         window.addEventListener('DOMContentLoaded', () => {
