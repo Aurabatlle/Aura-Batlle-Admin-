@@ -567,6 +567,15 @@
                 </div>
                 
                 <!-- API Status Indicator -->
+
+<!-- Add this new card for Manage Hosters -->
+    <div class="card" onclick="navigateTo('hoster.html')">
+        <i class="fas fa-server"></i>
+        <h3>Manage Hosters</h3>
+        <p>Configure and manage server hosts</p>
+    </div>
+</div>
+                
                <div class="dashboard-cards">
     <div class="card" onclick="navigateTo('admin.html')" id="adminCard">
         <i class="fas fa-users-cog"></i>
@@ -716,14 +725,16 @@
         const headerLogo = document.getElementById('headerLogo');
         
   // Card data for search functionality
+// Card data for search functionality
 const cardData = [
     { title: "Manage Admins", description: "Add, edit or remove admin accounts", icon: "fas fa-users-cog", link: "admin.html" },
     { title: "Update Version", description: "Manage application updates", icon: "fas fa-sync-alt", link: "ubdate.html" },
     { title: "Maintenance Control", description: "Enable/disable maintenance mode", icon: "fas fa-tools", link: "maintanace.html" },
     { title: "Manage Users", description: "View and manage user accounts", icon: "fas fa-user-friends", link: "manageuser.html" },
-    // Add these two new entries
     { title: "Manage Tournament", description: "Create and manage tournaments", icon: "fas fa-trophy", link: "mantch.html" },
-    { title: "Manage Premium", description: "Configure premium features and subscriptions", icon: "fas fa-crown", link: "premium.html" }
+    { title: "Manage Premium", description: "Configure premium features and subscriptions", icon: "fas fa-crown", link: "premium.html" },
+    // Add this new entry for Manage Hosters
+    { title: "Manage Hosters", description: "Configure and manage server hosts", icon: "fas fa-server", link: "hoster.html" }
 ];
         
         // Check if user is logged in
