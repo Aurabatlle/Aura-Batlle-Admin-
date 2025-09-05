@@ -1,160 +1,1088 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Hosters</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#111; color:#fff; margin:0; }
-    header { background:#222; padding:10px; text-align:center; }
-    nav { display:flex; justify-content:space-around; background:#333; }
-    nav button { flex:1; padding:12px; border:none; background:#333; color:#aaa; font-size:16px; }
-    nav button.active { background:#444; color:#fff; }
-    section { display:none; padding:15px; }
-    section.active { display:block; }
-    input, select { width:100%; padding:10px; margin:6px 0; border-radius:6px; border:1px solid #555; background:#222; color:#fff; }
-    button.action { background:#e11d48; color:#fff; border:none; padding:10px 15px; border-radius:6px; margin-top:10px; width:100%; }
-    .list { margin-top:15px; }
-    .hoster { background:#1e1e1e; padding:10px; border-radius:8px; margin-bottom:10px; }
-    .hoster small { color:#aaa; }
-    .badge { padding:2px 6px; border-radius:6px; font-size:12px; }
-    .active-badge { background:green; }
-    .banned-badge { background:red; }
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Hoster Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --danger: #e63946;
+            --warning: #fca311;
+            --gray: #6c757d;
+            --white: #ffffff;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .login-card {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-header {
+            background: var(--primary);
+            padding: 25px;
+            text-align: center;
+            color: var(--white);
+        }
+        
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .logo img {
+            height: 50px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .login-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .login-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .input-group-prepend {
+            padding: 0 15px;
+            background: #f8f9fa;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid #ddd;
+        }
+        
+        .input-group-prepend i {
+            color: var(--gray);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            font-size: 16px;
+            color: var(--dark);
+            background: var(--white);
+        }
+        
+        .form-control:focus {
+            outline: none;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--white);
+            margin-top: 10px;
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        .login-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            min-height: 90vh;
+        }
+        
+        .dashboard-header {
+            background: var(--primary);
+            padding: 20px;
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info span {
+            margin-right: 15px;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .dashboard-body {
+            padding: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+        }
+        
+        .search-box button {
+            padding: 10px 15px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: var(--light);
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        
+        .hoster-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .hoster-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            background: var(--light);
+        }
+        
+        .hoster-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .hoster-name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .hoster-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: var(--success);
+            color: var(--dark);
+        }
+        
+        .status-banned {
+            background: var(--danger);
+            color: var(--white);
+        }
+        
+        .hoster-details {
+            margin-bottom: 10px;
+        }
+        
+        .hoster-detail {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .hoster-detail label {
+            font-weight: 600;
+            min-width: 100px;
+        }
+        
+        .hoster-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .ban-btn {
+            background: var(--danger);
+            color: var(--white);
+        }
+        
+        .unban-btn {
+            background: var(--success);
+            color: var(--white);
+        }
+        
+        .add-hoster-form {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .hoster-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .hoster-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-  <header>
-    <h2>Admin Panel</h2>
-  </header>
+    <!-- Login Page -->
+    <div class="container login-container" id="loginPage">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo">
+                    <h1>Admin Login</h1>
+                </div>
+                <p>Access your admin dashboard</p>
+            </div>
+            
+            <div class="login-body">
+                <div class="alert alert-danger" id="errorMessage"></div>
+                <div class="alert alert-success" id="successMessage"></div>
+                
+                <div class="form-group">
+                    <label for="username">Username or Email</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="text" class="form-control" id="username" placeholder="Enter username or email">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="loginBtn">
+                    <span>Login</span>
+                    <div class="loader" id="loginLoader"></div>
+                </button>
+                
+                <div class="login-footer">
+                    <a href="#" id="forgotPassword">Forgot Password?</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <nav>
-    <button id="tabAdd" class="active">Add Hoster</button>
-    <button id="tabManage">Manage Hosters</button>
-  </nav>
+    <!-- Dashboard Page -->
+    <div class="container dashboard" id="dashboardPage">
+        <div class="dashboard-header">
+            <h1>Hoster Management Dashboard</h1>
+            <div class="user-info">
+                <span id="adminUsername">Admin User</span>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+        
+        <div class="dashboard-body">
+            <div class="tabs">
+                <div class="tab active" data-tab="viewHosters">View Hosters</div>
+                <div class="tab" data-tab="addHoster">Add Hoster</div>
+            </div>
+            
+            <div class="tab-content active" id="viewHostersTab">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search by name, email, username or phone">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <div class="filters">
+                    <div class="filter-btn active" data-filter="all">All Hosters</div>
+                    <div class="filter-btn" data-filter="mostMatches">Most Matches</div>
+                    <div class="filter-btn" data-filter="leastMatches">Least Matches</div>
+                    <div class="filter-btn" data-filter="active">Active</div>
+                    <div class="filter-btn" data-filter="banned">Banned</div>
+                </div>
+                
+                <div class="hoster-list" id="hosterList">
+                    <!-- Hoster cards will be added here dynamically -->
+                </div>
+            </div>
+            
+            <div class="tab-content" id="addHosterTab">
+                <h2>Add New Hoster</h2>
+                <form class="add-hoster-form" id="addHosterForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hosterUsername">Username</label>
+                            <input type="text" class="form-control" id="hosterUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hosterName">Full Name</label>
+                            <input type="text" class="form-control" id="hosterName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hosterEmail">Email</label>
+                            <input type="email" class="form-control" id="hosterEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hosterPhone">Phone Number</label>
+                            <input type="tel" class="form-control" id="hosterPhone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hosterPassword">Password</label>
+                        <input type="password" class="form-control" id="hosterPassword" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Add Hoster</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-  <!-- Add Hoster Page -->
-  <section id="pageAdd" class="active">
-    <h3>Add Hoster</h3>
-    <input id="username" placeholder="Username">
-    <input id="name" placeholder="Name">
-    <input id="email" type="email" placeholder="Email">
-    <input id="phone" placeholder="Phone">
-    <input id="password" type="password" placeholder="Password">
-    <select id="status">
-      <option value="active">Active</option>
-      <option value="banned">Banned</option>
-    </select>
-    <input id="matches" type="number" placeholder="Total Matches" value="0">
-    <button class="action" id="createBtn">Create Hoster</button>
-  </section>
+    <!-- Hoster Detail Modal -->
+    <div class="modal" id="hosterModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Hoster Details</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div id="modalBody">
+                <!-- Modal content will be added here dynamically -->
+            </div>
+        </div>
+    </div>
 
-  <!-- Manage Hosters Page -->
-  <section id="pageManage">
-    <h3>Manage Hosters</h3>
-    <input id="search" placeholder="Search by username/email/name/phone">
-    <select id="filter">
-      <option value="all">All</option>
-      <option value="active">Active</option>
-      <option value="banned">Banned</option>
-      <option value="most">Most Matches</option>
-      <option value="low">Low Matches</option>
-    </select>
-    <div class="list" id="hosterList"></div>
-  </section>
-
-<script>
-// Firebase setup
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// Tab switching
-const tabAdd=document.getElementById("tabAdd"),tabManage=document.getElementById("tabManage");
-const pageAdd=document.getElementById("pageAdd"),pageManage=document.getElementById("pageManage");
-
-function showPage(page){
-  pageAdd.classList.remove("active"); pageManage.classList.remove("active");
-  tabAdd.classList.remove("active"); tabManage.classList.remove("active");
-  if(page==="add"){ pageAdd.classList.add("active"); tabAdd.classList.add("active"); }
-  else { pageManage.classList.add("active"); tabManage.classList.add("active"); }
-}
-
-tabAdd.onclick=()=>showPage("add");
-tabManage.onclick=()=>showPage("manage");
-
-// Add Hoster
-const createBtn=document.getElementById("createBtn");
-createBtn.onclick=()=>{
-  const data={
-    username:username.value,
-    firstName:name.value,
-    email:email.value,
-    phone:phone.value,
-    password:password.value,
-    status:status.value,
-    totalMatches:parseInt(matches.value)||0
-  };
-  if(!data.username||!data.email){alert("Fill required fields");return;}
-  db.ref("hosters").push(data);
-  alert("Hoster added");
-  username.value=name.value=email.value=phone.value=password.value="";
-  matches.value=0;
-  showPage("manage");
-};
-
-// Manage Hosters
-const hosterList=document.getElementById("hosterList");
-const search=document.getElementById("search");
-const filter=document.getElementById("filter");
-
-let hosters=[];
-
-db.ref("hosters").on("value",snap=>{
-  hosters=[];
-  snap.forEach(cs=>{
-    const v=cs.val();
-    v._id=cs.key;
-    hosters.push(v);
-  });
-  render();
-});
-
-function render(){
-  let q=search.value.toLowerCase();
-  let rows=hosters.filter(h=>{
-    return !q||[h.username,h.firstName,h.email,h.phone].some(x=>(x||"").toLowerCase().includes(q));
-  });
-  if(filter.value==="active") rows=rows.filter(h=>h.status==="active");
-  if(filter.value==="banned") rows=rows.filter(h=>h.status==="banned");
-  if(filter.value==="most") rows=rows.sort((a,b)=>b.totalMatches-a.totalMatches);
-  if(filter.value==="low") rows=rows.sort((a,b)=>a.totalMatches-b.totalMatches);
-
-  hosterList.innerHTML="";
-  rows.forEach(h=>{
-    const div=document.createElement("div");
-    div.className="hoster";
-    div.innerHTML=`<b>@${h.username}</b> <span class="badge ${h.status==='banned'?'banned-badge':'active-badge'}">${h.status}</span><br>
-      ${h.firstName} • ${h.email} • ${h.phone}<br>
-      Matches: ${h.totalMatches||0}<br>
-      <button onclick="toggleBan('${h._id}','${h.status}')">${h.status==='banned'?'Unban':'Ban'}</button>`;
-    hosterList.appendChild(div);
-  });
-}
-
-search.oninput=render;
-filter.onchange=render;
-
-function toggleBan(id,status){
-  const newStatus=(status==='banned')?'active':'banned';
-  db.ref('hosters/'+id+'/status').set(newStatus);
-}
-</script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
+            authDomain: "aura-battle-main.firebaseapp.com",
+            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
+            projectId: "aura-battle-main",
+            storageBucket: "aura-battle-main.firebasestorage.app",
+            messagingSenderId: "763779990289",
+            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
+            measurementId: "G-ZZXZ00HK07"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // DOM Elements
+        const loginPage = document.getElementById('loginPage');
+        const dashboardPage = document.getElementById('dashboardPage');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loginLoader = document.getElementById('loginLoader');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminUsernameSpan = document.getElementById('adminUsername');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const hosterList = document.getElementById('hosterList');
+        const addHosterForm = document.getElementById('addHosterForm');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const hosterModal = document.getElementById('hosterModal');
+        const closeModal = document.getElementById('closeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        // Current admin data
+        let currentAdmin = null;
+        
+        // Login function
+        loginBtn.addEventListener('click', loginUser);
+        
+        // Also allow login with Enter key
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginUser();
+            }
+        });
+        
+        function loginUser() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            // Validate inputs
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.querySelector('span').textContent = 'Logging in...';
+            loginLoader.style.display = 'block';
+            loginBtn.disabled = true;
+            
+            // Reference to the admins node in Firebase
+            const adminsRef = database.ref('admins');
+            
+            // Check if the user exists
+            adminsRef.once('value')
+                .then(snapshot => {
+                    let userFound = false;
+                    let userData = null;
+                    
+                    snapshot.forEach(childSnapshot => {
+                        const admin = childSnapshot.val();
+                        
+                        // Check if username/email and password match
+                        if ((admin.username === username || admin.email === username) && admin.password === password) {
+                            userFound = true;
+                            userData = admin;
+                            userData.key = childSnapshot.key;
+                            return true; // Break out of forEach
+                        }
+                    });
+                    
+                    if (userFound) {
+                        // Login successful
+                        showSuccess('Login successful! Redirecting...');
+                        currentAdmin = userData;
+                        
+                        // Save user data to localStorage
+                        localStorage.setItem('adminRole', userData.role);
+                        localStorage.setItem('adminUsername', userData.username);
+                        localStorage.setItem('adminEmail', userData.email);
+                        localStorage.setItem('loginTime', new Date().getTime());
+                        
+                        // Update UI
+                        adminUsernameSpan.textContent = userData.username;
+                        
+                        // Load hosters
+                        loadHosters();
+                        
+                        // Switch to dashboard view
+                        setTimeout(() => {
+                            loginPage.style.display = 'none';
+                            dashboardPage.style.display = 'block';
+                        }, 1000);
+                    } else {
+                        // Login failed
+                        showError('Invalid username/email or password');
+                        loginBtn.querySelector('span').textContent = 'Login';
+                        loginLoader.style.display = 'none';
+                        loginBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    showError('Error connecting to database: ' + error.message);
+                    loginBtn.querySelector('span').textContent = 'Login';
+                    loginLoader.style.display = 'none';
+                    loginBtn.disabled = false;
+                });
+        }
+        
+        // Logout function
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('adminRole');
+            localStorage.removeItem('adminUsername');
+            localStorage.removeItem('adminEmail');
+            localStorage.removeItem('loginTime');
+            
+            dashboardPage.style.display = 'none';
+            loginPage.style.display = 'flex';
+            
+            // Clear form fields
+            usernameInput.value = '';
+            passwordInput.value = '';
+        });
+        
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show corresponding content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === tabId + 'Tab') {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Load hosters from Firebase
+        function loadHosters(searchTerm = '', filter = 'all') {
+            const hostersRef = database.ref('hosters');
+            
+            hostersRef.once('value')
+                .then(snapshot => {
+                    hosterList.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        hosterList.innerHTML = '<p>No hosters found.</p>';
+                        return;
+                    }
+                    
+                    let hosters = [];
+                    snapshot.forEach(childSnapshot => {
+                        const hoster = childSnapshot.val();
+                        hoster.id = childSnapshot.key;
+                        hosters.push(hoster);
+                    });
+                    
+                    // Apply search filter
+                    if (searchTerm) {
+                        const term = searchTerm.toLowerCase();
+                        hosters = hosters.filter(hoster => 
+                            hoster.username.toLowerCase().includes(term) ||
+                            (hoster.firstName && hoster.firstName.toLowerCase().includes(term)) ||
+                            hoster.email.toLowerCase().includes(term) ||
+                            (hoster.phone && hoster.phone.includes(term))
+                        );
+                    }
+                    
+                    // Apply additional filters
+                    switch(filter) {
+                        case 'mostMatches':
+                            hosters.sort((a, b) => (b.totalMatches || 0) - (a.totalMatches || 0));
+                            break;
+                        case 'leastMatches':
+                            hosters.sort((a, b) => (a.totalMatches || 0) - (b.totalMatches || 0));
+                            break;
+                        case 'active':
+                            hosters = hosters.filter(hoster => hoster.status !== 'banned');
+                            break;
+                        case 'banned':
+                            hosters = hosters.filter(hoster => hoster.status === 'banned');
+                            break;
+                    }
+                    
+                    // Display hosters
+                    hosters.forEach(hoster => {
+                        const card = document.createElement('div');
+                        card.className = 'hoster-card';
+                        card.innerHTML = `
+                            <div class="hoster-header">
+                                <div class="hoster-name">${hoster.firstName || 'N/A'} ${hoster.lastName || ''}</div>
+                                <div class="hoster-status ${hoster.status === 'banned' ? 'status-banned' : 'status-active'}">
+                                    ${hoster.status === 'banned' ? 'Banned' : 'Active'}
+                                </div>
+                            </div>
+                            <div class="hoster-details">
+                                <div class="hoster-detail">
+                                    <label>Username:</label>
+                                    <span>${hoster.username}</span>
+                                </div>
+                                <div class="hoster-detail">
+                                    <label>Email:</label>
+                                    <span>${hoster.email}</span>
+                                </div>
+                                <div class="hoster-detail">
+                                    <label>Phone:</label>
+                                    <span>${hoster.phone || 'N/A'}</span>
+                                </div>
+                                <div class="hoster-detail">
+                                    <label>Matches Hosted:</label>
+                                    <span>${hoster.totalMatches || 0}</span>
+                                </div>
+                            </div>
+                            <div class="hoster-actions">
+                                <button class="action-btn ${hoster.status === 'banned' ? 'unban-btn' : 'ban-btn'}" 
+                                    data-id="${hoster.id}" data-action="${hoster.status === 'banned' ? 'unban' : 'ban'}">
+                                    ${hoster.status === 'banned' ? 'Unban' : 'Ban'}
+                                </button>
+                                <button class="action-btn view-btn" data-id="${hoster.id}">View Details</button>
+                            </div>
+                        `;
+                        hosterList.appendChild(card);
+                    });
+                    
+                    // Add event listeners to action buttons
+                    document.querySelectorAll('.action-btn').forEach(btn => {
+                        if (btn.classList.contains('ban-btn') || btn.classList.contains('unban-btn')) {
+                            btn.addEventListener('click', function() {
+                                const hosterId = this.getAttribute('data-id');
+                                const action = this.getAttribute('data-action');
+                                toggleHosterStatus(hosterId, action);
+                            });
+                        } else if (btn.classList.contains('view-btn')) {
+                            btn.addEventListener('click', function() {
+                                const hosterId = this.getAttribute('data-id');
+                                viewHosterDetails(hosterId);
+                            });
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading hosters:', error);
+                    hosterList.innerHTML = '<p>Error loading hosters. Please try again.</p>';
+                });
+        }
+        
+        // Toggle hoster status (ban/unban)
+        function toggleHosterStatus(hosterId, action) {
+            const newStatus = action === 'ban' ? 'banned' : 'active';
+            database.ref('hosters/' + hosterId).update({
+                status: newStatus
+            })
+            .then(() => {
+                showSuccess(`Hoster ${action === 'ban' ? 'banned' : 'unbanned'} successfully!`);
+                loadHosters(searchInput.value, document.querySelector('.filter-btn.active').getAttribute('data-filter'));
+            })
+            .catch(error => {
+                showError('Error updating hoster: ' + error.message);
+            });
+        }
+        
+        // View hoster details
+        function viewHosterDetails(hosterId) {
+            database.ref('hosters/' + hosterId).once('value')
+                .then(snapshot => {
+                    const hoster = snapshot.val();
+                    
+                    modalTitle.textContent = `${hoster.firstName || 'N/A'} ${hoster.lastName || ''}'s Details`;
+                    modalBody.innerHTML = `
+                        <div class="hoster-details">
+                            <div class="hoster-detail">
+                                <label>Username:</label>
+                                <span>${hoster.username}</span>
+                            </div>
+                            <div class="hoster-detail">
+                                <label>Email:</label>
+                                <span>${hoster.email}</span>
+                            </div>
+                            <div class="hoster-detail">
+                                <label>Phone:</label>
+                                <span>${hoster.phone || 'N/A'}</span>
+                            </div>
+                            <div class="hoster-detail">
+                                <label>Matches Hosted:</label>
+                                <span>${hoster.totalMatches || 0}</span>
+                            </div>
+                            <div class="hoster-detail">
+                                <label>Status:</label>
+                                <span class="hoster-status ${hoster.status === 'banned' ? 'status-banned' : 'status-active'}">
+                                    ${hoster.status === 'banned' ? 'Banned' : 'Active'}
+                                </span>
+                            </div>
+                            <div class="hoster-detail">
+                                <label>Registration Date:</label>
+                                <span>${hoster.registrationDate || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    hosterModal.style.display = 'flex';
+                })
+                .catch(error => {
+                    showError('Error loading hoster details: ' + error.message);
+                });
+        }
+        
+        // Close modal
+        closeModal.addEventListener('click', function() {
+            hosterModal.style.display = 'none';
+        });
+        
+        // Click outside modal to close
+        window.addEventListener('click', function(event) {
+            if (event.target === hosterModal) {
+                hosterModal.style.display = 'none';
+            }
+        });
+        
+        // Add new hoster
+        addHosterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('hosterUsername').value.trim();
+            const name = document.getElementById('hosterName').value.trim();
+            const email = document.getElementById('hosterEmail').value.trim();
+            const phone = document.getElementById('hosterPhone').value.trim();
+            const password = document.getElementById('hosterPassword').value;
+            
+            // Basic validation
+            if (!username || !name || !email || !password) {
+                showError('Please fill all required fields');
+                return;
+            }
+            
+            // Create hoster object
+            const hosterData = {
+                username: username,
+                firstName: name,
+                email: email,
+                phone: phone,
+                password: password,
+                status: 'active',
+                totalMatches: 0,
+                registrationDate: new Date().toLocaleDateString()
+            };
+            
+            // Save to Firebase
+            const newHosterRef = database.ref('hosters').push();
+            newHosterRef.set(hosterData)
+                .then(() => {
+                    showSuccess('Hoster added successfully!');
+                    addHosterForm.reset();
+                    
+                    // Switch to view hosters tab
+                    tabs[0].click();
+                    
+                    // Reload hosters list
+                    loadHosters();
+                })
+                .catch(error => {
+                    showError('Error adding hoster: ' + error.message);
+                });
+        });
+        
+        // Search hosters
+        searchBtn.addEventListener('click', function() {
+            const searchTerm = searchInput.value.trim();
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+            loadHosters(searchTerm, activeFilter);
+        });
+        
+        // Filter hosters
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.getAttribute('data-filter');
+                const searchTerm = searchInput.value.trim();
+                loadHosters(searchTerm, filter);
+            });
+        });
+        
+        // Forgot password handler
+        forgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showError('Please contact system administrator to reset your password');
+        });
+        
+        // Helper functions for showing messages
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Check if user is already logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const adminRole = localStorage.getItem('adminRole');
+            const adminUser = localStorage.getItem('adminUsername');
+            const loginTime = localStorage.getItem('loginTime');
+            const currentTime = new Date().getTime();
+            
+            // If user was logged in less than 10 minutes ago, redirect to dashboard
+            if (adminRole && adminUser && loginTime && (currentTime - parseInt(loginTime)) < 600000) {
+                adminUsernameSpan.textContent = adminUser;
+                currentAdmin = {
+                    username: adminUser,
+                    role: adminRole,
+                    email: localStorage.getItem('adminEmail')
+                };
+                
+                loginPage.style.display = 'none';
+                dashboardPage.style.display = 'block';
+                
+                // Load hosters
+                loadHosters();
+            } else if (adminRole) {
+                // Clear expired login
+                localStorage.removeItem('adminRole');
+                localStorage.removeItem('adminUsername');
+                localStorage.removeItem('adminEmail');
+                localStorage.removeItem('loginTime');
+            }
+        });
+    </script>
 </body>
 </html>
