@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Hosters</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#111; color:#fff; margin:0; }
+    header { background:#222; padding:10px; text-align:center; }
+    nav { display:flex; justify-content:space-around; background:#333; }
+    nav button { flex:1; padding:12px; border:none; background:#333; color:#aaa; font-size:16px; }
+    nav button.active { background:#444; color:#fff; }
+    section { display:none; padding:15px; }
+    section.active { display:block; }
+    input, select { width:100%; padding:10px; margin:6px 0; border-radius:6px; border:1px solid #555; background:#222; color:#fff; }
+    button.action { background:#e11d48; color:#fff; border:none; padding:10px 15px; border-radius:6px; margin-top:10px; width:100%; }
+    .list { margin-top:15px; }
+    .hoster { background:#1e1e1e; padding:10px; border-radius:8px; margin-bottom:10px; }
+    .hoster small { color:#aaa; }
+    .badge { padding:2px 6px; border-radius:6px; font-size:12px; }
+    .active-badge { background:green; }
+    .banned-badge { background:red; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+  <header>
+    <h2>Admin Panel</h2>
+  </header>
+
+  <nav>
+    <button id="tabAdd" class="active">Add Hoster</button>
+    <button id="tabManage">Manage Hosters</button>
+  </nav>
+
+  <!-- Add Hoster Page -->
+  <section id="pageAdd" class="active">
+    <h3>Add Hoster</h3>
+    <input id="username" placeholder="Username">
+    <input id="name" placeholder="Name">
+    <input id="email" type="email" placeholder="Email">
+    <input id="phone" placeholder="Phone">
+    <input id="password" type="password" placeholder="Password">
+    <select id="status">
+      <option value="active">Active</option>
+      <option value="banned">Banned</option>
+    </select>
+    <input id="matches" type="number" placeholder="Total Matches" value="0">
+    <button class="action" id="createBtn">Create Hoster</button>
+  </section>
+
+  <!-- Manage Hosters Page -->
+  <section id="pageManage">
+    <h3>Manage Hosters</h3>
+    <input id="search" placeholder="Search by username/email/name/phone">
+    <select id="filter">
+      <option value="all">All</option>
+      <option value="active">Active</option>
+      <option value="banned">Banned</option>
+      <option value="most">Most Matches</option>
+      <option value="low">Low Matches</option>
+    </select>
+    <div class="list" id="hosterList"></div>
+  </section>
+
+<script>
+// Firebase setup
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Tab switching
+const tabAdd=document.getElementById("tabAdd"),tabManage=document.getElementById("tabManage");
+const pageAdd=document.getElementById("pageAdd"),pageManage=document.getElementById("pageManage");
+
+function showPage(page){
+  pageAdd.classList.remove("active"); pageManage.classList.remove("active");
+  tabAdd.classList.remove("active"); tabManage.classList.remove("active");
+  if(page==="add"){ pageAdd.classList.add("active"); tabAdd.classList.add("active"); }
+  else { pageManage.classList.add("active"); tabManage.classList.add("active"); }
+}
+
+tabAdd.onclick=()=>showPage("add");
+tabManage.onclick=()=>showPage("manage");
+
+// Add Hoster
+const createBtn=document.getElementById("createBtn");
+createBtn.onclick=()=>{
+  const data={
+    username:username.value,
+    firstName:name.value,
+    email:email.value,
+    phone:phone.value,
+    password:password.value,
+    status:status.value,
+    totalMatches:parseInt(matches.value)||0
+  };
+  if(!data.username||!data.email){alert("Fill required fields");return;}
+  db.ref("hosters").push(data);
+  alert("Hoster added");
+  username.value=name.value=email.value=phone.value=password.value="";
+  matches.value=0;
+  showPage("manage");
+};
+
+// Manage Hosters
+const hosterList=document.getElementById("hosterList");
+const search=document.getElementById("search");
+const filter=document.getElementById("filter");
+
+let hosters=[];
+
+db.ref("hosters").on("value",snap=>{
+  hosters=[];
+  snap.forEach(cs=>{
+    const v=cs.val();
+    v._id=cs.key;
+    hosters.push(v);
+  });
+  render();
+});
+
+function render(){
+  let q=search.value.toLowerCase();
+  let rows=hosters.filter(h=>{
+    return !q||[h.username,h.firstName,h.email,h.phone].some(x=>(x||"").toLowerCase().includes(q));
+  });
+  if(filter.value==="active") rows=rows.filter(h=>h.status==="active");
+  if(filter.value==="banned") rows=rows.filter(h=>h.status==="banned");
+  if(filter.value==="most") rows=rows.sort((a,b)=>b.totalMatches-a.totalMatches);
+  if(filter.value==="low") rows=rows.sort((a,b)=>a.totalMatches-b.totalMatches);
+
+  hosterList.innerHTML="";
+  rows.forEach(h=>{
+    const div=document.createElement("div");
+    div.className="hoster";
+    div.innerHTML=`<b>@${h.username}</b> <span class="badge ${h.status==='banned'?'banned-badge':'active-badge'}">${h.status}</span><br>
+      ${h.firstName} • ${h.email} • ${h.phone}<br>
+      Matches: ${h.totalMatches||0}<br>
+      <button onclick="toggleBan('${h._id}','${h.status}')">${h.status==='banned'?'Unban':'Ban'}</button>`;
+    hosterList.appendChild(div);
+  });
+}
+
+search.oninput=render;
+filter.onchange=render;
+
+function toggleBan(id,status){
+  const newStatus=(status==='banned')?'active':'banned';
+  db.ref('hosters/'+id+'/status').set(newStatus);
+}
+</script>
+</body>
+</html>
