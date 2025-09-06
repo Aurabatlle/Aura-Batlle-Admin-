@@ -36,184 +36,7 @@
             max-width: 100%;
         }
         
-        /* Login Page Styles */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        
-        .login-card {
-            background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-            width: 100%;
-            max-width: 400px;
-        }
-        
-        .login-header {
-            background: var(--primary);
-            padding: 25px;
-            text-align: center;
-            color: var(--white);
-        }
-        
-        .logo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .logo img {
-            height: 50px;
-            margin-right: 10px;
-        }
-        
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
-        
-        .login-header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .login-body {
-            padding: 25px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-        
-        .input-group {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .input-group-prepend {
-            padding: 0 15px;
-            background: #f8f9fa;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            border-right: 1px solid #ddd;
-        }
-        
-        .input-group-prepend i {
-            color: var(--gray);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: none;
-            font-size: 16px;
-            color: var(--dark);
-            background: var(--white);
-        }
-        
-        .form-control:focus {
-            outline: none;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background: var(--secondary);
-        }
-        
-        .btn-secondary {
-            background: var(--gray);
-            color: var(--white);
-            margin-top: 10px;
-        }
-        
-        .login-footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #eee;
-        }
-        
-        .login-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
-        
-        .alert {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .loader {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-            margin: 0 auto;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Dashboard Styles */
         .dashboard {
-            display: none;
             background: var(--white);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -228,15 +51,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .dashboard-header h1 {
             font-size: 20px;
+            margin-bottom: 10px;
         }
         
         .user-info {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .user-info span {
@@ -260,6 +87,7 @@
             display: flex;
             border-bottom: 1px solid #ddd;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
         .tab {
@@ -334,6 +162,8 @@
             border-radius: 10px;
             padding: 15px;
             background: var(--light);
+            display: flex;
+            flex-direction: column;
         }
         
         .hoster-header {
@@ -341,6 +171,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            flex-wrap: wrap;
         }
         
         .hoster-name {
@@ -365,13 +196,28 @@
             color: var(--white);
         }
         
-        .hoster-details {
+        .hoster-content {
+            display: flex;
+            gap: 15px;
             margin-bottom: 10px;
+        }
+        
+        .hoster-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+        
+        .hoster-details {
+            flex: 1;
         }
         
         .hoster-detail {
             display: flex;
             margin-bottom: 5px;
+            flex-wrap: wrap;
         }
         
         .hoster-detail label {
@@ -383,6 +229,7 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .action-btn {
@@ -402,7 +249,12 @@
             color: var(--white);
         }
         
-        .add-hoster-form {
+        .edit-btn {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .add-hoster-form, .edit-hoster-form {
             display: grid;
             gap: 15px;
         }
@@ -413,10 +265,93 @@
             gap: 15px;
         }
         
-        @media (min-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr 1fr;
-            }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            color: var(--dark);
+            background: var(--white);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .image-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .image-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            border: 2px dashed var(--primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        
+        .upload-btn {
+            background: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .upload-btn input {
+            display: none;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--white);
         }
         
         .modal {
@@ -456,6 +391,51 @@
             cursor: pointer;
         }
         
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            max-width: 350px;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (min-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
         @media (max-width: 768px) {
             .dashboard-header {
                 flex-direction: column;
@@ -474,9 +454,18 @@
                 gap: 10px;
             }
             
+            .hoster-content {
+                flex-direction: column;
+                align-items: center;
+            }
+            
             .hoster-actions {
                 width: 100%;
                 justify-content: flex-start;
+            }
+            
+            .hoster-detail label {
+                min-width: 80px;
             }
         }
     </style>
@@ -486,135 +475,163 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <!-- Login Page -->
-    <div class="container login-container" id="loginPage">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="logo">
-                    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo">
-                    <h1>Admin Login</h1>
+    <div class="container">
+        <!-- Dashboard Page -->
+        <div class="dashboard" id="dashboardPage">
+            <div class="dashboard-header">
+                <h1>Hoster Management Dashboard</h1>
+                <div class="user-info">
+                    <span id="adminUsername">Admin User</span>
+                    <button class="logout-btn" id="logoutBtn">Logout</button>
                 </div>
-                <p>Access your admin dashboard</p>
             </div>
             
-            <div class="login-body">
-                <div class="alert alert-danger" id="errorMessage"></div>
-                <div class="alert alert-success" id="successMessage"></div>
+            <div class="dashboard-body">
+                <div class="tabs">
+                    <div class="tab active" data-tab="viewHosters">View Hosters</div>
+                    <div class="tab" data-tab="addHoster">Add Hoster</div>
+                </div>
                 
-                <div class="form-group">
-                    <label for="username">Username or Email</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <input type="text" class="form-control" id="username" placeholder="Enter username or email">
+                <div class="tab-content active" id="viewHostersTab">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search by name, email, username or phone">
+                        <button id="searchBtn"><i class="fas fa-search"></i></button>
+                    </div>
+                    
+                    <div class="filters">
+                        <div class="filter-btn active" data-filter="all">All Hosters</div>
+                        <div class="filter-btn" data-filter="mostMatches">Most Matches</div>
+                        <div class="filter-btn" data-filter="leastMatches">Least Matches</div>
+                        <div class="filter-btn" data-filter="active">Active</div>
+                        <div class="filter-btn" data-filter="banned">Banned</div>
+                    </div>
+                    
+                    <div class="hoster-list" id="hosterList">
+                        <!-- Hoster cards will be added here dynamically -->
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <i class="fas fa-lock"></i>
+                <div class="tab-content" id="addHosterTab">
+                    <h2>Add New Hoster</h2>
+                    <form class="add-hoster-form" id="addHosterForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hosterUsername">Username *</label>
+                                <input type="text" class="form-control" id="hosterUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hosterName">Full Name *</label>
+                                <input type="text" class="form-control" id="hosterName" required>
+                            </div>
                         </div>
-                        <input type="password" class="form-control" id="password" placeholder="Enter password">
-                    </div>
-                </div>
-                
-                <button class="btn btn-primary" id="loginBtn">
-                    <span>Login</span>
-                    <div class="loader" id="loginLoader"></div>
-                </button>
-                
-                <div class="login-footer">
-                    <a href="#" id="forgotPassword">Forgot Password?</a>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hosterEmail">Email *</label>
+                                <input type="email" class="form-control" id="hosterEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hosterPhone">Phone Number *</label>
+                                <input type="tel" class="form-control" id="hosterPhone" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hosterPassword">Password *</label>
+                            <input type="password" class="form-control" id="hosterPassword" required>
+                        </div>
+                        
+                        <div class="image-upload">
+                            <div class="image-preview" id="addImagePreview">
+                                <i class="fas fa-user fa-3x" style="color: #ccc;"></i>
+                                <img id="addPreviewImg" src="" alt="Preview">
+                            </div>
+                            <label class="upload-btn">
+                                <i class="fas fa-upload"></i> Upload Image
+                                <input type="file" id="addHosterImage" accept="image/*">
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <span>Add Hoster</span>
+                            <div class="loader" id="addHosterLoader"></div>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Dashboard Page -->
-    <div class="container dashboard" id="dashboardPage">
-        <div class="dashboard-header">
-            <h1>Hoster Management Dashboard</h1>
-            <div class="user-info">
-                <span id="adminUsername">Admin User</span>
-                <button class="logout-btn" id="logoutBtn">Logout</button>
-            </div>
-        </div>
-        
-        <div class="dashboard-body">
-            <div class="tabs">
-                <div class="tab active" data-tab="viewHosters">View Hosters</div>
-                <div class="tab" data-tab="addHoster">Add Hoster</div>
-            </div>
-            
-            <div class="tab-content active" id="viewHostersTab">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Search by name, email, username or phone">
-                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+        <!-- Hoster Edit Modal -->
+        <div class="modal" id="editHosterModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Edit Hoster Details</h2>
+                    <button class="close-modal" id="closeEditModal">&times;</button>
                 </div>
-                
-                <div class="filters">
-                    <div class="filter-btn active" data-filter="all">All Hosters</div>
-                    <div class="filter-btn" data-filter="mostMatches">Most Matches</div>
-                    <div class="filter-btn" data-filter="leastMatches">Least Matches</div>
-                    <div class="filter-btn" data-filter="active">Active</div>
-                    <div class="filter-btn" data-filter="banned">Banned</div>
-                </div>
-                
-                <div class="hoster-list" id="hosterList">
-                    <!-- Hoster cards will be added here dynamically -->
-                </div>
-            </div>
-            
-            <div class="tab-content" id="addHosterTab">
-                <h2>Add New Hoster</h2>
-                <form class="add-hoster-form" id="addHosterForm">
+                <form class="edit-hoster-form" id="editHosterForm">
+                    <input type="hidden" id="editHosterId">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="hosterUsername">Username</label>
-                            <input type="text" class="form-control" id="hosterUsername" required>
+                            <label for="editUsername">Username *</label>
+                            <input type="text" class="form-control" id="editUsername" required>
                         </div>
                         <div class="form-group">
-                            <label for="hosterName">Full Name</label>
-                            <input type="text" class="form-control" id="hosterName" required>
+                            <label for="editName">Full Name *</label>
+                            <input type="text" class="form-control" id="editName" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="hosterEmail">Email</label>
-                            <input type="email" class="form-control" id="hosterEmail" required>
+                            <label for="editEmail">Email *</label>
+                            <input type="email" class="form-control" id="editEmail" required>
                         </div>
                         <div class="form-group">
-                            <label for="hosterPhone">Phone Number</label>
-                            <input type="tel" class="form-control" id="hosterPhone" required>
+                            <label for="editPhone">Phone Number *</label>
+                            <input type="tel" class="form-control" id="editPhone" required>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="hosterPassword">Password</label>
-                        <input type="password" class="form-control" id="hosterPassword" required>
+                        <label for="editPassword">Password (leave blank to keep current)</label>
+                        <input type="password" class="form-control" id="editPassword">
                     </div>
                     
-                    <button type="submit" class="btn btn-primary">Add Hoster</button>
+                    <div class="form-group">
+                        <label for="editStatus">Status</label>
+                        <select class="form-control" id="editStatus">
+                            <option value="active">Active</option>
+                            <option value="banned">Banned</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editMatches">Total Matches Hosted</label>
+                        <input type="number" class="form-control" id="editMatches" min="0">
+                    </div>
+                    
+                    <div class="image-upload">
+                        <div class="image-preview" id="editImagePreview">
+                            <i class="fas fa-user fa-3x" style="color: #ccc;"></i>
+                            <img id="editPreviewImg" src="" alt="Preview">
+                        </div>
+                        <label class="upload-btn">
+                            <i class="fas fa-upload"></i> Change Image
+                            <input type="file" id="editHosterImage" accept="image/*">
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <span>Update Hoster</span>
+                        <div class="loader" id="editHosterLoader"></div>
+                    </button>
                 </form>
             </div>
         </div>
-    </div>
 
-    <!-- Hoster Detail Modal -->
-    <div class="modal" id="hosterModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Hoster Details</h2>
-                <button class="close-modal" id="closeModal">&times;</button>
-            </div>
-            <div id="modalBody">
-                <!-- Modal content will be added here dynamically -->
-            </div>
-        </div>
+        <!-- Alert Messages -->
+        <div class="alert alert-danger" id="errorMessage"></div>
+        <div class="alert alert-success" id="successMessage"></div>
     </div>
 
     <script>
@@ -634,116 +651,35 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
+        // ImgBB API Key
+        const IMGBB_API_KEY = 'a7dcfb1d31cf1961024c9dcc608cc0e4';
+        
         // DOM Elements
-        const loginPage = document.getElementById('loginPage');
         const dashboardPage = document.getElementById('dashboardPage');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const loginBtn = document.getElementById('loginBtn');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const loginLoader = document.getElementById('loginLoader');
-        const forgotPasswordLink = document.getElementById('forgotPassword');
-        const logoutBtn = document.getElementById('logoutBtn');
         const adminUsernameSpan = document.getElementById('adminUsername');
+        const logoutBtn = document.getElementById('logoutBtn');
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
         const hosterList = document.getElementById('hosterList');
         const addHosterForm = document.getElementById('addHosterForm');
+        const editHosterForm = document.getElementById('editHosterForm');
         const searchInput = document.getElementById('searchInput');
         const searchBtn = document.getElementById('searchBtn');
         const filterBtns = document.querySelectorAll('.filter-btn');
-        const hosterModal = document.getElementById('hosterModal');
-        const closeModal = document.getElementById('closeModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
+        const editHosterModal = document.getElementById('editHosterModal');
+        const closeEditModal = document.getElementById('closeEditModal');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const addHosterImage = document.getElementById('addHosterImage');
+        const addPreviewImg = document.getElementById('addPreviewImg');
+        const editHosterImage = document.getElementById('editHosterImage');
+        const editPreviewImg = document.getElementById('editPreviewImg');
+        const addHosterLoader = document.getElementById('addHosterLoader');
+        const editHosterLoader = document.getElementById('editHosterLoader');
         
         // Current admin data
         let currentAdmin = null;
-        
-        // Login function
-        loginBtn.addEventListener('click', loginUser);
-        
-        // Also allow login with Enter key
-        passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                loginUser();
-            }
-        });
-        
-        function loginUser() {
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            // Validate inputs
-            if (!username || !password) {
-                showError('Please enter both username and password');
-                return;
-            }
-            
-            // Show loading state
-            loginBtn.querySelector('span').textContent = 'Logging in...';
-            loginLoader.style.display = 'block';
-            loginBtn.disabled = true;
-            
-            // Reference to the admins node in Firebase
-            const adminsRef = database.ref('admins');
-            
-            // Check if the user exists
-            adminsRef.once('value')
-                .then(snapshot => {
-                    let userFound = false;
-                    let userData = null;
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const admin = childSnapshot.val();
-                        
-                        // Check if username/email and password match
-                        if ((admin.username === username || admin.email === username) && admin.password === password) {
-                            userFound = true;
-                            userData = admin;
-                            userData.key = childSnapshot.key;
-                            return true; // Break out of forEach
-                        }
-                    });
-                    
-                    if (userFound) {
-                        // Login successful
-                        showSuccess('Login successful! Redirecting...');
-                        currentAdmin = userData;
-                        
-                        // Save user data to localStorage
-                        localStorage.setItem('adminRole', userData.role);
-                        localStorage.setItem('adminUsername', userData.username);
-                        localStorage.setItem('adminEmail', userData.email);
-                        localStorage.setItem('loginTime', new Date().getTime());
-                        
-                        // Update UI
-                        adminUsernameSpan.textContent = userData.username;
-                        
-                        // Load hosters
-                        loadHosters();
-                        
-                        // Switch to dashboard view
-                        setTimeout(() => {
-                            loginPage.style.display = 'none';
-                            dashboardPage.style.display = 'block';
-                        }, 1000);
-                    } else {
-                        // Login failed
-                        showError('Invalid username/email or password');
-                        loginBtn.querySelector('span').textContent = 'Login';
-                        loginLoader.style.display = 'none';
-                        loginBtn.disabled = false;
-                    }
-                })
-                .catch(error => {
-                    showError('Error connecting to database: ' + error.message);
-                    loginBtn.querySelector('span').textContent = 'Login';
-                    loginLoader.style.display = 'none';
-                    loginBtn.disabled = false;
-                });
-        }
+        let currentHosterImage = null;
         
         // Logout function
         logoutBtn.addEventListener('click', function() {
@@ -752,12 +688,9 @@
             localStorage.removeItem('adminEmail');
             localStorage.removeItem('loginTime');
             
-            dashboardPage.style.display = 'none';
-            loginPage.style.display = 'flex';
-            
-            // Clear form fields
-            usernameInput.value = '';
-            passwordInput.value = '';
+            // Redirect to login page (would be in a real scenario)
+            alert('Logged out successfully. Redirecting to login...');
+            // In a real app: window.location.href = 'login.html';
         });
         
         // Tab switching
@@ -803,9 +736,9 @@
                     if (searchTerm) {
                         const term = searchTerm.toLowerCase();
                         hosters = hosters.filter(hoster => 
-                            hoster.username.toLowerCase().includes(term) ||
+                            (hoster.username && hoster.username.toLowerCase().includes(term)) ||
                             (hoster.firstName && hoster.firstName.toLowerCase().includes(term)) ||
-                            hoster.email.toLowerCase().includes(term) ||
+                            (hoster.email && hoster.email.toLowerCase().includes(term)) ||
                             (hoster.phone && hoster.phone.includes(term))
                         );
                     }
@@ -837,22 +770,25 @@
                                     ${hoster.status === 'banned' ? 'Banned' : 'Active'}
                                 </div>
                             </div>
-                            <div class="hoster-details">
-                                <div class="hoster-detail">
-                                    <label>Username:</label>
-                                    <span>${hoster.username}</span>
-                                </div>
-                                <div class="hoster-detail">
-                                    <label>Email:</label>
-                                    <span>${hoster.email}</span>
-                                </div>
-                                <div class="hoster-detail">
-                                    <label>Phone:</label>
-                                    <span>${hoster.phone || 'N/A'}</span>
-                                </div>
-                                <div class="hoster-detail">
-                                    <label>Matches Hosted:</label>
-                                    <span>${hoster.totalMatches || 0}</span>
+                            <div class="hoster-content">
+                                <img src="${hoster.profileImage || 'https://via.placeholder.com/80'}" alt="${hoster.username}" class="hoster-image">
+                                <div class="hoster-details">
+                                    <div class="hoster-detail">
+                                        <label>Username:</label>
+                                        <span>${hoster.username || 'N/A'}</span>
+                                    </div>
+                                    <div class="hoster-detail">
+                                        <label>Email:</label>
+                                        <span>${hoster.email || 'N/A'}</span>
+                                    </div>
+                                    <div class="hoster-detail">
+                                        <label>Phone:</label>
+                                        <span>${hoster.phone || 'N/A'}</span>
+                                    </div>
+                                    <div class="hoster-detail">
+                                        <label>Matches Hosted:</label>
+                                        <span>${hoster.totalMatches || 0}</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="hoster-actions">
@@ -860,7 +796,7 @@
                                     data-id="${hoster.id}" data-action="${hoster.status === 'banned' ? 'unban' : 'ban'}">
                                     ${hoster.status === 'banned' ? 'Unban' : 'Ban'}
                                 </button>
-                                <button class="action-btn view-btn" data-id="${hoster.id}">View Details</button>
+                                <button class="action-btn edit-btn" data-id="${hoster.id}">Edit Details</button>
                             </div>
                         `;
                         hosterList.appendChild(card);
@@ -874,10 +810,10 @@
                                 const action = this.getAttribute('data-action');
                                 toggleHosterStatus(hosterId, action);
                             });
-                        } else if (btn.classList.contains('view-btn')) {
+                        } else if (btn.classList.contains('edit-btn')) {
                             btn.addEventListener('click', function() {
                                 const hosterId = this.getAttribute('data-id');
-                                viewHosterDetails(hosterId);
+                                loadHosterForEdit(hosterId);
                             });
                         }
                     });
@@ -903,60 +839,51 @@
             });
         }
         
-        // View hoster details
-        function viewHosterDetails(hosterId) {
+        // Load hoster data for editing
+        function loadHosterForEdit(hosterId) {
             database.ref('hosters/' + hosterId).once('value')
                 .then(snapshot => {
                     const hoster = snapshot.val();
                     
-                    modalTitle.textContent = `${hoster.firstName || 'N/A'} ${hoster.lastName || ''}'s Details`;
-                    modalBody.innerHTML = `
-                        <div class="hoster-details">
-                            <div class="hoster-detail">
-                                <label>Username:</label>
-                                <span>${hoster.username}</span>
-                            </div>
-                            <div class="hoster-detail">
-                                <label>Email:</label>
-                                <span>${hoster.email}</span>
-                            </div>
-                            <div class="hoster-detail">
-                                <label>Phone:</label>
-                                <span>${hoster.phone || 'N/A'}</span>
-                            </div>
-                            <div class="hoster-detail">
-                                <label>Matches Hosted:</label>
-                                <span>${hoster.totalMatches || 0}</span>
-                            </div>
-                            <div class="hoster-detail">
-                                <label>Status:</label>
-                                <span class="hoster-status ${hoster.status === 'banned' ? 'status-banned' : 'status-active'}">
-                                    ${hoster.status === 'banned' ? 'Banned' : 'Active'}
-                                </span>
-                            </div>
-                            <div class="hoster-detail">
-                                <label>Registration Date:</label>
-                                <span>${hoster.registrationDate || 'N/A'}</span>
-                            </div>
-                        </div>
-                    `;
+                    // Populate form fields
+                    document.getElementById('editHosterId').value = hosterId;
+                    document.getElementById('editUsername').value = hoster.username || '';
+                    document.getElementById('editName').value = hoster.firstName || '';
+                    document.getElementById('editEmail').value = hoster.email || '';
+                    document.getElementById('editPhone').value = hoster.phone || '';
+                    document.getElementById('editStatus').value = hoster.status || 'active';
+                    document.getElementById('editMatches').value = hoster.totalMatches || 0;
                     
-                    hosterModal.style.display = 'flex';
+                    // Set image preview
+                    if (hoster.profileImage) {
+                        editPreviewImg.src = hoster.profileImage;
+                        editPreviewImg.style.display = 'block';
+                        document.querySelector('#editImagePreview i').style.display = 'none';
+                    } else {
+                        editPreviewImg.style.display = 'none';
+                        document.querySelector('#editImagePreview i').style.display = 'block';
+                    }
+                    
+                    // Store current image URL
+                    currentHosterImage = hoster.profileImage || null;
+                    
+                    // Show modal
+                    editHosterModal.style.display = 'flex';
                 })
                 .catch(error => {
                     showError('Error loading hoster details: ' + error.message);
                 });
         }
         
-        // Close modal
-        closeModal.addEventListener('click', function() {
-            hosterModal.style.display = 'none';
+        // Close edit modal
+        closeEditModal.addEventListener('click', function() {
+            editHosterModal.style.display = 'none';
         });
         
         // Click outside modal to close
         window.addEventListener('click', function(event) {
-            if (event.target === hosterModal) {
-                hosterModal.style.display = 'none';
+            if (event.target === editHosterModal) {
+                editHosterModal.style.display = 'none';
             }
         });
         
@@ -976,35 +903,193 @@
                 return;
             }
             
-            // Create hoster object
-            const hosterData = {
+            // Show loading state
+            addHosterForm.querySelector('span').textContent = 'Adding Hoster...';
+            addHosterLoader.style.display = 'block';
+            addHosterForm.querySelector('button').disabled = true;
+            
+            // Check if we have an image to upload
+            if (addHosterImage.files.length > 0) {
+                // Upload image first
+                uploadImageToImgBB(addHosterImage.files[0])
+                    .then(imageUrl => {
+                        // Create hoster object with image
+                        const hosterData = createHosterData(username, name, email, phone, password, imageUrl);
+                        saveHosterToDatabase(hosterData, true);
+                    })
+                    .catch(error => {
+                        showError('Error uploading image: ' + error.message);
+                        addHosterForm.querySelector('span').textContent = 'Add Hoster';
+                        addHosterLoader.style.display = 'none';
+                        addHosterForm.querySelector('button').disabled = false;
+                    });
+            } else {
+                // Create hoster object without image
+                const hosterData = createHosterData(username, name, email, phone, password);
+                saveHosterToDatabase(hosterData, true);
+            }
+        });
+        
+        // Edit hoster
+        editHosterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const hosterId = document.getElementById('editHosterId').value;
+            const username = document.getElementById('editUsername').value.trim();
+            const name = document.getElementById('editName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const password = document.getElementById('editPassword').value;
+            const status = document.getElementById('editStatus').value;
+            const matches = document.getElementById('editMatches').value;
+            
+            // Basic validation
+            if (!username || !name || !email) {
+                showError('Please fill all required fields');
+                return;
+            }
+            
+            // Show loading state
+            editHosterForm.querySelector('span').textContent = 'Updating Hoster...';
+            editHosterLoader.style.display = 'block';
+            editHosterForm.querySelector('button').disabled = true;
+            
+            // Check if we have a new image to upload
+            if (editHosterImage.files.length > 0) {
+                // Upload new image first
+                uploadImageToImgBB(editHosterImage.files[0])
+                    .then(imageUrl => {
+                        // Update hoster with new image
+                        updateHosterInDatabase(hosterId, username, name, email, phone, password, status, matches, imageUrl);
+                    })
+                    .catch(error => {
+                        showError('Error uploading image: ' + error.message);
+                        editHosterForm.querySelector('span').textContent = 'Update Hoster';
+                        editHosterLoader.style.display = 'none';
+                        editHosterForm.querySelector('button').disabled = false;
+                    });
+            } else {
+                // Update hoster without changing image
+                updateHosterInDatabase(hosterId, username, name, email, phone, password, status, matches, currentHosterImage);
+            }
+        });
+        
+        // Create hoster data object
+        function createHosterData(username, name, email, phone, password, imageUrl = null) {
+            const nameParts = name.split(' ');
+            const firstName = nameParts[0];
+            const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+            
+            return {
                 username: username,
-                firstName: name,
+                firstName: firstName,
+                lastName: lastName,
                 email: email,
                 phone: phone,
                 password: password,
+                profileImage: imageUrl,
                 status: 'active',
                 totalMatches: 0,
                 registrationDate: new Date().toLocaleDateString()
             };
+        }
+        
+        // Save hoster to database
+        function saveHosterToDatabase(hosterData, isNew = false) {
+            const ref = isNew ? database.ref('hosters').push() : database.ref('hosters/' + hosterData.id);
             
-            // Save to Firebase
-            const newHosterRef = database.ref('hosters').push();
-            newHosterRef.set(hosterData)
+            ref.set(hosterData)
                 .then(() => {
-                    showSuccess('Hoster added successfully!');
-                    addHosterForm.reset();
+                    showSuccess(`Hoster ${isNew ? 'added' : 'updated'} successfully!`);
                     
-                    // Switch to view hosters tab
-                    tabs[0].click();
+                    if (isNew) {
+                        addHosterForm.reset();
+                        addPreviewImg.style.display = 'none';
+                        document.querySelector('#addImagePreview i').style.display = 'block';
+                    } else {
+                        editHosterModal.style.display = 'none';
+                    }
                     
                     // Reload hosters list
                     loadHosters();
                 })
                 .catch(error => {
-                    showError('Error adding hoster: ' + error.message);
+                    showError(`Error ${isNew ? 'adding' : 'updating'} hoster: ` + error.message);
+                })
+                .finally(() => {
+                    if (isNew) {
+                        addHosterForm.querySelector('span').textContent = 'Add Hoster';
+                        addHosterLoader.style.display = 'none';
+                        addHosterForm.querySelector('button').disabled = false;
+                    } else {
+                        editHosterForm.querySelector('span').textContent = 'Update Hoster';
+                        editHosterLoader.style.display = 'none';
+                        editHosterForm.querySelector('button').disabled = false;
+                    }
                 });
-        });
+        }
+        
+        // Update hoster in database
+        function updateHosterInDatabase(hosterId, username, name, email, phone, password, status, matches, imageUrl) {
+            const nameParts = name.split(' ');
+            const firstName = nameParts[0];
+            const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+            
+            const updateData = {
+                username: username,
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                phone: phone,
+                status: status,
+                totalMatches: parseInt(matches) || 0,
+                profileImage: imageUrl
+            };
+            
+            // Only update password if provided
+            if (password) {
+                updateData.password = password;
+            }
+            
+            database.ref('hosters/' + hosterId).update(updateData)
+                .then(() => {
+                    showSuccess('Hoster updated successfully!');
+                    editHosterModal.style.display = 'none';
+                    loadHosters();
+                })
+                .catch(error => {
+                    showError('Error updating hoster: ' + error.message);
+                })
+                .finally(() => {
+                    editHosterForm.querySelector('span').textContent = 'Update Hoster';
+                    editHosterLoader.style.display = 'none';
+                    editHosterForm.querySelector('button').disabled = false;
+                });
+        }
+        
+        // Upload image to ImgBB
+        function uploadImageToImgBB(file) {
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        resolve(data.data.url);
+                    } else {
+                        reject(new Error(data.error.message || 'Image upload failed'));
+                    }
+                })
+                .catch(error => {
+                    reject(error);
+                });
+            });
+        }
         
         // Search hosters
         searchBtn.addEventListener('click', function() {
@@ -1025,10 +1110,30 @@
             });
         });
         
-        // Forgot password handler
-        forgotPasswordLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showError('Please contact system administrator to reset your password');
+        // Image preview for add form
+        addHosterImage.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addPreviewImg.src = e.target.result;
+                    addPreviewImg.style.display = 'block';
+                    document.querySelector('#addImagePreview i').style.display = 'none';
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Image preview for edit form
+        editHosterImage.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    editPreviewImg.src = e.target.result;
+                    editPreviewImg.style.display = 'block';
+                    document.querySelector('#editImagePreview i').style.display = 'none';
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
         });
         
         // Helper functions for showing messages
@@ -1061,7 +1166,7 @@
             const loginTime = localStorage.getItem('loginTime');
             const currentTime = new Date().getTime();
             
-            // If user was logged in less than 10 minutes ago, redirect to dashboard
+            // If user was logged in less than 10 minutes ago, show dashboard
             if (adminRole && adminUser && loginTime && (currentTime - parseInt(loginTime)) < 600000) {
                 adminUsernameSpan.textContent = adminUser;
                 currentAdmin = {
@@ -1070,19 +1175,59 @@
                     email: localStorage.getItem('adminEmail')
                 };
                 
-                loginPage.style.display = 'none';
-                dashboardPage.style.display = 'block';
-                
-                // Load hosters
-                loadHosters();
-            } else if (adminRole) {
-                // Clear expired login
-                localStorage.removeItem('adminRole');
-                localStorage.removeItem('adminUsername');
-                localStorage.removeItem('adminEmail');
-                localStorage.removeItem('loginTime');
+                // Verify admin credentials with database
+                verifyAdminCredentials(adminUser);
+            } else {
+                if (adminRole) {
+                    // Clear expired login
+                    localStorage.removeItem('adminRole');
+                    localStorage.removeItem('adminUsername');
+                    localStorage.removeItem('adminEmail');
+                    localStorage.removeItem('loginTime');
+                }
+                // Redirect to login page (would be in a real scenario)
+                alert('Please login to access admin panel');
+                // In a real app: window.location.href = 'login.html';
             }
         });
+        
+        // Verify admin credentials with database
+        function verifyAdminCredentials(username) {
+            const adminsRef = database.ref('admins');
+            
+            adminsRef.once('value')
+                .then(snapshot => {
+                    let adminFound = false;
+                    
+                    snapshot.forEach(childSnapshot => {
+                        const admin = childSnapshot.val();
+                        
+                        // Check if username matches
+                        if (admin.username === username || admin.email === username) {
+                            adminFound = true;
+                            return true; // Break out of forEach
+                        }
+                    });
+                    
+                    if (!adminFound) {
+                        // Admin not found in database
+                        localStorage.removeItem('adminRole');
+                        localStorage.removeItem('adminUsername');
+                        localStorage.removeItem('adminEmail');
+                        localStorage.removeItem('loginTime');
+                        
+                        // Redirect to login page (would be in a real scenario)
+                        alert('Admin credentials invalid. Please login again.');
+                        // In a real app: window.location.href = 'login.html';
+                    } else {
+                        // Load hosters
+                        loadHosters();
+                    }
+                })
+                .catch(error => {
+                    showError('Error verifying admin credentials: ' + error.message);
+                });
+        }
     </script>
 </body>
 </html>
