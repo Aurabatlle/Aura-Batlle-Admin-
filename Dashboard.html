@@ -596,7 +596,11 @@
         <h3>Maintenance Control</h3>
         <p>Enable/disable maintenance mode</p>
     </div>
-    
+    <div class="card" onclick="navigateTo('ad-banner.html')">
+    <i class="fas fa-ad"></i>
+    <h3>Ad Banner Management</h3>
+    <p>Manage advertisement banners</p>
+</div>
     <div class="card" onclick="navigateTo('manageuser.html')">
         <i class="fas fa-user-friends"></i>
         <h3>Manage Users</h3>
@@ -735,8 +739,9 @@ const cardData = [
     { title: "Manage Users", description: "View and manage user accounts", icon: "fas fa-user-friends", link: "manageuser.html" },
     { title: "Manage Tournament", description: "Create and manage tournaments", icon: "fas fa-trophy", link: "mantch.html" },
     { title: "Manage Premium", description: "Configure premium features and subscriptions", icon: "fas fa-crown", link: "premium.html" },
-    // Add this new entry for Manage Hosters
-    { title: "Manage Hosters", description: "Configure and manage server hosts", icon: "fas fa-server", link: "hoster.html" }
+    { title: "Manage Hosters", description: "Configure and manage server hosts", icon: "fas fa-server", link: "hoster.html" },
+    // Add this new entry for Ad Banner Management
+    { title: "Ad Banner Management", description: "Manage advertisement banners", icon: "fas fa-ad", link: "ad-banner.html" }
 ];
         
         // Check if user is logged in
