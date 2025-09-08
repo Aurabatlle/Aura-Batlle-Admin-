@@ -53,12 +53,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .header-left {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            justify-content: space-between;
         }
         
         .logo {
@@ -67,12 +71,12 @@
         }
         
         .logo img {
-            height: 40px;
+            height: 35px;
             margin-right: 10px;
         }
         
         .logo h1 {
-            font-size: 22px;
+            font-size: 18px;
             color: var(--primary);
         }
         
@@ -80,10 +84,12 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 5px;
             cursor: pointer;
             font-weight: 500;
+            font-size: 14px;
+            white-space: nowrap;
         }
         
         /* Content Area */
@@ -91,36 +97,38 @@
             background: var(--white);
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 20px;
-            margin: 20px 0;
+            padding: 15px;
+            margin: 15px 0;
         }
         
         .page-title {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 20px;
+            margin-bottom: 15px;
             color: var(--dark);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         /* Form Styles */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
+            font-size: 14px;
         }
         
         .form-control {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 14px;
             transition: all 0.3s ease;
         }
         
@@ -131,11 +139,11 @@
         }
         
         .btn {
-            padding: 12px 20px;
+            padding: 10px 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
             transition: all 0.3s ease;
         }
@@ -160,8 +168,8 @@
         }
         
         .btn-sm {
-            padding: 8px 12px;
-            font-size: 14px;
+            padding: 6px 10px;
+            font-size: 12px;
         }
         
         /* File Upload */
@@ -169,39 +177,42 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 15px 0;
+            margin: 12px 0;
         }
         
         .file-upload-label {
             display: inline-block;
-            padding: 12px 20px;
+            padding: 10px 15px;
             background: var(--light);
             color: var(--dark);
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: center;
+            font-size: 14px;
         }
         
         .file-upload-label i {
-            margin-right: 8px;
+            margin-right: 6px;
         }
         
         .upload-preview {
-            width: 300px;
+            width: 100%;
+            max-width: 300px;
             height: 150px;
-            border-radius: 8px;
+            border-radius: 6px;
             object-fit: cover;
             border: 2px dashed #ddd;
             padding: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         /* Alert Styles */
         .alert {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 14px;
         }
         
         .alert-danger {
@@ -220,12 +231,13 @@
         .banners-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 15px;
+            font-size: 14px;
         }
         
         .banners-table th, 
         .banners-table td {
-            padding: 12px 15px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -240,71 +252,56 @@
         }
         
         .banner-image {
-            width: 150px;
-            height: 75px;
+            width: 120px;
+            height: 60px;
             object-fit: cover;
-            border-radius: 5px;
+            border-radius: 4px;
         }
         
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
         
         /* Login prompt */
         .login-prompt {
             text-align: center;
-            padding: 50px 20px;
+            padding: 40px 15px;
         }
         
         .login-prompt i {
-            font-size: 60px;
+            font-size: 50px;
             color: var(--gray);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .login-prompt h2 {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: var(--dark);
+            font-size: 20px;
         }
         
         .login-prompt p {
             color: var(--gray);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
         
         /* Loader */
         .loader {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: var(--white);
             animation: spin 1s ease-in-out infinite;
-            margin-left: 10px;
+            margin-left: 8px;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-        
-        /* Status badge */
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .status-active {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .status-inactive {
-            background-color: #f8d7da;
-            color: #721c24;
         }
         
         /* Mobile responsive */
@@ -312,15 +309,137 @@
             .banners-table {
                 display: block;
                 overflow-x: auto;
+                font-size: 12px;
+            }
+            
+            .banners-table th, 
+            .banners-table td {
+                padding: 8px 6px;
             }
             
             .action-buttons {
                 flex-direction: column;
             }
             
-            .upload-preview {
+            .page-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .page-title h2 {
+                font-size: 18px;
+            }
+            
+            .banner-image {
+                width: 80px;
+                height: 40px;
+            }
+            
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .logo {
                 width: 100%;
-                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .back-btn {
+                align-self: flex-end;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .content {
+                padding: 10px;
+            }
+            
+            .banners-table {
+                font-size: 11px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .logo h1 {
+                font-size: 16px;
+            }
+        }
+        
+        /* Card view for mobile */
+        .banners-grid {
+            display: none;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .banner-card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .banner-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .banner-card-sno {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        .banner-card-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .banner-card-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .banner-card-url {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        
+        .banner-card-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        
+        @media (max-width: 768px) {
+            .banners-table {
+                display: none;
+            }
+            
+            .banners-grid {
+                display: grid;
             }
         }
     </style>
@@ -339,8 +458,8 @@
                         <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo">
                         <h1>Aura Battle Admin</h1>
                     </div>
+                    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
                 </div>
-                <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
             </div>
         </div>
     </header>
@@ -351,7 +470,7 @@
             <div class="content">
                 <div class="page-title">
                     <h2>Ad Banner Management</h2>
-                    <button class="btn btn-primary" onclick="showAddForm()"><i class="fas fa-plus"></i> Add New Banner</button>
+                    <button class="btn btn-primary" onclick="showAddForm()"><i class="fas fa-plus"></i> Add Banner</button>
                 </div>
                 
                 <!-- Add/Edit Form -->
@@ -379,30 +498,22 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="bannerStatus">Status</label>
-                            <select class="form-control" id="bannerStatus">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
                             <button type="button" class="btn btn-primary" id="saveBannerBtn">Save Banner</button>
                             <button type="button" class="btn btn-secondary" onclick="hideForm()">Cancel</button>
                         </div>
                     </form>
                 </div>
                 
-                <!-- Banners Table -->
+                <!-- Banners Table (Desktop) -->
                 <div id="bannersList">
-                    <h3>Active Banners</h3>
+                    <h3>Ad Banners</h3>
                     <table class="banners-table">
                         <thead>
                             <tr>
+                                <th>S.No</th>
                                 <th>Image</th>
                                 <th>Name</th>
                                 <th>Redirect URL</th>
-                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -410,6 +521,11 @@
                             <!-- Banners will be loaded here -->
                         </tbody>
                     </table>
+                    
+                    <!-- Banners Grid (Mobile) -->
+                    <div class="banners-grid" id="bannersGrid">
+                        <!-- Banners will be loaded here in card format -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -447,11 +563,13 @@
         const loginPrompt = document.getElementById('loginPrompt');
         const bannerForm = document.getElementById('bannerForm');
         const bannersTableBody = document.getElementById('bannersTableBody');
+        const bannersGrid = document.getElementById('bannersGrid');
         
         // State variables
         let isEditMode = false;
         let currentBannerId = null;
         let uploadedImageUrl = null;
+        let bannerCount = 0;
         
         // Check if user is logged in
         window.addEventListener('DOMContentLoaded', () => {
@@ -532,6 +650,9 @@
             
             // Show form
             bannerForm.style.display = 'block';
+            
+            // Scroll to form
+            bannerForm.scrollIntoView({ behavior: 'smooth' });
         }
         
         // Hide form
@@ -554,7 +675,6 @@
                         // Fill form with banner data
                         document.getElementById('bannerName').value = banner.name || '';
                         document.getElementById('redirectUrl').value = banner.redirectUrl || '';
-                        document.getElementById('bannerStatus').value = banner.status || 'active';
                         
                         // Set image preview
                         if (banner.imageUrl) {
@@ -570,6 +690,9 @@
                         
                         // Show form
                         bannerForm.style.display = 'block';
+                        
+                        // Scroll to form
+                        bannerForm.scrollIntoView({ behavior: 'smooth' });
                     }
                 })
                 .catch(error => {
@@ -668,7 +791,6 @@
         document.getElementById('saveBannerBtn').addEventListener('click', function() {
             const bannerName = document.getElementById('bannerName').value.trim();
             const redirectUrl = document.getElementById('redirectUrl').value.trim();
-            const status = document.getElementById('bannerStatus').value;
             
             // Validation
             if (!bannerName) {
@@ -695,7 +817,6 @@
             const bannerData = {
                 name: bannerName,
                 redirectUrl: redirectUrl,
-                status: status,
                 imageUrl: uploadedImageUrl,
                 updatedAt: new Date().toISOString()
             };
@@ -763,28 +884,38 @@
             bannersRef.once('value')
                 .then(snapshot => {
                     bannersTableBody.innerHTML = '';
+                    bannersGrid.innerHTML = '';
+                    bannerCount = 0;
                     
                     if (!snapshot.exists()) {
                         bannersTableBody.innerHTML = `
                             <tr>
                                 <td colspan="5" style="text-align: center; padding: 20px;">
-                                    No banners found. Click "Add New Banner" to create one.
+                                    No banners found. Click "Add Banner" to create one.
                                 </td>
                             </tr>
+                        `;
+                        
+                        bannersGrid.innerHTML = `
+                            <div style="text-align: center; padding: 20px; grid-column: 1 / -1;">
+                                No banners found. Click "Add Banner" to create one.
+                            </div>
                         `;
                         return;
                     }
                     
                     snapshot.forEach(childSnapshot => {
+                        bannerCount++;
                         const banner = childSnapshot.val();
                         const bannerId = childSnapshot.key;
                         
+                        // Add to table (desktop view)
                         const row = document.createElement('tr');
                         row.innerHTML = `
+                            <td>${bannerCount}</td>
                             <td><img src="${banner.imageUrl || 'https://via.placeholder.com/150x75?text=No+Image'}" alt="Banner" class="banner-image"></td>
                             <td>${banner.name || 'Unnamed'}</td>
-                            <td><a href="${banner.redirectUrl}" target="_blank">${banner.redirectUrl}</a></td>
-                            <td><span class="status-badge ${banner.status === 'active' ? 'status-active' : 'status-inactive'}">${banner.status || 'inactive'}</span></td>
+                            <td><a href="${banner.redirectUrl}" target="_blank" style="word-break: break-all; font-size: 12px;">${banner.redirectUrl}</a></td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn btn-primary btn-sm" onclick="showEditForm('${bannerId}')"><i class="fas fa-edit"></i> Edit</button>
@@ -794,6 +925,26 @@
                         `;
                         
                         bannersTableBody.appendChild(row);
+                        
+                        // Add to grid (mobile view)
+                        const card = document.createElement('div');
+                        card.className = 'banner-card';
+                        card.innerHTML = `
+                            <div class="banner-card-header">
+                                <span class="banner-card-sno">#${bannerCount}</span>
+                                <span class="banner-card-name">${banner.name || 'Unnamed'}</span>
+                            </div>
+                            <img src="${banner.imageUrl || 'https://via.placeholder.com/300x150?text=No+Image'}" alt="Banner" class="banner-card-image">
+                            <div class="banner-card-url">
+                                <a href="${banner.redirectUrl}" target="_blank">${banner.redirectUrl}</a>
+                            </div>
+                            <div class="banner-card-actions">
+                                <button class="btn btn-primary btn-sm" onclick="showEditForm('${bannerId}')"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteBanner('${bannerId}')"><i class="fas fa-trash"></i> Delete</button>
+                            </div>
+                        `;
+                        
+                        bannersGrid.appendChild(card);
                     });
                 })
                 .catch(error => {
@@ -804,6 +955,12 @@
                                 Error loading banners: ${error.message}
                             </td>
                         </tr>
+                    `;
+                    
+                    bannersGrid.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: var(--danger); grid-column: 1 / -1;">
+                            Error loading banners: ${error.message}
+                        </div>
                     `;
                 });
         }
