@@ -95,7 +95,7 @@
             display: none;
             position: absolute;
             top: 60px;
-            left: 0;
+            right: 0;
             background: var(--white);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -545,7 +545,8 @@
                         </div>
                     </div>
                     <div class="logo">
-                        
+                        <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo" id="headerLogo">
+                        <h1>Aura Battle</h1>
                     </div>
                 </div>
             </div>
@@ -558,6 +559,9 @@
             <div class="content">
                 <h2 class="page-title">Dashboard</h2>
                 
+                <!-- API Status Indicator -->
+                <div class="api-status" id="apiStatus"></div>
+                
                 <!-- Search Bar -->
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
@@ -565,61 +569,59 @@
                     <div class="search-results" id="searchResults"></div>
                 </div>
                 
-                <!-- API Status Indicator -->
-
-<!-- Add this new card for Manage Hosters -->
-   
-                
-               <div class="dashboard-cards">
-    <div class="card" onclick="navigateTo('admin.html')" id="adminCard">
-        <i class="fas fa-users-cog"></i>
-        <h3>Manage Admins</h3>
-        <p>Add, edit or remove admin accounts</p>
-    </div>
-
- <div class="card" onclick="navigateTo('hoster.html')">
-        <i class="fas fa-server"></i>
-        <h3>Manage Hosters</h3>
-        <p>Configure and manage server hosts</p>
-    </div>
-</div>
-                   
-    <div class="card" onclick="navigateTo('ubdate.html')">
-        <i class="fas fa-sync-alt"></i>
-        <h3>Update Version</h3>
-        <p>Manage application updates</p>
-    </div>
-    
-    <div class="card" onclick="navigateTo('maintanace.html')">
-        <i class="fas fa-tools"></i>
-        <h3>Maintenance Control</h3>
-        <p>Enable/disable maintenance mode</p>
-    </div>
-    <div class="card" onclick="navigateTo('ad-banner.html')">
-    <i class="fas fa-ad"></i>
-    <h3>Ad Banner Management</h3>
-    <p>Manage advertisement banners</p>
-</div>
-    <div class="card" onclick="navigateTo('manageuser.html')">
-        <i class="fas fa-user-friends"></i>
-        <h3>Manage Users</h3>
-        <p>View and manage user accounts</p>
-    </div>
-    
-    <!-- New Tournament Management Card -->
-    <div class="card" onclick="navigateTo('mantch.html')">
-        <i class="fas fa-trophy"></i>
-        <h3>Manage Tournament</h3>
-        <p>Create and manage tournaments</p>
-    </div>
-    
-    <!-- New Premium Management Card -->
-    <div class="card" onclick="navigateTo('premium.html')">
-        <i class="fas fa-crown"></i>
-        <h3>Manage Premium</h3>
-        <p>Configure premium features and subscriptions</p>
-    </div>
-</div>
+                <div class="dashboard-cards">
+                    <div class="card" onclick="navigateTo('admin.html')" id="adminCard">
+                        <i class="fas fa-users-cog"></i>
+                        <h3>Manage Admins</h3>
+                        <p>Add, edit or remove admin accounts</p>
+                    </div>
+                    
+                    <div class="card" onclick="navigateTo('hoster.html')">
+                        <i class="fas fa-server"></i>
+                        <h3>Manage Hosters</h3>
+                        <p>Configure and manage server hosts</p>
+                    </div>
+                    
+                    <div class="card" onclick="navigateTo('ubdate.html')">
+                        <i class="fas fa-sync-alt"></i>
+                        <h3>Update Version</h3>
+                        <p>Manage application updates</p>
+                    </div>
+                    
+                    <div class="card" onclick="navigateTo('maintanace.html')">
+                        <i class="fas fa-tools"></i>
+                        <h3>Maintenance Control</h3>
+                        <p>Enable/disable maintenance mode</p>
+                    </div>
+                    
+                    <div class="card" onclick="navigateTo('ad-banner.html')">
+                        <i class="fas fa-ad"></i>
+                        <h3>Ad Banner Management</h3>
+                        <p>Manage advertisement banners</p>
+                    </div>
+                    
+                    <div class="card" onclick="navigateTo('manageuser.html')">
+                        <i class="fas fa-user-friends"></i>
+                        <h3>Manage Users</h3>
+                        <p>View and manage user accounts</p>
+                    </div>
+                    
+                    <!-- New Tournament Management Card -->
+                    <div class="card" onclick="navigateTo('mantch.html')">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Manage Tournament</h3>
+                        <p>Create and manage tournaments</p>
+                    </div>
+                    
+                    <!-- New Premium Management Card -->
+                    <div class="card" onclick="navigateTo('premium.html')">
+                        <i class="fas fa-crown"></i>
+                        <h3>Manage Premium</h3>
+                        <p>Configure premium features and subscriptions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <div id="loginPrompt" class="login-prompt">
             <i class="fas fa-lock"></i>
@@ -729,33 +731,36 @@
         const searchResults = document.getElementById('searchResults');
         const headerLogo = document.getElementById('headerLogo');
         
-  // Card data for search functionality
-// Card data for search functionality
-const cardData = [
-    { title: "Manage Admins", description: "Add, edit or remove admin accounts", icon: "fas fa-users-cog", link: "admin.html" },
-    { title: "Update Version", description: "Manage application updates", icon: "fas fa-sync-alt", link: "ubdate.html" },
-    { title: "Maintenance Control", description: "Enable/disable maintenance mode", icon: "fas fa-tools", link: "maintanace.html" },
-    { title: "Manage Users", description: "View and manage user accounts", icon: "fas fa-user-friends", link: "manageuser.html" },
-    { title: "Manage Tournament", description: "Create and manage tournaments", icon: "fas fa-trophy", link: "mantch.html" },
-    { title: "Manage Premium", description: "Configure premium features and subscriptions", icon: "fas fa-crown", link: "premium.html" },
-    { title: "Manage Hosters", description: "Configure and manage server hosts", icon: "fas fa-server", link: "hoster.html" },
-    // Add this new entry for Ad Banner Management
-    { title: "Ad Banner Management", description: "Manage advertisement banners", icon: "fas fa-ad", link: "ad-banner.html" }
-];
+        // Card data for search functionality
+        const cardData = [
+            { title: "Manage Admins", description: "Add, edit or remove admin accounts", icon: "fas fa-users-cog", link: "admin.html" },
+            { title: "Update Version", description: "Manage application updates", icon: "fas fa-sync-alt", link: "ubdate.html" },
+            { title: "Maintenance Control", description: "Enable/disable maintenance mode", icon: "fas fa-tools", link: "maintanace.html" },
+            { title: "Manage Users", description: "View and manage user accounts", icon: "fas fa-user-friends", link: "manageuser.html" },
+            { title: "Manage Tournament", description: "Create and manage tournaments", icon: "fas fa-trophy", link: "mantch.html" },
+            { title: "Manage Premium", description: "Configure premium features and subscriptions", icon: "fas fa-crown", link: "premium.html" },
+            { title: "Manage Hosters", description: "Configure and manage server hosts", icon: "fas fa-server", link: "hoster.html" },
+            { title: "Ad Banner Management", description: "Manage advertisement banners", icon: "fas fa-ad", link: "ad-banner.html" }
+        ];
         
         // Check if user is logged in
         window.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, checking authentication...');
             const adminRole = localStorage.getItem('adminRole');
             const adminUsername = localStorage.getItem('adminUsername');
             const adminEmail = localStorage.getItem('adminEmail');
             const loginTime = localStorage.getItem('loginTime');
             const currentTime = new Date().getTime();
             
+            console.log('Stored data:', { adminRole, adminUsername, adminEmail, loginTime });
+            
             // If user was logged in less than 10 minutes ago
             if (adminRole && adminUsername && loginTime && (currentTime - parseInt(loginTime)) < 600000) {
+                console.log('User appears to be logged in, verifying...');
                 // Verify admin still exists in database
                 verifyAdminInDatabase(adminUsername, adminEmail);
             } else {
+                console.log('No valid login found, showing login prompt');
                 showLoginPrompt();
             }
         });
@@ -846,8 +851,10 @@ const cardData = [
                     });
                     
                     if (adminFound) {
+                        console.log('Admin found in database:', adminData);
                         showDashboard(adminData);
                     } else {
+                        console.log('Admin not found in database');
                         showLoginPrompt();
                     }
                 })
@@ -883,6 +890,8 @@ const cardData = [
             if (adminData.role !== 'founder') {
                 adminCard.classList.add('restricted');
             }
+            
+            console.log('Dashboard shown successfully');
         }
         
         // Show login prompt
@@ -896,6 +905,8 @@ const cardData = [
             localStorage.removeItem('adminUsername');
             localStorage.removeItem('adminEmail');
             localStorage.removeItem('loginTime');
+            
+            console.log('Login prompt shown');
         }
         
         // Toggle profile dropdown
