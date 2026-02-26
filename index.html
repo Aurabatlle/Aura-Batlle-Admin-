@@ -27,29 +27,28 @@
         
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
         }
         
         .container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
         }
         
         .login-card {
             background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 18px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
-            transition: transform 0.3s ease;
         }
         
         .login-header {
             background: var(--primary);
-            padding: 25px;
+            padding: 28px 25px;
             text-align: center;
             color: var(--white);
         }
@@ -58,196 +57,205 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 6px;
         }
         
         .logo img {
-            height: 50px;
-            margin-right: 10px;
-        }
-        
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 600;
+            height: 52px;
         }
         
         .login-header p {
-            font-size: 14px;
-            opacity: 0.9;
+            font-size: 13px;
+            opacity: 0.85;
+            margin-top: 6px;
         }
         
         .login-body {
-            padding: 25px;
+            padding: 28px 24px 24px;
         }
         
         .form-group {
             margin-bottom: 20px;
-            position: relative;
         }
         
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 14px;
             color: var(--dark);
         }
         
         .input-group {
             display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            align-items: stretch;
+            border: 1.5px solid #dde1f0;
+            border-radius: 10px;
             overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.15);
         }
         
         .input-group-prepend {
-            padding: 0 15px;
-            background: #f8f9fa;
-            height: 100%;
+            padding: 0 14px;
+            background: #f4f6fb;
             display: flex;
             align-items: center;
-            border-right: 1px solid #ddd;
+            border-right: 1.5px solid #dde1f0;
+            min-width: 46px;
+            justify-content: center;
         }
         
         .input-group-prepend i {
             color: var(--gray);
+            font-size: 15px;
+        }
+
+        .pw-wrap {
+            position: relative;
+            flex: 1;
+            display: flex;
         }
         
         .form-control {
+            flex: 1;
             width: 100%;
-            padding: 12px 15px;
+            padding: 13px 42px 13px 14px;
             border: none;
-            font-size: 16px;
+            font-size: 16px; /* 16px prevents iOS auto-zoom */
             color: var(--dark);
             background: var(--white);
+            -webkit-appearance: none;
+        }
+
+        .form-control.no-right-pad {
+            padding-right: 14px;
         }
         
         .form-control:focus {
             outline: none;
         }
+
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray);
+            font-size: 14px;
+            padding: 4px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .toggle-pw:hover { color: var(--primary); }
         
         .btn {
             width: 100%;
             padding: 14px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.02em;
         }
         
         .btn-primary {
             background: var(--primary);
             color: var(--white);
+            box-shadow: 0 4px 15px rgba(67,97,238,0.35);
         }
         
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: var(--secondary);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(67,97,238,0.4);
         }
-        
-        .btn-secondary {
-            background: var(--gray);
-            color: var(--white);
-            margin-top: 10px;
+
+        .btn:active:not(:disabled) {
+            transform: scale(0.98);
         }
-        
-        .login-footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #eee;
-        }
-        
-        .login-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 14px;
-        }
-        
-        .login-footer a:hover {
-            text-decoration: underline;
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         .alert {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 11px 14px;
+            border-radius: 9px;
+            margin-bottom: 18px;
+            font-size: 14px;
             display: none;
+            align-items: center;
+            gap: 8px;
         }
         
         .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fdf0f0;
+            color: #c0392b;
             border: 1px solid #f5c6cb;
         }
         
         .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #edfaf1;
+            color: #1a7a3c;
+            border: 1px solid #b7e4c7;
         }
         
-        .role-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
+        .login-footer {
+            text-align: center;
+            padding: 14px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
             font-size: 12px;
-            font-weight: 600;
-            margin-left: 10px;
+            color: var(--gray);
         }
-        
-        .founder {
-            background: var(--warning);
-            color: var(--dark);
-        }
-        
-        .admin {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        @media (max-width: 480px) {
-            .login-card {
-                border-radius: 10px;
-            }
-            
-            .login-header {
-                padding: 20px;
-            }
-            
-            .logo img {
-                height: 40px;
-            }
-            
-            .logo h1 {
-                font-size: 20px;
-            }
-            
-            .login-body {
-                padding: 20px;
-            }
-        }
-        
+
         .loader {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.35);
             border-radius: 50%;
             border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-            margin: 0 auto;
+            animation: spin 0.8s linear infinite;
+            display: none;
+            flex-shrink: 0;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* ── Mobile optimisations ── */
+        @media (max-width: 480px) {
+            body {
+                align-items: flex-start;
+                padding-top: 36px;
+            }
+            .login-card { border-radius: 14px; }
+            .login-header { padding: 22px 18px; }
+            .logo img { height: 44px; }
+            .login-body { padding: 22px 18px 18px; }
+        }
+
+        @media (max-width: 360px) {
+            body { padding-top: 16px; }
+        }
     </style>
-    <!-- Firebase App (the core Firebase SDK) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Database -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
@@ -256,49 +264,60 @@
             <div class="login-header">
                 <div class="logo">
                     <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo">
-                    
                 </div>
-                
+                <p>Sign in to your account</p>
             </div>
             
             <div class="login-body">
                 <div class="alert alert-danger" id="errorMessage"></div>
                 <div class="alert alert-success" id="successMessage"></div>
                 
+                <!-- Username only (no email) -->
                 <div class="form-group">
-                    <label for="username">Username or Email</label>
+                    <label for="username">Username</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <i class="fas fa-user"></i>
                         </div>
-                        <input type="text" class="form-control" id="username" placeholder="Enter username or email">
+                        <input type="text" class="form-control no-right-pad" id="username"
+                               placeholder="Enter your username"
+                               autocomplete="username"
+                               autocorrect="off" autocapitalize="off" spellcheck="false">
                     </div>
                 </div>
                 
+                <!-- Password with show/hide toggle -->
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <i class="fas fa-lock"></i>
                         </div>
-                        <input type="password" class="form-control" id="password" placeholder="Enter password">
+                        <div class="pw-wrap">
+                            <input type="password" class="form-control" id="password"
+                                   placeholder="Enter your password"
+                                   autocomplete="current-password">
+                            <button class="toggle-pw" type="button" onclick="togglePassword()" aria-label="Toggle password visibility">
+                                <i class="fas fa-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <button class="btn btn-primary" id="loginBtn">
-                    <span>Login</span>
+                <button class="btn btn-primary" id="loginBtn" onclick="loginUser()">
+                    <span id="btnText">Login</span>
                     <div class="loader" id="loginLoader"></div>
                 </button>
-                
-                <div class="login-footer">
-                    <a href="#" id="forgotPassword">Forgot Password?</a>
-                </div>
+            </div>
+
+            <div class="login-footer">
+                🔒 Session expires after 30 minutes
             </div>
         </div>
     </div>
 
     <script>
-        // Firebase configuration
+        // ── Firebase config ──────────────────────────────────────────
         const firebaseConfig = {
             apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
             authDomain: "aura-battle-main.firebaseapp.com",
@@ -310,144 +329,114 @@
             measurementId: "G-ZZXZ00HK07"
         };
         
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        
-        // DOM Elements
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const loginBtn = document.getElementById('loginBtn');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const loginLoader = document.getElementById('loginLoader');
-        const forgotPasswordLink = document.getElementById('forgotPassword');
-        
-        // Login function
-        loginBtn.addEventListener('click', loginUser);
-        
-        // Also allow login with Enter key
-        passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                loginUser();
+
+        // ── Session: 30 minutes ──────────────────────────────────────
+        const SESSION_MS = 30 * 60 * 1000;
+
+        // Check existing session on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('adminUsername');
+            const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+
+            if (savedUser && (Date.now() - loginTime) < SESSION_MS) {
+                showSuccess('Welcome back! Redirecting...');
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+            } else {
+                clearSession(); // wipe any expired data
             }
         });
-        
+
+        // ── Allow Enter key on both fields ───────────────────────────
+        document.getElementById('username').addEventListener('keypress', e => { if (e.key === 'Enter') loginUser(); });
+        document.getElementById('password').addEventListener('keypress', e => { if (e.key === 'Enter') loginUser(); });
+
+        // ── Toggle password visibility ────────────────────────────────
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon  = document.getElementById('eyeIcon');
+            const show  = input.type === 'password';
+            input.type  = show ? 'text' : 'password';
+            icon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+        }
+
+        // ── Login ─────────────────────────────────────────────────────
         function loginUser() {
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            // Validate inputs
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
             if (!username || !password) {
-                showError('Please enter both username and password');
+                showError('Please enter both username and password.');
                 return;
             }
-            
-            // Show loading state
-            loginBtn.querySelector('span').textContent = 'Logging in...';
-            loginLoader.style.display = 'block';
-            loginBtn.disabled = true;
-            
-            // Reference to the admins node in Firebase
-            const adminsRef = database.ref('admins');
-            
-            // Check if the user exists
-            adminsRef.once('value')
+
+            setLoading(true);
+
+            // Search Firebase /admins node for matching username + password
+            database.ref('admins').once('value')
                 .then(snapshot => {
                     let userFound = false;
-                    let userData = null;
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const admin = childSnapshot.val();
-                        
-                        // Check if username/email and password match
-                        if ((admin.username === username || admin.email === username) && admin.password === password) {
+                    let userData  = null;
+
+                    snapshot.forEach(child => {
+                        const admin = child.val();
+                        if (admin.username === username && admin.password === password) {
                             userFound = true;
-                            userData = admin;
-                            userData.key = childSnapshot.key;
-                            return true; // Break out of forEach
+                            userData  = { ...admin, key: child.key };
+                            return true; // break forEach
                         }
                     });
-                    
+
                     if (userFound) {
-                        // Login successful
-                        showSuccess('Login successful! Redirecting...');
-                        
-                        // Save user data to localStorage
-                        localStorage.setItem('adminRole', userData.role);
+                        // Save username + timestamp for 30-min session
                         localStorage.setItem('adminUsername', userData.username);
-                        localStorage.setItem('adminEmail', userData.email);
-                        localStorage.setItem('loginTime', new Date().getTime());
-                        
-                        // Redirect to dashboard after a short delay
-                        setTimeout(() => {
-                            window.location.href = 'dashboard.html';
-                        }, 1500);
+                        localStorage.setItem('loginTime',    Date.now().toString());
+                        // Save optional fields if present
+                        if (userData.role)  localStorage.setItem('adminRole',  userData.role);
+                        if (userData.email) localStorage.setItem('adminEmail', userData.email);
+
+                        showSuccess('Login successful! Redirecting...');
+                        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
                     } else {
-                        // Login failed
-                        showError('Invalid username/email or password');
-                        loginBtn.querySelector('span').textContent = 'Login';
-                        loginLoader.style.display = 'none';
-                        loginBtn.disabled = false;
+                        showError('Invalid username or password.');
+                        setLoading(false);
                     }
                 })
-                .catch(error => {
-                    showError('Error connecting to database: ' + error.message);
-                    loginBtn.querySelector('span').textContent = 'Login';
-                    loginLoader.style.display = 'none';
-                    loginBtn.disabled = false;
+                .catch(err => {
+                    showError('Connection error: ' + err.message);
+                    setLoading(false);
                 });
         }
-        
-        // Forgot password handler
-        forgotPasswordLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showError('Please contact system administrator to reset your password');
-        });
-        
-        // Helper functions for showing messages
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 5000);
+
+        // ── Helpers ───────────────────────────────────────────────────
+        function setLoading(state) {
+            const btn    = document.getElementById('loginBtn');
+            const text   = document.getElementById('btnText');
+            const loader = document.getElementById('loginLoader');
+            btn.disabled         = state;
+            text.textContent     = state ? 'Signing in...' : 'Login';
+            loader.style.display = state ? 'block' : 'none';
         }
-        
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 3000);
+
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+            el.style.display = 'flex';
+            document.getElementById('successMessage').style.display = 'none';
+            setTimeout(() => { el.style.display = 'none'; }, 5000);
         }
-        
-        // Check if user is already logged in
-        window.addEventListener('DOMContentLoaded', () => {
-            const adminRole = localStorage.getItem('adminRole');
-            const loginTime = localStorage.getItem('loginTime');
-            const currentTime = new Date().getTime();
-            
-            // If user was logged in less than 10 minutes ago, redirect to dashboard
-            if (adminRole && loginTime && (currentTime - parseInt(loginTime)) < 600000) {
-                showSuccess('Welcome back! Redirecting...');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1500);
-            } else if (adminRole) {
-                // Clear expired login
-                localStorage.removeItem('adminRole');
-                localStorage.removeItem('adminUsername');
-                localStorage.removeItem('adminEmail');
-                localStorage.removeItem('loginTime');
-            }
-        });
+
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.innerHTML = '<i class="fas fa-check-circle"></i> ' + msg;
+            el.style.display = 'flex';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function clearSession() {
+            ['adminUsername', 'adminRole', 'adminEmail', 'loginTime'].forEach(k => localStorage.removeItem(k));
+        }
     </script>
 </body>
 </html>
