@@ -6,1299 +6,1195 @@
     <title>Admin Dashboard - Aura Battle</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
             --primary: #4361ee;
             --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --light: #f8f9fa;
-            --dark: #212529;
+            --light: #f5f7fb;
+            --dark: #1a1d2e;
             --danger: #e63946;
             --warning: #fca311;
             --gray: #6c757d;
             --white: #ffffff;
+            --border: #e4e8f5;
+            --shadow: 0 2px 12px rgba(67,97,238,0.09);
         }
-        
+
         body {
-            background-color: #f5f7fb;
-            color: #333;
-            line-height: 1.6;
-            padding-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.5;
         }
-        
-        .container {
+
+        /* ── Header ── */
+        header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 0 20px;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-inner {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 15px;
-        }
-        
-        /* Header Styles */
-        header {
-            background: var(--white);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-content {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
+            gap: 12px;
         }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
+
+        /* Logo — always company logo */
         .logo {
             display: flex;
             align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
         }
-        
+
         .logo img {
-            height: 40px;
-            margin-right: 10px;
+            height: 36px;
+            width: 36px;
+            object-fit: contain;
+            flex-shrink: 0;
         }
-        
-        .logo h1 {
-            font-size: 22px;
+
+        .logo span {
+            font-size: 18px;
+            font-weight: 700;
             color: var(--primary);
+            white-space: nowrap;
         }
-        
+
+        /* Profile avatar — separate from logo */
         .user-profile {
+            display: none;
             position: relative;
-            display: none; /* Hidden by default, shown after login */
+            flex-shrink: 0;
         }
-        
-        .profile-img {
-            width: 45px;
-            height: 45px;
+
+        .avatar-btn {
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            cursor: pointer;
-            object-fit: cover;
+            background: var(--primary);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
             border: 2px solid var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
         }
-        
-        /* Profile dropdown */
+
+        .avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* shown only if profileImage exists */
+        }
+
+        .avatar-btn:hover { box-shadow: 0 0 0 3px rgba(67,97,238,0.2); }
+
+        /* Dropdown */
         .profile-dropdown {
             display: none;
             position: absolute;
-            top: 60px;
+            top: calc(100% + 10px);
             right: 0;
             background: var(--white);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            width: 250px;
-            z-index: 1000;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border-radius: 12px;
+            width: 220px;
+            z-index: 300;
             overflow: hidden;
         }
-        
-        .profile-dropdown.active {
-            display: block;
+
+        .profile-dropdown.active { display: block; }
+
+        .dropdown-user {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            background: #fafbff;
         }
-        
-        .profile-info {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .profile-info img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border: 3px solid var(--primary);
-        }
-        
-        .profile-info h3 {
-            margin-bottom: 5px;
-            font-size: 18px;
-        }
-        
-        .profile-info p {
-            color: var(--gray);
-            font-size: 14px;
-        }
-        
-        .profile-menu {
-            list-style: none;
-            padding: 10px 0;
-        }
-        
-        .profile-menu li {
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .profile-menu li:hover {
-            background: #f5f7fb;
-        }
-        
-        .profile-menu i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-        
-        /* Content Area */
-        .content {
-            background: var(--white);
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 20px;
-            margin: 20px 0;
-        }
-        
-        .page-title {
-            font-size: 24px;
-            margin-bottom: 20px;
+
+        .dropdown-user .name {
+            font-weight: 700;
+            font-size: 15px;
             color: var(--dark);
         }
-        
-        /* Dashboard Cards */
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .card {
-            background: var(--white);
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card i {
-            font-size: 40px;
-            margin-bottom: 15px;
+
+        .dropdown-user .role-badge {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(67,97,238,0.12);
             color: var(--primary);
         }
-        
-        .card h3 {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-        
-        .card p {
-            color: var(--gray);
+
+        .profile-menu { list-style: none; padding: 6px 0; }
+
+        .profile-menu li {
+            padding: 10px 16px;
+            cursor: pointer;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.15s;
         }
-        
-        /* Restricted card style */
-        .card.restricted {
-            opacity: 0.6;
-            cursor: not-allowed;
+
+        .profile-menu li:hover { background: var(--light); }
+        .profile-menu li.danger { color: var(--danger); }
+        .profile-menu li i { width: 16px; text-align: center; }
+
+        /* ── Main ── */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
         }
-        
-        .card.restricted:hover {
-            transform: none;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+        /* Welcome bar */
+        .welcome-bar {
+            background: linear-gradient(135deg, var(--primary) 0%, #6c63ff 100%);
+            border-radius: 14px;
+            padding: 20px 24px;
+            color: #fff;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        
-        /* Search Bar */
-        .search-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .search-bar {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
+
+        .welcome-bar h2 { font-size: 20px; font-weight: 700; }
+        .welcome-bar p  { font-size: 13px; opacity: 0.85; margin-top: 3px; }
+
+        .session-badge {
+            background: rgba(255,255,255,0.18);
             border-radius: 8px;
-            font-size: 16px;
-            padding-left: 40px;
+            padding: 8px 14px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
         }
-        
-        .search-icon {
+
+        /* Search */
+        .search-wrap {
+            position: relative;
+            margin-bottom: 22px;
+        }
+
+        .search-wrap i {
             position: absolute;
-            left: 15px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--gray);
+            font-size: 14px;
         }
-        
+
+        .search-bar {
+            width: 100%;
+            padding: 11px 14px 11px 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            background: var(--white);
+            color: var(--dark);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
+        }
+
         .search-results {
+            display: none;
             position: absolute;
-            top: 100%;
+            top: calc(100% + 4px);
             left: 0;
             width: 100%;
-            background: white;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            max-height: 300px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            max-height: 260px;
             overflow-y: auto;
-            z-index: 100;
-            display: none;
+            z-index: 150;
         }
-        
-        .search-result-item {
-            padding: 12px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
+
+        .search-item {
+            padding: 11px 14px;
             display: flex;
             align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f3ff;
+            transition: background 0.15s;
         }
-        
-        .search-result-item:hover {
-            background-color: #f5f7fb;
+
+        .search-item:last-child { border-bottom: none; }
+        .search-item:hover { background: var(--light); }
+        .search-item i { color: var(--primary); width: 18px; text-align: center; }
+
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
         }
-        
-        .search-result-item i {
-            margin-right: 10px;
+
+        .card {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 22px 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(67,97,238,0.14);
+            border-color: rgba(67,97,238,0.3);
+        }
+
+        .card:active { transform: scale(0.97); }
+
+        .card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: rgba(67,97,238,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 22px;
             color: var(--primary);
+            transition: background 0.2s;
         }
-        
-        /* Modal Styles */
+
+        .card:hover .card-icon { background: rgba(67,97,238,0.18); }
+
+        .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+        .card p  { font-size: 12px; color: var(--gray); line-height: 1.4; }
+
+        /* Special card colors */
+        .card.push .card-icon    { background: rgba(252,163,17,0.12); color: var(--warning); }
+        .card.push:hover .card-icon { background: rgba(252,163,17,0.22); }
+        .card.danger-card .card-icon { background: rgba(230,57,70,0.1); color: var(--danger); }
+
+        .card.restricted {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .card.restricted:hover {
+            transform: none;
+            box-shadow: var(--shadow);
+            border-color: var(--border);
+        }
+
+        /* ── Modals ── */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px);
+            z-index: 400;
             justify-content: center;
-            align-items: center;
-            padding: 15px;
+            align-items: flex-end;
+            padding: 0;
         }
-        
-        .modal-content {
+
+        @media (min-width: 600px) {
+            .modal { align-items: center; padding: 16px; }
+        }
+
+        .modal.open { display: flex; }
+
+        .modal-box {
             background: var(--white);
-            border-radius: 10px;
+            border-radius: 18px 18px 0 0;
             width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            max-height: 90vh;
+            max-width: 480px;
+            padding: 20px 20px 32px;
+            max-height: 90dvh;
             overflow-y: auto;
+            animation: slideUp 0.25s ease;
         }
-        
+
+        @media (min-width: 600px) {
+            .modal-box { border-radius: 18px; padding: 24px; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
-        
-        .close {
-            font-size: 24px;
+
+        .modal-header h3 { font-size: 17px; font-weight: 700; }
+
+        .close-btn {
+            width: 32px; height: 32px;
+            border: none; background: var(--light);
+            border-radius: 50%;
             cursor: pointer;
+            font-size: 16px;
+            color: var(--gray);
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
         }
-        
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
+        .close-btn:hover { background: #e4e8f5; color: var(--dark); }
+
+        /* Form */
+        .form-group { margin-bottom: 16px; }
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 7px;
         }
-        
+
         .form-control {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--dark);
+            background: #fafbff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
         }
-        
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 90px;
+        }
+
         .form-control:focus {
-            border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
         }
-        
+
         .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             padding: 12px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 6px;
         }
-        
+
         .btn-primary {
             background: var(--primary);
-            color: var(--white);
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(67,97,238,0.3);
         }
-        
-        .btn-primary:hover {
-            background: var(--secondary);
+
+        .btn-primary:hover:not(:disabled) { background: var(--secondary); transform: translateY(-1px); }
+        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-push {
+            background: var(--warning);
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(252,163,17,0.35);
         }
-        
-        .btn-secondary {
-            background: var(--gray);
-            color: var(--white);
+
+        .btn-push:hover:not(:disabled) { background: #e09000; transform: translateY(-1px); }
+
+        .alert {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-size: 13.5px;
+            font-weight: 500;
+            margin-bottom: 14px;
         }
-        
-        .btn-danger {
-            background: var(--danger);
-            color: var(--white);
+
+        .alert-danger  { background: #fdecea; color: #b71c2a; border: 1px solid #f5c0c3; }
+        .alert-success { background: #edfaf1; color: #1a7a3c; border: 1px solid #b2e8c4; }
+
+        /* File upload */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            margin-bottom: 12px;
         }
-        
-        /* File Upload */
-        .file-upload {
+
+        .upload-area:hover { border-color: var(--primary); background: #fafbff; }
+        .upload-area i { font-size: 28px; color: var(--gray); margin-bottom: 8px; display: block; }
+        .upload-area p { font-size: 13px; color: var(--gray); }
+
+        .upload-preview {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            display: block;
+            margin: 0 auto 12px;
+        }
+
+        /* Loading screen */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            background: var(--white);
+            z-index: 999;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 15px 0;
+            justify-content: center;
+            gap: 16px;
         }
-        
-        .file-upload-label {
-            display: inline-block;
-            padding: 12px 20px;
-            background: var(--light);
-            color: var(--dark);
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 15px;
-            text-align: center;
+
+        #loadingScreen img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            animation: pulse 1.5s ease-in-out infinite;
         }
-        
-        .file-upload-label i {
-            margin-right: 8px;
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.7; transform: scale(0.95); }
         }
-        
-        .upload-preview {
-            width: 150px;
-            height: 150px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 2px dashed #ddd;
-            padding: 5px;
+
+        .loading-text { font-size: 14px; color: var(--gray); }
+
+        .spinner {
+            width: 20px; height: 20px;
+            border: 2.5px solid rgba(67,97,238,0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
         }
-        
-        /* Alert Styles */
-        .alert {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+
+        .btn-spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
             display: none;
         }
-        
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* Login prompt */
         .login-prompt {
             text-align: center;
-            padding: 50px 20px;
-        }
-        
-        .login-prompt i {
-            font-size: 60px;
-            color: var(--gray);
-            margin-bottom: 20px;
-        }
-        
-        .login-prompt h2 {
-            margin-bottom: 15px;
-            color: var(--dark);
-        }
-        
-        .login-prompt p {
-            color: var(--gray);
-            margin-bottom: 25px;
-        }
-        
-        /* Password Change Modal */
-        #passwordModal .modal-content {
-            max-width: 400px;
-        }
-        
-        /* Mobile-first responsive styles */
-        @media (max-width: 768px) {
-            .dashboard-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .header-left {
-                margin-bottom: 10px;
-                justify-content: center;
-                width: 100%;
-            }
-            
-            .profile-dropdown {
-                width: 200px;
-                left: 50%;
-                transform: translateX(-50%);
-            }
-            
-            .modal-content {
-                padding: 15px;
-            }
-        }
-        
-        @media (min-width: 769px) {
-            .btn {
-                width: auto;
-            }
-        }
-        
-        /* Loader */
-        .loader {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-            margin: 0 auto;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* API Status */
-        .api-status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            text-align: center;
+            padding: 60px 20px;
             display: none;
         }
-        
-        .api-status.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+
+        .login-prompt i { font-size: 56px; color: var(--gray); opacity: 0.4; margin-bottom: 20px; display: block; }
+        .login-prompt h2 { margin-bottom: 10px; }
+        .login-prompt p  { color: var(--gray); margin-bottom: 24px; font-size: 14px; }
+
+        .btn-go-login {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            width: auto;
         }
-        
-        .api-status.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        /* Push notification preview */
+        .push-preview {
+            background: #1a1d2e;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
+            color: #fff;
+            display: none;
+        }
+
+        .push-preview .pn-title {
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .push-preview .pn-body {
+            font-size: 12px;
+            opacity: 0.75;
+            line-height: 1.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .welcome-bar h2 { font-size: 17px; }
+            .session-badge { display: none; }
+        }
+
+        @media (max-width: 360px) {
+            .cards-grid { grid-template-columns: 1fr; }
         }
     </style>
-    <!-- Firebase App (the core Firebase SDK) -->
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Database -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="header-left">
-                    <div class="user-profile" id="userProfile">
-                        <img src="https://via.placeholder.com/45" alt="Profile" class="profile-img" id="profileMenuBtn">
-                        <div class="profile-dropdown" id="profileDropdown">
-                            <div class="profile-info">
-                                <img src="https://via.placeholder.com/80" alt="Profile" id="dropdownProfileImg">
-                                <h3 id="dropdownUsername">Admin User</h3>
-                                <p id="dropdownRole">Founder</p>
-                            </div>
-                            <ul class="profile-menu">
-                                <li onclick="openSettings()"><i class="fas fa-cog"></i> Settings</li>
-                                <li onclick="openPasswordModal()"><i class="fas fa-key"></i> Change Password</li>
-                                <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="logo">
-                        <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo" id="headerLogo">
-                        <h1>Aura Battle</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div id="dashboardContent" style="display: none;">
-            <div class="content">
-                <h2 class="page-title">Dashboard</h2>
-                
-                <!-- API Status Indicator -->
-                <div class="api-status" id="apiStatus"></div>
-                
-                <!-- Search Bar -->
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-bar" id="searchInput" placeholder="Search options...">
-                    <div class="search-results" id="searchResults"></div>
+<!-- Loading screen (low-network friendly) -->
+<div id="loadingScreen">
+    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Logo" onerror="this.style.display='none'">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading dashboard...</p>
+</div>
+
+<!-- Header -->
+<header>
+    <div class="header-inner">
+        <!-- Company logo — always fixed, never replaced -->
+        <a class="logo" href="#">
+            <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo"
+                 onerror="this.style.display='none'">
+            <span>Aura Battle</span>
+        </a>
+
+        <!-- User avatar (separate from logo) -->
+        <div class="user-profile" id="userProfile">
+            <button class="avatar-btn" id="avatarBtn" aria-label="Profile menu">
+                <img id="avatarImg" src="" alt="">
+                <span id="avatarInitial">A</span>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-user">
+                    <div class="name" id="ddUsername">Admin</div>
+                    <span class="role-badge" id="ddRole">Admin</span>
                 </div>
-                
-                <div class="dashboard-cards">
-                    <div class="card" onclick="navigateTo('admin.html')" id="adminCard">
-                        <i class="fas fa-users-cog"></i>
-                        <h3>Manage Admins</h3>
-                        <p>Add, edit or remove admin accounts</p>
-                    </div>
-                    
-                    <div class="card" onclick="navigateTo('hoster.html')">
-                        <i class="fas fa-server"></i>
-                        <h3>Manage Hosters</h3>
-                        <p>Configure and manage server hosts</p>
-                    </div>
-                    
-                    <div class="card" onclick="navigateTo('ubdate.html')">
-                        <i class="fas fa-sync-alt"></i>
-                        <h3>Update Version</h3>
-                        <p>Manage application updates</p>
-                    </div>
-                    
-                    <div class="card" onclick="navigateTo('maintanace.html')">
-                        <i class="fas fa-tools"></i>
-                        <h3>Maintenance Control</h3>
-                        <p>Enable/disable maintenance mode</p>
-                    </div>
-                    
-                    <div class="card" onclick="navigateTo('ad-banner.html')">
-                        <i class="fas fa-ad"></i>
-                        <h3>Ad Banner Management</h3>
-                        <p>Manage advertisement banners</p>
-                    </div>
-                    
-                    <div class="card" onclick="navigateTo('manageuser.html')">
-                        <i class="fas fa-user-friends"></i>
-                        <h3>Manage Users</h3>
-                        <p>View and manage user accounts</p>
-                    </div>
-                    
-                    <!-- New Tournament Management Card -->
-                    <div class="card" onclick="navigateTo('mantch.html')">
-                        <i class="fas fa-trophy"></i>
-                        <h3>Manage Tournament</h3>
-                        <p>Create and manage tournaments</p>
-                    </div>
-                
-                    </div>
-                </div>
+                <ul class="profile-menu">
+                    <li onclick="openModal('settingsModal')"><i class="fas fa-cog"></i> Settings</li>
+                    <li onclick="openModal('passwordModal')"><i class="fas fa-key"></i> Change Password</li>
+                    <li class="danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+                </ul>
             </div>
         </div>
-        
-        <div id="loginPrompt" class="login-prompt">
-            <i class="fas fa-lock"></i>
-            <h2>Authentication Required</h2>
-            <p>Please login to access the admin dashboard</p>
-            <button class="btn btn-primary" onclick="window.location.href='index.html'">Go to Login</button>
+    </div>
+</header>
+
+<!-- Main -->
+<div class="main" id="mainArea" style="display:none;">
+
+    <!-- Welcome bar -->
+    <div class="welcome-bar">
+        <div>
+            <h2>Welcome back, <span id="welcomeName">Admin</span> 👋</h2>
+            <p>Manage your Aura Battle platform</p>
+        </div>
+        <div class="session-badge">
+            <i class="fas fa-clock"></i>
+            Session: <span id="sessionTimer">30:00</span>
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Profile Settings</h3>
-                <span class="close" onclick="closeModal('settingsModal')">&times;</span>
-            </div>
-            
-            <div class="alert alert-danger" id="settingsError"></div>
-            <div class="alert alert-success" id="settingsSuccess"></div>
-            
-            <div class="file-upload">
-                <label for="profileImageUpload" class="file-upload-label">
-                    <i class="fas fa-upload"></i> Change Profile Picture
-                </label>
-                <input type="file" id="profileImageUpload" accept="image/*" style="display: none;">
-                <img src="https://via.placeholder.com/150" alt="Preview" class="upload-preview" id="profileImagePreview">
-                <button class="btn btn-primary" id="uploadProfileImageBtn">Upload Image</button>
-            </div>
-            
-            <form id="profileForm">
-                <div class="form-group">
-                    <label for="settingsUsername">Username</label>
-                    <input type="text" class="form-control" id="settingsUsername">
-                </div>
-                
-                <div class="form-group">
-                    <label for="settingsEmail">Email Address</label>
-                    <input type="email" class="form-control" id="settingsEmail">
-                </div>
-                
-                <button type="button" class="btn btn-primary" id="updateProfileBtn">Update Profile</button>
-            </form>
-        </div>
+    <!-- Search -->
+    <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-bar" id="searchInput" placeholder="Search dashboard options...">
+        <div class="search-results" id="searchResults"></div>
     </div>
 
-    <!-- Password Change Modal -->
-    <div class="modal" id="passwordModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Change Password</h3>
-                <span class="close" onclick="closeModal('passwordModal')">&times;</span>
-            </div>
-            
-            <div class="alert alert-danger" id="passwordError"></div>
-            <div class="alert alert-success" id="passwordSuccess"></div>
-            
-            <form id="passwordForm">
-                <div class="form-group">
-                    <label for="currentPassword">Current Password</label>
-                    <input type="password" class="form-control" id="currentPassword">
-                </div>
-                
-                <div class="form-group">
-                    <label for="newPassword">New Password</label>
-                    <input type="password" class="form-control" id="newPassword">
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm New Password</label>
-                    <input type="password" class="form-control" id="confirmPassword">
-                </div>
-                
-                <button type="button" class="btn btn-primary" id="changePasswordBtn">Change Password</button>
-            </form>
-        </div>
-    </div>
+    <!-- Dashboard cards -->
+    <div class="cards-grid" id="cardsGrid">
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-            authDomain: "aura-battle-main.firebaseapp.com",
-            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-            projectId: "aura-battle-main",
-            storageBucket: "aura-battle-main.firebasestorage.app",
-            messagingSenderId: "763779990289",
-            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
-            measurementId: "G-ZZXZ00HK07"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // ImgBB API Key
-        const IMGBB_API_KEY = 'a7dcfb1d31cf1961024c9dcc608cc0e4';
-        
-        // DOM Elements
-        const profileMenuBtn = document.getElementById('profileMenuBtn');
-        const profileDropdown = document.getElementById('profileDropdown');
-        const dashboardContent = document.getElementById('dashboardContent');
-        const loginPrompt = document.getElementById('loginPrompt');
-        const adminCard = document.getElementById('adminCard');
-        const apiStatus = document.getElementById('apiStatus');
-        const userProfile = document.getElementById('userProfile');
-        const searchInput = document.getElementById('searchInput');
-        const searchResults = document.getElementById('searchResults');
-        const headerLogo = document.getElementById('headerLogo');
-        
-        // Card data for search functionality
-        const cardData = [
-            { title: "Manage Admins", description: "Add, edit or remove admin accounts", icon: "fas fa-users-cog", link: "admin.html" },
-            { title: "Update Version", description: "Manage application updates", icon: "fas fa-sync-alt", link: "ubdate.html" },
-            { title: "Maintenance Control", description: "Enable/disable maintenance mode", icon: "fas fa-tools", link: "maintanace.html" },
-            { title: "Manage Users", description: "View and manage user accounts", icon: "fas fa-user-friends", link: "manageuser.html" },
-            { title: "Manage Tournament", description: "Create and manage tournaments", icon: "fas fa-trophy", link: "mantch.html" },
-            { title: "Manage Hosters", description: "Configure and manage server hosts", icon: "fas fa-server", link: "hoster.html" },
-            { title: "Ad Banner Management", description: "Manage advertisement banners", icon: "fas fa-ad", link: "ad-banner.html" }
-        ];
-        
-        // Check if user is logged in
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, checking authentication...');
-            const adminRole = localStorage.getItem('adminRole');
-            const adminUsername = localStorage.getItem('adminUsername');
-            const adminEmail = localStorage.getItem('adminEmail');
-            const loginTime = localStorage.getItem('loginTime');
-            const currentTime = new Date().getTime();
-            
-            console.log('Stored data:', { adminRole, adminUsername, adminEmail, loginTime });
-            
-            // If user was logged in less than 10 minutes ago
-            if (adminRole && adminUsername && loginTime && (currentTime - parseInt(loginTime)) < 600000) {
-                console.log('User appears to be logged in, verifying...');
-                // Verify admin still exists in database
-                verifyAdminInDatabase(adminUsername, adminEmail);
-            } else {
-                console.log('No valid login found, showing login prompt');
-                showLoginPrompt();
-            }
-        });
-        
-        // Search functionality
-        function performSearch() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            searchResults.innerHTML = '';
-            
-            if (!searchTerm) {
-                searchResults.style.display = 'none';
-                return;
-            }
-            
-            // Filter card data based on search term
-            const filteredResults = cardData.filter(card => 
-                card.title.toLowerCase().includes(searchTerm) || 
-                card.description.toLowerCase().includes(searchTerm)
-            );
-            
-            if (filteredResults.length > 0) {
-                filteredResults.forEach(result => {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = 'search-result-item';
-                    resultItem.innerHTML = `
-                        <i class="${result.icon}"></i>
-                        <div>
-                            <div><strong>${result.title}</strong></div>
-                            <div style="font-size: 12px; color: var(--gray);">${result.description}</div>
-                        </div>
-                    `;
-                    resultItem.addEventListener('click', () => {
-                        navigateTo(result.link);
-                    });
-                    searchResults.appendChild(resultItem);
-                });
-                searchResults.style.display = 'block';
-            } else {
-                const noResults = document.createElement('div');
-                noResults.className = 'search-result-item';
-                noResults.textContent = 'No results found';
-                searchResults.appendChild(noResults);
-                searchResults.style.display = 'block';
-            }
+        <div class="card" id="adminCard" onclick="navigateTo('manage-admins.html')">
+            <div class="card-icon"><i class="fas fa-users-cog"></i></div>
+            <h3>Manage Admins</h3>
+            <p>Add, edit or remove admin accounts</p>
+        </div>
+
+        <div class="card" onclick="navigateTo('hoster.html')">
+            <div class="card-icon"><i class="fas fa-server"></i></div>
+            <h3>Manage Hosters</h3>
+            <p>Configure and manage server hosts</p>
+        </div>
+
+        <div class="card" onclick="navigateTo('ubdate.html')">
+            <div class="card-icon"><i class="fas fa-sync-alt"></i></div>
+            <h3>Update Version</h3>
+            <p>Manage application updates</p>
+        </div>
+
+        <div class="card" onclick="navigateTo('maintanace.html')">
+            <div class="card-icon"><i class="fas fa-tools"></i></div>
+            <h3>Maintenance Control</h3>
+            <p>Enable/disable maintenance mode</p>
+        </div>
+
+        <div class="card" onclick="navigateTo('ad-banner.html')">
+            <div class="card-icon"><i class="fas fa-ad"></i></div>
+            <h3>Ad Banner Management</h3>
+            <p>Manage advertisement banners</p>
+        </div>
+
+        <div class="card" onclick="navigateTo('manageuser.html')">
+            <div class="card-icon"><i class="fas fa-user-friends"></i></div>
+            <h3>Manage Users</h3>
+            <p>View and manage user accounts</p>
+        </div>
+
+        <div class="card" onclick="navigateTo('mantch.html')">
+            <div class="card-icon"><i class="fas fa-trophy"></i></div>
+            <h3>Manage Tournament</h3>
+            <p>Create and manage tournaments</p>
+        </div>
+
+        <!-- Push Notification Sender -->
+        <div class="card push" onclick="navigateTo('push.html')">
+            <div class="card-icon"><i class="fas fa-bell"></i></div>
+            <h3>Push Notification</h3>
+            <p>Send messages to all users</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- Login Prompt -->
+<div class="login-prompt" id="loginPrompt">
+    <i class="fas fa-ban"></i>
+    <h2>You Don't Have Access</h2>
+    <p>You need to be logged in to view this page.<br>Please sign in with your admin account.</p>
+    <button class="btn-go-login" onclick="window.location.href='index.html'">
+        <i class="fas fa-sign-in-alt"></i> Go to Login
+    </button>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Settings Modal -->
+<div class="modal" id="settingsModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Profile Settings</h3>
+            <button class="close-btn" onclick="closeModal('settingsModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="alert alert-danger"  id="settingsError"></div>
+        <div class="alert alert-success" id="settingsSuccess"></div>
+
+        <!-- Avatar preview -->
+        <div style="text-align:center;margin-bottom:16px;">
+            <img id="profileImagePreview" class="upload-preview"
+                 src="https://via.placeholder.com/90" alt="Preview">
+        </div>
+
+        <label for="profileImageUpload" class="upload-area">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Click to choose a profile image</p>
+        </label>
+        <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
+
+        <button class="btn btn-primary" id="uploadProfileImageBtn">
+            <div class="btn-spinner" id="uploadSpinner"></div>
+            <span id="uploadBtnText"><i class="fas fa-upload"></i> Upload Image</span>
+        </button>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" class="form-control" id="settingsUsername">
+        </div>
+
+        <button class="btn btn-primary" id="updateProfileBtn">
+            <div class="btn-spinner" id="updateSpinner"></div>
+            <span id="updateBtnText">Update Profile</span>
+        </button>
+    </div>
+</div>
+
+<!-- Password Modal -->
+<div class="modal" id="passwordModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Change Password</h3>
+            <button class="close-btn" onclick="closeModal('passwordModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="alert alert-danger"  id="passwordError"></div>
+        <div class="alert alert-success" id="passwordSuccess"></div>
+
+        <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+        </div>
+        <div class="form-group">
+            <label>New Password</label>
+            <input type="password" class="form-control" id="newPassword" placeholder="Min. 6 characters">
+        </div>
+        <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" class="form-control" id="confirmPassword" placeholder="Repeat new password">
+        </div>
+
+        <button class="btn btn-primary" id="changePasswordBtn">
+            <div class="btn-spinner" id="pwSpinner"></div>
+            <span id="pwBtnText">Change Password</span>
+        </button>
+    </div>
+</div>
+
+
+
+<script>
+    // ── Firebase ──────────────────────────────────────────────────────
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
+        authDomain: "aura-battle-main.firebaseapp.com",
+        databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
+        projectId: "aura-battle-main",
+        storageBucket: "aura-battle-main.firebasestorage.app",
+        messagingSenderId: "763779990289",
+        appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const IMGBB_KEY      = 'a7dcfb1d31cf1961024c9dcc608cc0e4';
+    const SESSION_MS     = 30 * 60 * 1000; // 30 minutes
+    let   sessionInterval = null;
+
+    // ── On load: verify session ───────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+        const username  = localStorage.getItem('adminUsername');
+        const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+
+        if (!username || (Date.now() - loginTime) >= SESSION_MS) {
+            clearSession();
+            hideLoading();
+            showLoginPrompt();
+            return;
         }
-        
-        // Add event listeners for search
-        searchInput.addEventListener('input', performSearch);
-        searchInput.addEventListener('focus', performSearch);
-        
-        // Hide search results when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-container')) {
-                searchResults.style.display = 'none';
-            }
-        });
-        
-        // Show API status
-        function showApiStatus(message, type) {
-            apiStatus.textContent = message;
-            apiStatus.className = `api-status ${type}`;
-            apiStatus.style.display = 'block';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                apiStatus.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Verify admin exists in database
-        function verifyAdminInDatabase(username, email) {
-            const adminsRef = database.ref('admins');
-            
-            adminsRef.once('value')
-                .then(snapshot => {
-                    let adminFound = false;
-                    let adminData = null;
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const admin = childSnapshot.val();
-                        
-                        // Check if username/email matches
-                        if (admin.username === username || admin.email === email) {
-                            adminFound = true;
-                            adminData = admin;
-                            return true;
-                        }
-                    });
-                    
-                    if (adminFound) {
-                        console.log('Admin found in database:', adminData);
-                        showDashboard(adminData);
-                    } else {
-                        console.log('Admin not found in database');
-                        showLoginPrompt();
-                    }
-                })
-                .catch(error => {
-                    console.error('Database error:', error);
-                    showLoginPrompt();
-                });
-        }
-        
-        // Show dashboard
-        function showDashboard(adminData) {
-            dashboardContent.style.display = 'block';
-            loginPrompt.style.display = 'none';
-            userProfile.style.display = 'block'; // Show profile icon after login
-            
-            // Update profile dropdown
-            document.getElementById('dropdownProfileImg').src = adminData.profileImage || 'https://via.placeholder.com/80';
-            document.getElementById('dropdownUsername').textContent = adminData.username;
-            document.getElementById('dropdownRole').textContent = adminData.role;
-            document.getElementById('profileMenuBtn').src = adminData.profileImage || 'https://via.placeholder.com/45';
-            
-            // Update settings form
-            document.getElementById('settingsUsername').value = adminData.username;
-            document.getElementById('settingsEmail').value = adminData.email;
-            document.getElementById('profileImagePreview').src = adminData.profileImage || 'https://via.placeholder.com/150';
-            
-            // Update header logo if available
-            if (adminData.profileImage) {
-                headerLogo.src = adminData.profileImage;
-            }
-            
-            // Restrict admin management for non-founder roles
-            if (adminData.role !== 'founder') {
-                adminCard.classList.add('restricted');
-            }
-            
-            console.log('Dashboard shown successfully');
-        }
-        
-        // Show login prompt
-        function showLoginPrompt() {
-            dashboardContent.style.display = 'none';
-            loginPrompt.style.display = 'block';
-            userProfile.style.display = 'none'; // Hide profile icon before login
-            
-            // Clear localStorage
-            localStorage.removeItem('adminRole');
-            localStorage.removeItem('adminUsername');
-            localStorage.removeItem('adminEmail');
-            localStorage.removeItem('loginTime');
-            
-            console.log('Login prompt shown');
-        }
-        
-        // Toggle profile dropdown
-        profileMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileDropdown.classList.toggle('active');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.user-profile')) {
-                profileDropdown.classList.remove('active');
-            }
-        });
-        
-        // Navigate to page
-        function navigateTo(page) {
-            // Check if it's the admin page and user is not founder
-            if (page === 'admin.html') {
-                const adminRole = localStorage.getItem('adminRole');
-                if (adminRole !== 'founder') {
-                    alert('Access denied. Only founder admins can access this page.');
-                    return;
-                }
-            }
-            
-            window.location.href = page;
-        }
-        
-        // Open settings modal
-        function openSettings() {
-            document.getElementById('settingsModal').style.display = 'flex';
-            profileDropdown.classList.remove('active');
-        }
-        
-        // Open password modal
-        function openPasswordModal() {
-            document.getElementById('passwordModal').style.display = 'flex';
-            profileDropdown.classList.remove('active');
-        }
-        
-        // Close modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        // Logout
-        function logout() {
-            localStorage.removeItem('adminRole');
-            localStorage.removeItem('adminUsername');
-            localStorage.removeItem('adminEmail');
-            localStorage.removeItem('loginTime');
-            window.location.reload();
-        }
-        
-        // Image upload preview
-        document.getElementById('profileImageUpload').addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                // Check file size (max 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    showAlert('settingsError', 'File size must be less than 5MB');
-                    this.value = '';
-                    return;
-                }
-                
-                // Check file type
-                if (!file.type.match('image.*')) {
-                    showAlert('settingsError', 'Please select an image file');
-                    this.value = '';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profileImagePreview').src = e.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-        
-        // Upload image to ImgBB
-        document.getElementById('uploadProfileImageBtn').addEventListener('click', function() {
-            const fileInput = document.getElementById('profileImageUpload');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                showAlert('settingsError', 'Please select an image first');
-                return;
-            }
-            
-            // Show loading state
-            const originalText = this.innerHTML;
-            this.innerHTML = 'Uploading... <div class="loader"></div>';
-            this.disabled = true;
-            
-            // Convert image to base64 for ImgBB API
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function() {
-                const base64Image = reader.result.split(',')[1];
-                
-                // Create form data
-                const formData = new FormData();
-                formData.append('key', IMGBB_API_KEY);
-                formData.append('image', base64Image);
-                
-                // Make the API request to ImgBB
-                fetch('https://api.imgbb.com/1/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('ImgBB API Response:', data);
-                    
-                    if (data.success) {
-                        // Update profile image in UI
-                        const imageUrl = data.data.url;
-                        document.getElementById('profileImagePreview').src = imageUrl;
-                        document.getElementById('profileMenuBtn').src = imageUrl;
-                        document.getElementById('dropdownProfileImg').src = imageUrl;
-                        headerLogo.src = imageUrl; // Update header logo
-                        
-                        // Save to Firebase database
-                        updateProfileImageInDatabase(imageUrl);
-                        
-                        showAlert('settingsSuccess', 'Profile image updated successfully!');
-                    } else {
-                        showAlert('settingsError', 'Failed to upload image: ' + (data.error.message || 'Unknown error'));
-                    }
-                    
-                    // Reset button
-                    document.getElementById('uploadProfileImageBtn').innerHTML = 'Upload Image';
-                    document.getElementById('uploadProfileImageBtn').disabled = false;
-                })
-                .catch(error => {
-                    console.error('Upload error:', error);
-                    showAlert('settingsError', 'Error uploading image: ' + error.message);
-                    
-                    // Reset button
-                    document.getElementById('uploadProfileImageBtn').innerHTML = 'Upload Image';
-                    document.getElementById('uploadProfileImageBtn').disabled = false;
-                });
-            };
-            
-            reader.onerror = function(error) {
-                console.error('File reading error:', error);
-                showAlert('settingsError', 'Error reading image file');
-                
-                // Reset button
-                document.getElementById('uploadProfileImageBtn').innerHTML = 'Upload Image';
-                document.getElementById('uploadProfileImageBtn').disabled = false;
-            };
-        });
-        
-        // Update profile image in Firebase database
-        function updateProfileImageInDatabase(imageUrl) {
-            const adminUsername = localStorage.getItem('adminUsername');
-            const adminsRef = database.ref('admins');
-            
-            // Find the admin by username and update their profile image
-            adminsRef.once('value')
-                .then(snapshot => {
-                    let adminKey = null;
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const admin = childSnapshot.val();
-                        if (admin.username === adminUsername) {
-                            adminKey = childSnapshot.key;
-                            return true;
-                        }
-                    });
-                    
-                    if (adminKey) {
-                        // Update the profile image
-                        adminsRef.child(adminKey).update({
-                            profileImage: imageUrl
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating profile image in database:', error);
-                });
-        }
-        
-        // Update profile information
-        document.getElementById('updateProfileBtn').addEventListener('click', function() {
-            const username = document.getElementById('settingsUsername').value.trim();
-            const email = document.getElementById('settingsEmail').value.trim();
-            const adminUsername = localStorage.getItem('adminUsername');
-            
-            if (!username || !email) {
-                showAlert('settingsError', 'Please fill in all fields');
-                return;
-            }
-            
-            if (!validateEmail(email) && email !== '') {
-                showAlert('settingsError', 'Please enter a valid email address');
-                return;
-            }
-            
-            // Show loading state
-            const originalText = this.innerHTML;
-            this.innerHTML = 'Updating... <div class="loader"></div>';
-            this.disabled = true;
-            
-            // Update in Firebase database
-            updateAdminProfile(adminUsername, username, email);
-        });
-        
-        // Update admin profile in Firebase
-        function updateAdminProfile(oldUsername, newUsername, newEmail) {
-            const adminsRef = database.ref('admins');
-            
-            adminsRef.once('value')
-                .then(snapshot => {
-                    let adminKey = null;
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const admin = childSnapshot.val();
-                        if (admin.username === oldUsername) {
-                            adminKey = childSnapshot.key;
-                            return true;
-                        }
-                    });
-                    
-                    if (adminKey) {
-                        // Update the admin profile
-                        adminsRef.child(adminKey).update({
-                            username: newUsername,
-                            email: newEmail
-                        }, (error) => {
-                            const updateBtn = document.getElementById('updateProfileBtn');
-                            
-                            if (error) {
-                                showAlert('settingsError', 'Error updating profile: ' + error.message);
-                                updateBtn.innerHTML = 'Update Profile';
-                                updateBtn.disabled = false;
-                            } else {
-                                // Update localStorage
-                                localStorage.setItem('adminUsername', newUsername);
-                                localStorage.setItem('adminEmail', newEmail);
-                                
-                                // Update UI
-                                document.getElementById('dropdownUsername').textContent = newUsername;
-                                
-                                showAlert('settingsSuccess', 'Profile updated successfully!');
-                                updateBtn.innerHTML = 'Update Profile';
-                                updateBtn.disabled = false;
-                            }
-                        });
-                    } else {
-                        showAlert('settingsError', 'Admin account not found');
-                        document.getElementById('updateProfileBtn').innerHTML = 'Update Profile';
-                        document.getElementById('updateProfileBtn').disabled = false;
-                    }
-                })
-                .catch(error => {
-                    console.error('Database error:', error);
-                    showAlert('settingsError', 'Error accessing database');
-                    document.getElementById('updateProfileBtn').innerHTML = 'Update Profile';
-                    document.getElementById('updateProfileBtn').disabled = false;
-                });
-        }
-        
-        // Change password
-        document.getElementById('changePasswordBtn').addEventListener('click', function() {
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const adminUsername = localStorage.getItem('adminUsername');
-            
-            if (!currentPassword || !newPassword || !confirmPassword) {
-                showAlert('passwordError', 'Please fill in all fields');
-                return;
-            }
-            
-            if (newPassword !== confirmPassword) {
-                showAlert('passwordError', 'New passwords do not match');
-                return;
-            }
-            
-            if (newPassword.length < 6) {
-                showAlert('passwordError', 'Password must be at least 6 characters long');
-                return;
-            }
-            
-            // Show loading state
-            const originalText = this.innerHTML;
-            this.innerHTML = 'Updating... <div class="loader"></div>';
-            this.disabled = true;
-            
-            // Verify current password first
-            verifyCurrentPassword(adminUsername, currentPassword, newPassword);
-        });
-        
-        // Verify current password before updating
-        function verifyCurrentPassword(username, currentPassword, newPassword) {
-            const adminsRef = database.ref('admins');
-            
-            adminsRef.once('value')
-                .then(snapshot => {
-                    let adminKey = null;
-                    let adminData = null;
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const admin = childSnapshot.val();
-                        if (admin.username === username) {
-                            adminKey = childSnapshot.key;
-                            adminData = admin;
-                            return true;
-                        }
-                    });
-                    
-                    if (adminKey) {
-                        // Check if current password matches
-                        if (adminData.password === currentPassword) {
-                            // Update the password
-                            updateAdminPassword(adminKey, newPassword);
-                        } else {
-                            showAlert('passwordError', 'Current password is incorrect');
-                            document.getElementById('changePasswordBtn').innerHTML = 'Change Password';
-                            document.getElementById('changePasswordBtn').disabled = false;
-                        }
-                    } else {
-                        showAlert('passwordError', 'Admin account not found');
-                        document.getElementById('changePasswordBtn').innerHTML = 'Change Password';
-                        document.getElementById('changePasswordBtn').disabled = false;
-                    }
-                })
-                .catch(error => {
-                    console.error('Database error:', error);
-                    showAlert('passwordError', 'Error accessing database');
-                    document.getElementById('changePasswordBtn').innerHTML = 'Change Password';
-                    document.getElementById('changePasswordBtn').disabled = false;
-                });
-        }
-        
-        // Update admin password in Firebase
-        function updateAdminPassword(adminKey, newPassword) {
-            const adminsRef = database.ref('admins');
-            
-            adminsRef.child(adminKey).update({
-                password: newPassword
-            }, (error) => {
-                const changePassBtn = document.getElementById('changePasswordBtn');
-                
-                if (error) {
-                    showAlert('passwordError', 'Error updating password: ' + error.message);
-                    changePassBtn.innerHTML = 'Change Password';
-                    changePassBtn.disabled = false;
+
+        // Verify in Firebase DB
+        db.ref('admins/' + username).once('value')
+            .then(snap => {
+                if (snap.exists()) {
+                    const data = snap.val();
+                    hideLoading();
+                    showDashboard(data);
                 } else {
-                    // Clear password fields
-                    document.getElementById('currentPassword').value = '';
-                    document.getElementById('newPassword').value = '';
-                    document.getElementById('confirmPassword').value = '';
-                    
-                    showAlert('passwordSuccess', 'Password updated successfully!');
-                    changePassBtn.innerHTML = 'Change Password';
-                    changePassBtn.disabled = false;
-                    
-                    // Close modal after 2 seconds
-                    setTimeout(() => {
-                        closeModal('passwordModal');
-                    }, 2000);
+                    clearSession();
+                    hideLoading();
+                    showLoginPrompt();
                 }
+            })
+            .catch(() => {
+                // Network issue — allow access with cached data (low-network friendly)
+                hideLoading();
+                showDashboard({ username: username, password: '' });
+            });
+    });
+
+    // ── Show / hide ───────────────────────────────────────────────────
+    function hideLoading() {
+        document.getElementById('loadingScreen').style.display = 'none';
+    }
+
+    function showDashboard(admin) {
+        document.getElementById('mainArea').style.display = 'block';
+        document.getElementById('loginPrompt').style.display = 'none';
+        document.getElementById('userProfile').style.display = 'block';
+
+        // Welcome text
+        document.getElementById('welcomeName').textContent = admin.username || 'Admin';
+
+        // Dropdown info
+        document.getElementById('ddUsername').textContent = admin.username || 'Admin';
+        document.getElementById('ddRole').textContent     = admin.role || 'Admin';
+
+        // Avatar: initial letter (not company logo!)
+        const initial = (admin.username || 'A').charAt(0).toUpperCase();
+        document.getElementById('avatarInitial').textContent = initial;
+
+        if (admin.profileImage) {
+            const img = document.getElementById('avatarImg');
+            img.src = admin.profileImage;
+            img.style.display = 'block';
+            document.getElementById('avatarInitial').style.display = 'none';
+            document.getElementById('profileImagePreview').src = admin.profileImage;
+        }
+
+        // Settings form
+        document.getElementById('settingsUsername').value = admin.username || '';
+
+        // Restrict admin card for non-founder
+        if (admin.role && admin.role !== 'founder') {
+            document.getElementById('adminCard').classList.add('restricted');
+        }
+
+        startSessionTimer();
+    }
+
+    function showLoginPrompt() {
+        document.getElementById('mainArea').style.display = 'none';
+        document.getElementById('loginPrompt').style.display = 'block';
+        document.getElementById('userProfile').style.display = 'none';
+    }
+
+    // ── Session countdown ─────────────────────────────────────────────
+    function startSessionTimer() {
+        const loginTime = parseInt(localStorage.getItem('loginTime') || Date.now().toString());
+
+        function tick() {
+            const remaining = SESSION_MS - (Date.now() - loginTime);
+            if (remaining <= 0) {
+                logout();
+                return;
+            }
+            const m = Math.floor(remaining / 60000);
+            const s = Math.floor((remaining % 60000) / 1000);
+            const el = document.getElementById('sessionTimer');
+            if (el) el.textContent = m + ':' + String(s).padStart(2, '0');
+        }
+
+        tick();
+        sessionInterval = setInterval(tick, 1000);
+    }
+
+    // ── Navigation ────────────────────────────────────────────────────
+    function navigateTo(page) {
+        if (page === 'manage-admins.html' || page === 'admin.html') {
+            const role = localStorage.getItem('adminRole') || '';
+            if (role && role !== 'founder') {
+                alert('Access denied. Only founder admins can access this page.');
+                return;
+            }
+        }
+        window.location.href = page;
+    }
+
+    // ── Profile dropdown ──────────────────────────────────────────────
+    document.getElementById('avatarBtn').addEventListener('click', e => {
+        e.stopPropagation();
+        document.getElementById('profileDropdown').classList.toggle('active');
+    });
+
+    document.addEventListener('click', () => {
+        document.getElementById('profileDropdown').classList.remove('active');
+    });
+
+    // ── Modal helpers ─────────────────────────────────────────────────
+    function openModal(id) {
+        document.getElementById(id).classList.add('open');
+        document.getElementById('profileDropdown').classList.remove('active');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    // Close modal on backdrop click
+    document.querySelectorAll('.modal').forEach(m => {
+        m.addEventListener('click', e => {
+            if (e.target === m) closeModal(m.id);
+        });
+    });
+
+    // ── Logout ────────────────────────────────────────────────────────
+    function logout() {
+        if (sessionInterval) clearInterval(sessionInterval);
+        clearSession();
+        window.location.href = 'index.html';
+    }
+
+    function clearSession() {
+        ['adminUsername', 'adminRole', 'adminEmail', 'loginTime'].forEach(k => localStorage.removeItem(k));
+    }
+
+    // ── Search ────────────────────────────────────────────────────────
+    const cardData = [
+        { title: "Manage Admins",          icon: "fas fa-users-cog",    link: "manage-admins.html" },
+        { title: "Manage Hosters",         icon: "fas fa-server",       link: "hoster.html" },
+        { title: "Update Version",         icon: "fas fa-sync-alt",     link: "ubdate.html" },
+        { title: "Maintenance Control",    icon: "fas fa-tools",        link: "maintanace.html" },
+        { title: "Ad Banner Management",   icon: "fas fa-ad",           link: "ad-banner.html" },
+        { title: "Manage Users",           icon: "fas fa-user-friends", link: "manageuser.html" },
+        { title: "Manage Tournament",      icon: "fas fa-trophy",       link: "mantch.html" },
+        { title: "Push Notification",      icon: "fas fa-bell",         link: "push.html" }
+    ];
+
+    const searchInput   = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', () => {
+        const q = searchInput.value.toLowerCase().trim();
+        searchResults.innerHTML = '';
+        if (!q) { searchResults.style.display = 'none'; return; }
+
+        const hits = cardData.filter(c => c.title.toLowerCase().includes(q));
+
+        if (!hits.length) {
+            searchResults.innerHTML = '<div class="search-item" style="color:var(--gray);">No results found</div>';
+        } else {
+            hits.forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'search-item';
+                el.innerHTML = `<i class="${c.icon}"></i><span>${c.title}</span>`;
+                el.addEventListener('click', () => {
+                    searchResults.style.display = 'none';
+                    searchInput.value = '';
+                    if (c.action) c.action();
+                    else navigateTo(c.link);
+                });
+                searchResults.appendChild(el);
             });
         }
-        
-        // Helper function to validate email
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
-        
-        // Helper function to show alerts
-        function showAlert(elementId, message) {
-            const alertElement = document.getElementById(elementId);
-            alertElement.textContent = message;
-            alertElement.style.display = 'block';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                alertElement.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Auto logout after 10 minutes
-        setInterval(() => {
-            const loginTime = localStorage.getItem('loginTime');
-            const currentTime = new Date().getTime();
-            
-            if (loginTime && (currentTime - parseInt(loginTime)) >= 600000) {
-                alert('Your session has expired. You will be logged out.');
-                logout();
+
+        searchResults.style.display = 'block';
+    });
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.search-wrap')) searchResults.style.display = 'none';
+    });
+
+    // ── Profile image upload (ImgBB) ──────────────────────────────────
+    document.getElementById('profileImageUpload').addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { showAlert('settingsError', 'Please select an image file.'); return; }
+        if (file.size > 5 * 1024 * 1024)    { showAlert('settingsError', 'File must be under 5 MB.'); return; }
+        const reader = new FileReader();
+        reader.onload = e => { document.getElementById('profileImagePreview').src = e.target.result; };
+        reader.readAsDataURL(file);
+    });
+
+    document.getElementById('uploadProfileImageBtn').addEventListener('click', () => {
+        const file = document.getElementById('profileImageUpload').files[0];
+        if (!file) { showAlert('settingsError', 'Please select an image first.'); return; }
+
+        setBtnLoading('uploadSpinner', 'uploadBtnText', true, 'Uploading...');
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            const b64 = reader.result.split(',')[1];
+            const fd  = new FormData();
+            fd.append('key', IMGBB_KEY);
+            fd.append('image', b64);
+
+            fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        const url = data.data.url;
+                        // Update avatar (not company logo!)
+                        const img = document.getElementById('avatarImg');
+                        img.src = url;
+                        img.style.display = 'block';
+                        document.getElementById('avatarInitial').style.display = 'none';
+                        document.getElementById('profileImagePreview').src = url;
+
+                        // Save to Firebase
+                        const uname = localStorage.getItem('adminUsername');
+                        db.ref('admins/' + uname).update({ profileImage: url });
+
+                        showAlert('settingsSuccess', 'Profile image updated!');
+                    } else {
+                        showAlert('settingsError', 'Upload failed: ' + (data.error?.message || 'Unknown'));
+                    }
+                    setBtnLoading('uploadSpinner', 'uploadBtnText', false, '<i class="fas fa-upload"></i> Upload Image');
+                })
+                .catch(err => {
+                    showAlert('settingsError', 'Error: ' + err.message);
+                    setBtnLoading('uploadSpinner', 'uploadBtnText', false, '<i class="fas fa-upload"></i> Upload Image');
+                });
+        };
+    });
+
+    // ── Update profile username ───────────────────────────────────────
+    document.getElementById('updateProfileBtn').addEventListener('click', () => {
+        const newUsername = document.getElementById('settingsUsername').value.trim();
+        const oldUsername = localStorage.getItem('adminUsername');
+
+        if (!newUsername) { showAlert('settingsError', 'Username cannot be empty.'); return; }
+
+        setBtnLoading('updateSpinner', 'updateBtnText', true, 'Updating...');
+
+        db.ref('admins/' + oldUsername).update({ username: newUsername })
+            .then(() => {
+                localStorage.setItem('adminUsername', newUsername);
+                document.getElementById('ddUsername').textContent   = newUsername;
+                document.getElementById('welcomeName').textContent  = newUsername;
+                document.getElementById('avatarInitial').textContent = newUsername.charAt(0).toUpperCase();
+                showAlert('settingsSuccess', 'Profile updated!');
+                setBtnLoading('updateSpinner', 'updateBtnText', false, 'Update Profile');
+            })
+            .catch(err => {
+                showAlert('settingsError', 'Error: ' + err.message);
+                setBtnLoading('updateSpinner', 'updateBtnText', false, 'Update Profile');
+            });
+    });
+
+    // ── Change password ───────────────────────────────────────────────
+    document.getElementById('changePasswordBtn').addEventListener('click', () => {
+        const curr    = document.getElementById('currentPassword').value;
+        const newPw   = document.getElementById('newPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+        const uname   = localStorage.getItem('adminUsername');
+
+        if (!curr || !newPw || !confirm) { showAlert('passwordError', 'Please fill in all fields.'); return; }
+        if (newPw !== confirm)           { showAlert('passwordError', 'Passwords do not match.'); return; }
+        if (newPw.length < 6)            { showAlert('passwordError', 'Password must be at least 6 characters.'); return; }
+
+        setBtnLoading('pwSpinner', 'pwBtnText', true, 'Updating...');
+
+        db.ref('admins/' + uname).once('value').then(snap => {
+            if (!snap.exists() || snap.val().password !== curr) {
+                showAlert('passwordError', 'Current password is incorrect.');
+                setBtnLoading('pwSpinner', 'pwBtnText', false, 'Change Password');
+                return;
             }
-        }, 60000); // Check every minute
-    </script>
+            db.ref('admins/' + uname).update({ password: newPw }).then(() => {
+                showAlert('passwordSuccess', 'Password changed successfully!');
+                setBtnLoading('pwSpinner', 'pwBtnText', false, 'Change Password');
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value     = '';
+                document.getElementById('confirmPassword').value = '';
+                setTimeout(() => closeModal('passwordModal'), 2000);
+            }).catch(err => {
+                showAlert('passwordError', 'Error: ' + err.message);
+                setBtnLoading('pwSpinner', 'pwBtnText', false, 'Change Password');
+            });
+        }).catch(err => {
+            showAlert('passwordError', 'DB Error: ' + err.message);
+            setBtnLoading('pwSpinner', 'pwBtnText', false, 'Change Password');
+        });
+    });
+
+    // ── Push Notification ─────────────────────────────────────────────
+    function updatePushPreview() {
+        const title = document.getElementById('pushTitle').value.trim();
+        const body  = document.getElementById('pushBody').value.trim();
+        const prev  = document.getElementById('pushPreview');
+
+        if (title || body) {
+            prev.style.display = 'block';
+            document.getElementById('previewTitle').textContent = title || 'Notification Title';
+            document.getElementById('previewBody').textContent  = body  || 'Your message will appear here...';
+        } else {
+            prev.style.display = 'none';
+        }
+    }
+
+    function sendPushNotification() {
+        const title = document.getElementById('pushTitle').value.trim();
+        const body  = document.getElementById('pushBody').value.trim();
+        const topic = document.getElementById('pushTopic').value.trim() || 'all';
+        const admin = localStorage.getItem('adminUsername') || 'unknown';
+
+        if (!title) { showAlert('pushError', 'Please enter a notification title.'); return; }
+        if (!body)  { showAlert('pushError', 'Please enter a message body.'); return; }
+
+        setBtnLoading('pushSpinner', 'pushBtnText', true, 'Sending...');
+
+        const payload = {
+            title:     title,
+            body:      body,
+            topic:     topic,
+            sentBy:    admin,
+            sentAt:    new Date().toISOString(),
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        // Save to Firebase /notifications — your FCM server can watch this node
+        db.ref('notifications').push(payload)
+            .then(() => {
+                showAlert('pushSuccess', '✓ Notification saved! Your FCM server will dispatch it.');
+                setBtnLoading('pushSpinner', 'pushBtnText', false, '<i class="fas fa-paper-plane"></i> Send Notification');
+                document.getElementById('pushTitle').value = '';
+                document.getElementById('pushBody').value  = '';
+                document.getElementById('pushTopic').value = 'all';
+                document.getElementById('pushPreview').style.display = 'none';
+            })
+            .catch(err => {
+                showAlert('pushError', 'Error: ' + err.message);
+                setBtnLoading('pushSpinner', 'pushBtnText', false, '<i class="fas fa-paper-plane"></i> Send Notification');
+            });
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────
+    function setBtnLoading(spinnerId, textId, loading, text) {
+        document.getElementById(spinnerId).style.display = loading ? 'block' : 'none';
+        document.getElementById(textId).innerHTML = loading ? '' : text;
+    }
+
+    function showAlert(id, msg) {
+        const el = document.getElementById(id);
+        el.innerHTML = msg;
+        el.style.display = 'flex';
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+</script>
 </body>
 </html>
