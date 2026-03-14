@@ -3,440 +3,455 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>Admin Login — Aura Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: \'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --danger: #e63946;
-            --warning: #fca311;
-            --gray: #6c757d;
-            --white: #ffffff;
+            --bg:        #0b0d17;
+            --surface:   rgba(255,255,255,0.04);
+            --surface2:  rgba(255,255,255,0.08);
+            --border:    rgba(255,255,255,0.10);
+            --accent:    #6c63ff;
+            --accent2:   #a78bfa;
+            --glow:      rgba(108,99,255,0.35);
+            --text:      #e8eaf6;
+            --muted:     rgba(232,234,246,0.55);
+            --danger:    #ff6b81;
+            --success:   #43e97b;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
             min-height: 100dvh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 16px;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .container {
+
+        /* Ambient background blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -160px; left: -160px;
+            width: 520px; height: 520px;
+            background: radial-gradient(circle, rgba(108,99,255,0.22) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatA 8s ease-in-out infinite alternate;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -120px; right: -100px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(167,139,250,0.18) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatB 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatA { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.08); } }
+        @keyframes floatB { from { transform: translate(0,0) scale(1); } to { transform: translate(-30px,-20px) scale(1.06); } }
+
+        .card {
             width: 100%;
             max-width: 420px;
-        }
-        
-        .login-card {
-            background: var(--white);
-            border-radius: 18px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            background: rgba(18,20,35,0.85);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
             overflow: hidden;
-        }
-        
-        .login-header {
-            background: var(--primary);
-            padding: 28px 25px;
-            text-align: center;
-            color: var(--white);
-        }
-        
-        .logo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        
-        .logo img {
-            height: 52px;
-        }
-        
-        .login-header p {
-            font-size: 13px;
-            opacity: 0.85;
-            margin-top: 6px;
-        }
-        
-        .login-body {
-            padding: 28px 24px 24px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--dark);
-        }
-        
-        .input-group {
-            display: flex;
-            align-items: stretch;
-            border: 1.5px solid #dde1f0;
-            border-radius: 10px;
-            overflow: hidden;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .input-group:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67,97,238,0.15);
-        }
-        
-        .input-group-prepend {
-            padding: 0 14px;
-            background: #f4f6fb;
-            display: flex;
-            align-items: center;
-            border-right: 1.5px solid #dde1f0;
-            min-width: 46px;
-            justify-content: center;
-        }
-        
-        .input-group-prepend i {
-            color: var(--gray);
-            font-size: 15px;
-        }
-
-        .pw-wrap {
             position: relative;
-            flex: 1;
-            display: flex;
-        }
-        
-        .form-control {
-            flex: 1;
-            width: 100%;
-            padding: 13px 42px 13px 14px;
-            border: none;
-            font-size: 16px; /* 16px prevents iOS auto-zoom */
-            color: var(--dark);
-            background: var(--white);
-            -webkit-appearance: none;
+            z-index: 1;
+            animation: cardIn 0.5s cubic-bezier(.22,.88,.32,1) both;
         }
 
-        .form-control.no-right-pad {
-            padding-right: 14px;
-        }
-        
-        .form-control:focus {
-            outline: none;
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(28px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .toggle-pw {
+        /* Top accent line */
+        .card::before {
+            content: '';
             position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--gray);
-            font-size: 14px;
-            padding: 4px;
-            transition: color 0.2s;
-            line-height: 1;
-        }
-        .toggle-pw:hover { color: var(--primary); }
-        
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            letter-spacing: 0.02em;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-            box-shadow: 0 4px 15px rgba(67,97,238,0.35);
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            background: var(--secondary);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(67,97,238,0.4);
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
         }
 
-        .btn:active:not(:disabled) {
-            transform: scale(0.98);
+        .card-head {
+            padding: 36px 32px 24px;
+            text-align: center;
+            position: relative;
         }
 
-        .btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
+        .logo-wrap {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 18px;
+            box-shadow: 0 0 20px var(--glow);
         }
-        
+        .logo-wrap img { height: 44px; width: 44px; object-fit: contain; }
+
+        .card-head h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+        .card-head p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        .card-body { padding: 0 28px 28px; }
+
         .alert {
-            padding: 11px 14px;
-            border-radius: 9px;
-            margin-bottom: 18px;
-            font-size: 14px;
             display: none;
             align-items: center;
             gap: 8px;
+            padding: 11px 14px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 500;
+            margin-bottom: 18px;
+            animation: fadeIn .25s ease;
         }
-        
-        .alert-danger {
-            background: #fdf0f0;
-            color: #c0392b;
-            border: 1px solid #f5c6cb;
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+        .alert-danger  { background: rgba(255,107,129,0.12); color: #ff8fa3; border: 1px solid rgba(255,107,129,0.2); }
+        .alert-success { background: rgba(67,233,123,0.10); color: #6ef7a4; border: 1px solid rgba(67,233,123,0.2); }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 8px;
         }
-        
-        .alert-success {
-            background: #edfaf1;
-            color: #1a7a3c;
-            border: 1px solid #b7e4c7;
+
+        .input-wrap {
+            display: flex;
+            align-items: stretch;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color .2s, box-shadow .2s;
         }
-        
-        .login-footer {
-            text-align: center;
-            padding: 14px 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #eee;
-            font-size: 12px;
-            color: var(--gray);
+        .input-wrap:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(108,99,255,.2);
         }
+
+        .inp-icon {
+            width: 46px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--muted);
+            font-size: 14px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border);
+        }
+
+        .pw-inner { position: relative; flex: 1; display: flex; }
+
+        .form-control {
+            flex: 1;
+            padding: 13px 14px;
+            background: transparent;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            color: var(--text);
+            -webkit-appearance: none;
+        }
+        .form-control::placeholder { color: rgba(232,234,246,0.3); }
+        .form-control:focus { outline: none; }
+
+        .toggle-pw {
+            position: absolute; right: 12px; top: 50%;
+            transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: var(--muted); font-size: 14px; padding: 4px;
+            transition: color .2s;
+        }
+        .toggle-pw:hover { color: var(--accent2); }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            box-shadow: 0 4px 20px var(--glow);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: transform .2s, box-shadow .2s, opacity .2s;
+            margin-top: 4px;
+        }
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px var(--glow);
+        }
+        .btn-login:active:not(:disabled) { transform: scale(0.98); }
+        .btn-login:disabled { opacity: .6; cursor: not-allowed; }
 
         .loader {
-            width: 18px;
-            height: 18px;
-            border: 2.5px solid rgba(255, 255, 255, 0.35);
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,.25);
+            border-top-color: #fff;
             border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 0.8s linear infinite;
-            display: none;
-            flex-shrink: 0;
+            animation: spin .75s linear infinite;
+            display: none; flex-shrink: 0;
         }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .card-foot {
+            text-align: center;
+            padding: 14px 28px 18px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--muted);
+            display: flex; align-items: center; justify-content: center; gap: 6px;
         }
 
-        /* ── Mobile optimisations ── */
         @media (max-width: 480px) {
-            body {
-                align-items: flex-start;
-                padding-top: 36px;
-            }
-            .login-card { border-radius: 14px; }
-            .login-header { padding: 22px 18px; }
-            .logo img { height: 44px; }
-            .login-body { padding: 22px 18px 18px; }
-        }
-
-        @media (max-width: 360px) {
-            body { padding-top: 16px; }
+            .card { border-radius: 20px; }
+            .card-head { padding: 28px 22px 18px; }
+            .card-body { padding: 0 20px 22px; }
+            .card-foot { padding: 12px 20px 16px; }
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="logo">
-                    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo">
-                </div>
-                <p>Sign in to your account</p>
-            </div>
-            
-            <div class="login-body">
-                <div class="alert alert-danger" id="errorMessage"></div>
-                <div class="alert alert-success" id="successMessage"></div>
-                
-                <!-- Username only (no email) -->
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <input type="text" class="form-control no-right-pad" id="username"
-                               placeholder="Enter your username"
-                               autocomplete="username"
-                               autocorrect="off" autocapitalize="off" spellcheck="false">
-                    </div>
-                </div>
-                
-                <!-- Password with show/hide toggle -->
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        <div class="pw-wrap">
-                            <input type="password" class="form-control" id="password"
-                                   placeholder="Enter your password"
-                                   autocomplete="current-password">
-                            <button class="toggle-pw" type="button" onclick="togglePassword()" aria-label="Toggle password visibility">
-                                <i class="fas fa-eye" id="eyeIcon"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="btn btn-primary" id="loginBtn" onclick="loginUser()">
-                    <span id="btnText">Login</span>
-                    <div class="loader" id="loginLoader"></div>
-                </button>
-            </div>
-
-            <div class="login-footer">
-                🔒 Session expires after 30 minutes
-            </div>
+<div class="card">
+    <div class="card-head">
+        <div class="logo-wrap">
+            <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Logo" onerror="this.style.display='none'">
         </div>
+        <h1>Admin Portal</h1>
+        <p>Aura Battle · Restricted Access</p>
     </div>
 
-    <script>
-        // ── Firebase config ──────────────────────────────────────────
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-            authDomain: "aura-battle-main.firebaseapp.com",
-            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-            projectId: "aura-battle-main",
-            storageBucket: "aura-battle-main.firebasestorage.app",
-            messagingSenderId: "763779990289",
-            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
-            measurementId: "G-ZZXZ00HK07"
-        };
-        
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+    <div class="card-body">
+        <div class="alert alert-danger"  id="errorMsg"></div>
+        <div class="alert alert-success" id="successMsg"></div>
 
-        // ── Session: 30 minutes ──────────────────────────────────────
-        const SESSION_MS = 30 * 60 * 1000;
+        <div class="form-group">
+            <label>Username</label>
+            <div class="input-wrap">
+                <div class="inp-icon"><i class="fas fa-user"></i></div>
+                <input type="text" class="form-control" id="username"
+                       placeholder="Enter username"
+                       autocomplete="username"
+                       autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+        </div>
 
-        // Check existing session on page load
-        window.addEventListener(\'DOMContentLoaded\', () => {
-            const savedUser = localStorage.getItem(\'adminUsername\');
-            const loginTime = parseInt(localStorage.getItem(\'loginTime\') || \'0\');
+        <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrap">
+                <div class="inp-icon"><i class="fas fa-lock"></i></div>
+                <div class="pw-inner">
+                    <input type="password" class="form-control" id="password"
+                           placeholder="Enter password"
+                           autocomplete="current-password">
+                    <button class="toggle-pw" type="button" onclick="togglePw()" aria-label="Show/hide password">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-            if (savedUser && (Date.now() - loginTime) < SESSION_MS) {
-                showSuccess(\'Welcome back! Redirecting...\');
-                setTimeout(() => { window.location.href = \'dashboard.html\'; }, 1200);
-            } else {
-                clearSession(); // wipe any expired data
+        <button class="btn-login" id="loginBtn" onclick="doLogin()">
+            <span id="btnTxt">Sign In</span>
+            <div class="loader" id="btnLoader"></div>
+        </button>
+    </div>
+
+    <div class="card-foot">
+        <i class="fas fa-shield-alt" style="color:var(--accent2);"></i>
+        Session expires after 30 minutes
+    </div>
+</div>
+
+<script>
+// ── Obfuscated config (XOR encoded, key=73) ─────────────────────────
+// Raw values are never visible in plain source
+const _e = (s,k)=>s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+const _k = 'aB3xQ9mZ'; // XOR key
+
+// Encoded Firebase config segments — decoded at runtime only
+const _cfg = {
+    a: "\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+    b: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+    c: "\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+    d: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+    e: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+    f: "\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+    g: "\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
+};
+
+function _d(s){ return _e(s,_k); }
+
+function _getConfig(){
+    return {
+        apiKey:            _d(_cfg.a),
+        authDomain:        _d(_cfg.b),
+        databaseURL:       _d(_cfg.c),
+        projectId:         _d(_cfg.d),
+        storageBucket:     _d(_cfg.e),
+        messagingSenderId: _d(_cfg.f),
+        appId:             _d(_cfg.g)
+    };
+}
+
+// ── Init Firebase ────────────────────────────────────────────────────
+firebase.initializeApp(_getConfig());
+const db = firebase.database();
+
+const SESSION_MS = 30 * 60 * 1000;
+
+// ── Session check on load ────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('adminUsername');
+    const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+
+    if (savedUser && (Date.now() - loginTime) < SESSION_MS) {
+        showSuccess('Welcome back! Redirecting…');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+    } else {
+        clearSession();
+    }
+});
+
+// ── Enter key support ────────────────────────────────────────────────
+['username','password'].forEach(id => {
+    document.getElementById(id).addEventListener('keypress', e => {
+        if (e.key === 'Enter') doLogin();
+    });
+});
+
+// ── Toggle password ──────────────────────────────────────────────────
+function togglePw() {
+    const inp  = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    icon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+}
+
+// ── Login ────────────────────────────────────────────────────────────
+function doLogin() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+        showError('Please enter both username and password.');
+        return;
+    }
+
+    setLoading(true);
+
+    // Try direct key lookup first (fast), then fall back to scan
+    db.ref('admins/' + username).once('value')
+        .then(snap => {
+            if (snap.exists()) {
+                const admin = snap.val();
+                if (admin.password === password) {
+                    // Key matches username — success
+                    saveSession(admin, username);
+                    return;
+                }
             }
-        });
-
-        // ── Allow Enter key on both fields ───────────────────────────
-        document.getElementById(\'username\').addEventListener(\'keypress\', e => { if (e.key === \'Enter\') loginUser(); });
-        document.getElementById(\'password\').addEventListener(\'keypress\', e => { if (e.key === \'Enter\') loginUser(); });
-
-        // ── Toggle password visibility ────────────────────────────────
-        function togglePassword() {
-            const input = document.getElementById(\'password\');
-            const icon  = document.getElementById(\'eyeIcon\');
-            const show  = input.type === \'password\';
-            input.type  = show ? \'text\' : \'password\';
-            icon.className = show ? \'fas fa-eye-slash\' : \'fas fa-eye\';
-        }
-
-        // ── Login ─────────────────────────────────────────────────────
-        function loginUser() {
-            const username = document.getElementById(\'username\').value.trim();
-            const password = document.getElementById(\'password\').value.trim();
-
-            if (!username || !password) {
-                showError(\'Please enter both username and password.\');
-                return;
-            }
-
-            setLoading(true);
-
-            // Search Firebase /admins node for matching username + password
-            database.ref(\'admins\').once(\'value\')
-                .then(snapshot => {
-                    let userFound = false;
-                    let userData  = null;
-
-                    snapshot.forEach(child => {
-                        const admin = child.val();
-                        if (admin.username === username && admin.password === password) {
-                            userFound = true;
-                            userData  = { ...admin, key: child.key };
-                            return true; // break forEach
-                        }
-                    });
-
-                    if (userFound) {
-                        // Save username + timestamp for 30-min session
-                        localStorage.setItem(\'adminUsername\', userData.username);
-                        localStorage.setItem(\'loginTime\',    Date.now().toString());
-                        // Save optional fields if present
-                        if (userData.role)  localStorage.setItem(\'adminRole\',  userData.role);
-                        if (userData.email) localStorage.setItem(\'adminEmail\', userData.email);
-
-                        showSuccess(\'Login successful! Redirecting...\');
-                        setTimeout(() => { window.location.href = \'dashboard.html\'; }, 1200);
-                    } else {
-                        showError(\'Invalid username or password.\');
-                        setLoading(false);
+            // Key didn't match — scan all admins (handles edge cases)
+            return db.ref('admins').once('value').then(allSnap => {
+                let found = false;
+                allSnap.forEach(child => {
+                    const a = child.val();
+                    if (a.username === username && a.password === password) {
+                        found = true;
+                        saveSession(a, child.key);
+                        return true;
                     }
-                })
-                .catch(err => {
-                    showError(\'Connection error: \' + err.message);
-                    setLoading(false);
                 });
-        }
+                if (!found) {
+                    showError('Invalid username or password.');
+                    setLoading(false);
+                }
+            });
+        })
+        .catch(err => {
+            showError('Connection error: ' + err.message);
+            setLoading(false);
+        });
+}
 
-        // ── Helpers ───────────────────────────────────────────────────
-        function setLoading(state) {
-            const btn    = document.getElementById(\'loginBtn\');
-            const text   = document.getElementById(\'btnText\');
-            const loader = document.getElementById(\'loginLoader\');
-            btn.disabled         = state;
-            text.textContent     = state ? \'Signing in...\' : \'Login\';
-            loader.style.display = state ? \'block\' : \'none\';
-        }
+function saveSession(admin, key) {
+    localStorage.setItem('adminUsername', key);          // key = Firebase node key
+    localStorage.setItem('adminDisplayName', admin.username || key);
+    localStorage.setItem('loginTime', Date.now().toString());
+    if (admin.role)  localStorage.setItem('adminRole',  admin.role);
+    if (admin.email) localStorage.setItem('adminEmail', admin.email);
 
-        function showError(msg) {
-            const el = document.getElementById(\'errorMessage\');
-            el.innerHTML = \'<i class="fas fa-exclamation-circle"></i> \' + msg;
-            el.style.display = \'flex\';
-            document.getElementById(\'successMessage\').style.display = \'none\';
-            setTimeout(() => { el.style.display = \'none\'; }, 5000);
-        }
+    showSuccess('Login successful! Redirecting…');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+}
 
-        function showSuccess(msg) {
-            const el = document.getElementById(\'successMessage\');
-            el.innerHTML = \'<i class="fas fa-check-circle"></i> \' + msg;
-            el.style.display = \'flex\';
-            document.getElementById(\'errorMessage\').style.display = \'none\';
-        }
+// ── Helpers ──────────────────────────────────────────────────────────
+function setLoading(on) {
+    const btn    = document.getElementById('loginBtn');
+    const txt    = document.getElementById('btnTxt');
+    const loader = document.getElementById('btnLoader');
+    btn.disabled         = on;
+    txt.textContent      = on ? 'Signing in…' : 'Sign In';
+    loader.style.display = on ? 'block' : 'none';
+}
 
-        function clearSession() {
-            [\'adminUsername\', \'adminRole\', \'adminEmail\', \'loginTime\'].forEach(k => localStorage.removeItem(k));
-        }
-    </script>
+function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+    el.style.display = 'flex';
+    document.getElementById('successMsg').style.display = 'none';
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+function showSuccess(msg) {
+    const el = document.getElementById('successMsg');
+    el.innerHTML = '<i class="fas fa-check-circle"></i> ' + msg;
+    el.style.display = 'flex';
+    document.getElementById('errorMsg').style.display = 'none';
+}
+
+function clearSession() {
+    ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime'].forEach(k => localStorage.removeItem(k));
+}
+</script>
 </body>
 </html>
