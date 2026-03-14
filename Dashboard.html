@@ -1,4 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Aura Battle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --light: #f5f7fb;
+            --dark: #1a1d2e;
+            --danger: #e63946;
+            --warning: #fca311;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --border: #e4e8f5;
+            --shadow: 0 2px 12px rgba(67,97,238,0.09);
+        }
+
+        body {
+            font-family: \'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.5;
+        }
+
+        /* %0%0 Header %0%0 */
+        header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 0 20px;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-inner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        /* Logo %4 always company logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo img {
+            height: 36px;
+            width: 36px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .logo span {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        /* Profile avatar %4 separate from logo */
+        .user-profile {
+            display: none;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* shown only if profileImage exists */
+        }
+
+        .avatar-btn:hover { box-shadow: 0 0 0 3px rgba(67,97,238,0.2); }
+
+        /* Dropdown */
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border-radius: 12px;
+            width: 220px;
+            z-index: 300;
+            overflow: hidden;
+        }
+
+        .profile-dropdown.active { display: block; }
+
+        .dropdown-user {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            background: #fafbff;
+        }
+
+        .dropdown-user .name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--dark);
+        }
+
+        .dropdown-user .role-badge {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(67,97,238,0.12);
+            color: var(--primary);
+        }
+
+        .profile-menu { list-style: none; padding: 6px 0; }
+
+        .profile-menu li {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.15s;
+        }
+
+        .profile-menu li:hover { background: var(--light); }
+        .profile-menu li.danger { color: var(--danger); }
+        .profile-menu li i { width: 16px; text-align: center; }
+
+        /* %0%0 Main %0%0 */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 16px 60px;
+        }
+
+        /* Welcome bar */
+        .welcome-bar {
+            background: linear-gradient(135deg, var(--primary) 0%, #6c63ff 100%);
+            border-radius: 14px;
+            padding: 20px 24px;
+            color: #fff;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .welcome-bar h2 { font-size: 20px; font-weight: 700; }
+        .welcome-bar p  { font-size: 13px; opacity: 0.85; margin-top: 3px; }
+
+        .session-badge {
+            background: rgba(255,255,255,0.18);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        /* Search */
+        .search-wrap {
+            position: relative;
+            margin-bottom: 22px;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 11px 14px 11px 40px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            background: var(--white);
+            color: var(--dark);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
+        }
+
+        .search-results {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            max-height: 260px;
+            overflow-y: auto;
+            z-index: 150;
+        }
+
+        .search-item {
+            padding: 11px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f3ff;
+            transition: background 0.15s;
+        }
+
+        .search-item:last-child { border-bottom: none; }
+        .search-item:hover { background: var(--light); }
+        .search-item i { color: var(--primary); width: 18px; text-align: center; }
+
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 22px 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(67,97,238,0.14);
+            border-color: rgba(67,97,238,0.3);
+        }
+
+        .card:active { transform: scale(0.97); }
+
+        .card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: rgba(67,97,238,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 22px;
+            color: var(--primary);
+            transition: background 0.2s;
+        }
+
+        .card:hover .card-icon { background: rgba(67,97,238,0.18); }
+
+        .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+        .card p  { font-size: 12px; color: var(--gray); line-height: 1.4; }
+
+        /* Special card colors */
+        .card.push .card-icon    { background: rgba(252,163,17,0.12); color: var(--warning); }
+        .card.push:hover .card-icon { background: rgba(252,163,17,0.22); }
+        .card.danger-card .card-icon { background: rgba(230,57,70,0.1); color: var(--danger); }
+
+        .card.restricted {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .card.restricted:hover {
+            transform: none;
+            box-shadow: var(--shadow);
+            border-color: var(--border);
+        }
+
+        /* %0%0 Modals %0%0 */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px);
+            z-index: 400;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 0;
+        }
+
+        @media (min-width: 600px) {
+            .modal { align-items: center; padding: 16px; }
+        }
+
+        .modal.open { display: flex; }
+
+        .modal-box {
+            background: var(--white);
+            border-radius: 18px 18px 0 0;
+            width: 100%;
+            max-width: 480px;
+            padding: 20px 20px 32px;
+            max-height: 90dvh;
+            overflow-y: auto;
+            animation: slideUp 0.25s ease;
+        }
+
+        @media (min-width: 600px) {
+            .modal-box { border-radius: 18px; padding: 24px; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-header h3 { font-size: 17px; font-weight: 700; }
+
+        .close-btn {
+            width: 32px; height: 32px;
+            border: none; background: var(--light);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--gray);
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .close-btn:hover { background: #e4e8f5; color: var(--dark); }
+
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 7px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--dark);
+            background: #fafbff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(67,97,238,0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) { background: var(--secondary); transform: translateY(-1px); }
+        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-push {
+            background: var(--warning);
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(252,163,17,0.35);
+        }
+
+        .btn-push:hover:not(:disabled) { background: #e09000; transform: translateY(-1px); }
+
+        .alert {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 9px;
+            font-size: 13.5px;
+            font-weight: 500;
+            margin-bottom: 14px;
+        }
+
+        .alert-danger  { background: #fdecea; color: #b71c2a; border: 1px solid #f5c0c3; }
+        .alert-success { background: #edfaf1; color: #1a7a3c; border: 1px solid #b2e8c4; }
+
+        /* File upload */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .upload-area:hover { border-color: var(--primary); background: #fafbff; }
+        .upload-area i { font-size: 28px; color: var(--gray); margin-bottom: 8px; display: block; }
+        .upload-area p { font-size: 13px; color: var(--gray); }
+
+        .upload-preview {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            display: block;
+            margin: 0 auto 12px;
+        }
+
+        /* Loading screen */
+        #loadingScreen {
+            position: fixed;
+            inset: 0;
+            background: var(--white);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        #loadingScreen img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.7; transform: scale(0.95); }
+        }
+
+        .loading-text { font-size: 14px; color: var(--gray); }
+
+        .spinner {
+            width: 20px; height: 20px;
+            border: 2.5px solid rgba(67,97,238,0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .btn-spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Login prompt */
+        .login-prompt {
+            text-align: center;
+            padding: 60px 20px;
+            display: none;
+        }
+
+        .login-prompt i { font-size: 56px; color: var(--gray); opacity: 0.4; margin-bottom: 20px; display: block; }
+        .login-prompt h2 { margin-bottom: 10px; }
+        .login-prompt p  { color: var(--gray); margin-bottom: 24px; font-size: 14px; }
+
+        .btn-go-login {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            width: auto;
+        }
+
+        /* Push notification preview */
+        .push-preview {
+            background: #1a1d2e;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
+            color: #fff;
+            display: none;
+        }
+
+        .push-preview .pn-title {
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .push-preview .pn-body {
+            font-size: 12px;
+            opacity: 0.75;
+            line-height: 1.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .welcome-bar h2 { font-size: 17px; }
+            .session-badge { display: none; }
+        }
+
+        @media (max-width: 360px) {
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+<!-- Loading screen (low-network friendly) -->
+<div id="loadingScreen">
+    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Logo" onerror="this.style.display=\'none\'">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading dashboard...</p>
+</div>
+
+<!-- Header -->
+<header>
+    <div class="header-inner">
+        <!-- Company logo %4 always fixed, never replaced -->
+        <a class="logo" href="#">
+            <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo"
+                 onerror="this.style.display=\'none\'">
+            
+        </a>
+
+        <!-- User avatar (separate from logo) -->
+        <div class="user-profile" id="userProfile">
+            <button class="avatar-btn" id="avatarBtn" aria-label="Profile menu">
+                <img id="avatarImg" src="" alt="">
+                <span id="avatarInitial">A</span>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-user">
+                    <div class="name" id="ddUsername">Admin</div>
+                    <span class="role-badge" id="ddRole">Admin</span>
+                </div>
+                <ul class="profile-menu">
+                    <li onclick="openModal(\'settingsModal\')"><i class="fas fa-cog"></i> Settings</li>
+                    <li onclick="openModal(\'passwordModal\')"><i class="fas fa-key"></i> Change Password</li>
+                    <li class="danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main -->
+<div class="main" id="mainArea" style="display:none;">
+
+    <!-- Welcome bar -->
+    <div class="welcome-bar">
+        <div>
+            <h2>Welcome back, <span id="welcomeName">Admin</span> %D%B</h2>
+            <p>Manage your Aura Battle platform</p>
+        </div>
+        <div class="session-badge">
+            <i class="fas fa-clock"></i>
+            Session: <span id="sessionTimer">30:00</span>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-bar" id="searchInput" placeholder="Search dashboard options...">
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <!-- Dashboard cards -->
+    <div class="cards-grid" id="cardsGrid">
+
+        <div class="card" id="adminCard" onclick="navigateTo(\'manage-admins.html\')">
+            <div class="card-icon"><i class="fas fa-users-cog"></i></div>
+            <h3>Manage Admins</h3>
+            <p>Add, edit or remove admin accounts</p>
+        </div>
+
+        <div class="card" onclick="navigateTo(\'hoster.html\')">
+            <div class="card-icon"><i class="fas fa-server"></i></div>
+            <h3>Manage Hosters</h3>
+            <p>Configure and manage server hosts</p>
+        </div>
+
+        <div class="card" onclick="navigateTo(\'ubdate.html\')">
+            <div class="card-icon"><i class="fas fa-sync-alt"></i></div>
+            <h3>Update Version</h3>
+            <p>Manage application updates</p>
+        </div>
+
+        <div class="card" onclick="navigateTo(\'maintanace.html\')">
+            <div class="card-icon"><i class="fas fa-tools"></i></div>
+            <h3>Maintenance Control</h3>
+            <p>Enable/disable maintenance mode</p>
+        </div>
+
+        <div class="card" onclick="navigateTo(\'ad-banner.html\')">
+            <div class="card-icon"><i class="fas fa-ad"></i></div>
+            <h3>Ad Banner Management</h3>
+            <p>Manage advertisement banners</p>
+        </div>
+
+        <div class="card" onclick="navigateTo(\'manageuser.html\')">
+            <div class="card-icon"><i class="fas fa-user-friends"></i></div>
+            <h3>Manage Users</h3>
+            <p>View and manage user accounts</p>
+        </div>
+
+        <div class="card" onclick="navigateTo(\'mantch.html\')">
+            <div class="card-icon"><i class="fas fa-trophy"></i></div>
+            <h3>Manage Tournament</h3>
+            <p>Create and manage tournaments</p>
+        </div>
+
+        <!-- Push Notification Sender -->
+        <div class="card push" onclick="navigateTo(\'push.html\')">
+            <div class="card-icon"><i class="fas fa-bell"></i></div>
+            <h3>Push Notification</h3>
+            <p>Send messages to all users</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- Login Prompt -->
+<div class="login-prompt" id="loginPrompt">
+    <i class="fas fa-ban"></i>
+    <h2>You Don\'t Have Access</h2>
+    <p>You need to be logged in to view this page.<br>Please sign in with your admin account.</p>
+    <button class="btn-go-login" onclick="window.location.href=\'index.html\'">
+        <i class="fas fa-sign-in-alt"></i> Go to Login
+    </button>
+</div>
+
+<!-- %0%0%0 MODALS %0%0%0 -->
+
+<!-- Settings Modal -->
+<div class="modal" id="settingsModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Profile Settings</h3>
+            <button class="close-btn" onclick="closeModal(\'settingsModal\')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="alert alert-danger"  id="settingsError"></div>
+        <div class="alert alert-success" id="settingsSuccess"></div>
+
+        <!-- Avatar preview -->
+        <div style="text-align:center;margin-bottom:16px;">
+            <img id="profileImagePreview" class="upload-preview"
+                 src="https://via.placeholder.com/90" alt="Preview">
+        </div>
+
+        <label for="profileImageUpload" class="upload-area">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Click to choose a profile image</p>
+        </label>
+        <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
+
+        <button class="btn btn-primary" id="uploadProfileImageBtn">
+            <div class="btn-spinner" id="uploadSpinner"></div>
+            <span id="uploadBtnText"><i class="fas fa-upload"></i> Upload Image</span>
+        </button>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" class="form-control" id="settingsUsername">
+        </div>
+
+        <button class="btn btn-primary" id="updateProfileBtn">
+            <div class="btn-spinner" id="updateSpinner"></div>
+            <span id="updateBtnText">Update Profile</span>
+        </button>
+    </div>
+</div>
+
+<!-- Password Modal -->
+<div class="modal" id="passwordModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Change Password</h3>
+            <button class="close-btn" onclick="closeModal(\'passwordModal\')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="alert alert-danger"  id="passwordError"></div>
+        <div class="alert alert-success" id="passwordSuccess"></div>
+
+        <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+        </div>
+        <div class="form-group">
+            <label>New Password</label>
+            <input type="password" class="form-control" id="newPassword" placeholder="Min. 6 characters">
+        </div>
+        <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" class="form-control" id="confirmPassword" placeholder="Repeat new password">
+        </div>
+
+        <button class="btn btn-primary" id="changePasswordBtn">
+            <div class="btn-spinner" id="pwSpinner"></div>
+            <span id="pwBtnText">Change Password</span>
+        </button>
+    </div>
+</div>
+
+
+
 <script>
-<!-- Code  Encrypt by Devloper Ak gamer -->
-document.write(decodeURIComponent('%3C!DOCTYPE%20html%3E%0A%3Chtml%20lang%3D%22en%22%3E%0A%3Chead%3E%0A%20%20%20%20%3Cmeta%20charset%3D%22UTF-8%22%3E%0A%20%20%20%20%3Cmeta%20name%3D%22viewport%22%20content%3D%22width%3Ddevice-width%2C%20initial-scale%3D1.0%22%3E%0A%20%20%20%20%3Ctitle%3EAdmin%20Dashboard%20-%20Aura%20Battle%3C%2Ftitle%3E%0A%20%20%20%20%3Clink%20rel%3D%22stylesheet%22%20href%3D%22https%3A%2F%2Fcdnjs.cloudflare.com%2Fajax%2Flibs%2Ffont-awesome%2F6.4.0%2Fcss%2Fall.min.css%22%3E%0A%20%20%20%20%3Cstyle%3E%0A%20%20%20%20%20%20%20%20*%2C%20*%3A%3Abefore%2C%20*%3A%3Aafter%20%7B%20margin%3A%200%3B%20padding%3A%200%3B%20box-sizing%3A%20border-box%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20%3Aroot%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20--primary%3A%20%234361ee%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--secondary%3A%20%233f37c9%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--light%3A%20%23f5f7fb%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--dark%3A%20%231a1d2e%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--danger%3A%20%23e63946%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--warning%3A%20%23fca311%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--gray%3A%20%236c757d%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--white%3A%20%23ffffff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--border%3A%20%23e4e8f5%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20--shadow%3A%200%202px%2012px%20rgba(67%2C97%2C238%2C0.09)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20body%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-family%3A%20\'Segoe%20UI\'%2C%20Tahoma%2C%20Geneva%2C%20Verdana%2C%20sans-serif%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--light)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--dark)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20line-height%3A%201.5%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20%250%250%20Header%20%250%250%20*%2F%0A%20%20%20%20%20%20%20%20header%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--white)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%200%202px%2010px%20rgba(0%2C0%2C0%2C0.08)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%200%2020px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20height%3A%2060px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20sticky%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20top%3A%200%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20z-index%3A%20200%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.header-inner%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20max-width%3A%201200px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin%3A%200%20auto%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20justify-content%3A%20space-between%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Logo%20%254%20always%20company%20logo%20*%2F%0A%20%20%20%20%20%20%20%20.logo%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20text-decoration%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20flex-shrink%3A%200%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.logo%20img%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20height%3A%2036px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%2036px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20object-fit%3A%20contain%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20flex-shrink%3A%200%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.logo%20span%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2018px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20700%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20white-space%3A%20nowrap%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Profile%20avatar%20%254%20separate%20from%20logo%20*%2F%0A%20%20%20%20%20%20%20%20.user-profile%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20relative%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20flex-shrink%3A%200%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.avatar-btn%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%2038px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20height%3A%2038px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2050%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20%23fff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2016px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20700%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%202px%20solid%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20pointer%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20justify-content%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20overflow%3A%20hidden%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20box-shadow%200.2s%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.avatar-btn%20img%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20height%3A%20100%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20object-fit%3A%20cover%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%20%2F*%20shown%20only%20if%20profileImage%20exists%20*%2F%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.avatar-btn%3Ahover%20%7B%20box-shadow%3A%200%200%200%203px%20rgba(67%2C97%2C238%2C0.2)%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Dropdown%20*%2F%0A%20%20%20%20%20%20%20%20.profile-dropdown%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20absolute%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20top%3A%20calc(100%25%20%2B%2010px)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20right%3A%200%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--white)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%201px%20solid%20var(--border)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%200%208px%2024px%20rgba(0%2C0%2C0%2C0.12)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20220px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20z-index%3A%20300%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20overflow%3A%20hidden%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.profile-dropdown.active%20%7B%20display%3A%20block%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.dropdown-user%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2014px%2016px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-bottom%3A%201px%20solid%20var(--border)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20%23fafbff%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.dropdown-user%20.name%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20700%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2015px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--dark)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.dropdown-user%20.role-badge%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20inline-block%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-top%3A%204px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%202px%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2020px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2011px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20600%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20rgba(67%2C97%2C238%2C0.12)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.profile-menu%20%7B%20list-style%3A%20none%3B%20padding%3A%206px%200%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.profile-menu%20li%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2010px%2016px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20pointer%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20background%200.15s%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.profile-menu%20li%3Ahover%20%7B%20background%3A%20var(--light)%3B%20%7D%0A%20%20%20%20%20%20%20%20.profile-menu%20li.danger%20%7B%20color%3A%20var(--danger)%3B%20%7D%0A%20%20%20%20%20%20%20%20.profile-menu%20li%20i%20%7B%20width%3A%2016px%3B%20text-align%3A%20center%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20%250%250%20Main%20%250%250%20*%2F%0A%20%20%20%20%20%20%20%20.main%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20max-width%3A%201200px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin%3A%200%20auto%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2024px%2016px%2060px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Welcome%20bar%20*%2F%0A%20%20%20%20%20%20%20%20.welcome-bar%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20linear-gradient(135deg%2C%20var(--primary)%200%25%2C%20%236c63ff%20100%25)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2020px%2024px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20%23fff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-bottom%3A%2024px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20justify-content%3A%20space-between%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20flex-wrap%3A%20wrap%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.welcome-bar%20h2%20%7B%20font-size%3A%2020px%3B%20font-weight%3A%20700%3B%20%7D%0A%20%20%20%20%20%20%20%20.welcome-bar%20p%20%20%7B%20font-size%3A%2013px%3B%20opacity%3A%200.85%3B%20margin-top%3A%203px%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.session-badge%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20rgba(255%2C255%2C255%2C0.18)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%208px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%208px%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2013px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%206px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20white-space%3A%20nowrap%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Search%20*%2F%0A%20%20%20%20%20%20%20%20.search-wrap%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20relative%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-bottom%3A%2022px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.search-wrap%20i%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20absolute%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20left%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20top%3A%2050%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20translateY(-50%25)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--gray)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.search-bar%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2011px%2014px%2011px%2040px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%201.5px%20solid%20var(--border)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--white)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--dark)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20border-color%200.2s%2C%20box-shadow%200.2s%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.search-bar%3Afocus%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20outline%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-color%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%200%200%200%203px%20rgba(67%2C97%2C238%2C0.12)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.search-results%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20absolute%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20top%3A%20calc(100%25%20%2B%204px)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20left%3A%200%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--white)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%201px%20solid%20var(--border)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%200%208px%2020px%20rgba(0%2C0%2C0%2C0.1)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20max-height%3A%20260px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20overflow-y%3A%20auto%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20z-index%3A%20150%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.search-item%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2011px%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20pointer%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-bottom%3A%201px%20solid%20%23f0f3ff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20background%200.15s%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.search-item%3Alast-child%20%7B%20border-bottom%3A%20none%3B%20%7D%0A%20%20%20%20%20%20%20%20.search-item%3Ahover%20%7B%20background%3A%20var(--light)%3B%20%7D%0A%20%20%20%20%20%20%20%20.search-item%20i%20%7B%20color%3A%20var(--primary)%3B%20width%3A%2018px%3B%20text-align%3A%20center%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Cards%20grid%20*%2F%0A%20%20%20%20%20%20%20%20.cards-grid%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20grid%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20grid-template-columns%3A%20repeat(auto-fill%2C%20minmax(200px%2C%201fr))%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%2016px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.card%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--white)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%201.5px%20solid%20var(--border)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2022px%2018px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20text-align%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20pointer%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20transform%200.2s%2C%20box-shadow%200.2s%2C%20border-color%200.2s%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%20var(--shadow)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.card%3Ahover%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20translateY(-4px)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%200%208px%2024px%20rgba(67%2C97%2C238%2C0.14)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-color%3A%20rgba(67%2C97%2C238%2C0.3)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.card%3Aactive%20%7B%20transform%3A%20scale(0.97)%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.card-icon%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%2052px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20height%3A%2052px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20rgba(67%2C97%2C238%2C0.1)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20justify-content%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin%3A%200%20auto%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2022px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20background%200.2s%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.card%3Ahover%20.card-icon%20%7B%20background%3A%20rgba(67%2C97%2C238%2C0.18)%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.card%20h3%20%7B%20font-size%3A%2014px%3B%20font-weight%3A%20700%3B%20margin-bottom%3A%205px%3B%20%7D%0A%20%20%20%20%20%20%20%20.card%20p%20%20%7B%20font-size%3A%2012px%3B%20color%3A%20var(--gray)%3B%20line-height%3A%201.4%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Special%20card%20colors%20*%2F%0A%20%20%20%20%20%20%20%20.card.push%20.card-icon%20%20%20%20%7B%20background%3A%20rgba(252%2C163%2C17%2C0.12)%3B%20color%3A%20var(--warning)%3B%20%7D%0A%20%20%20%20%20%20%20%20.card.push%3Ahover%20.card-icon%20%7B%20background%3A%20rgba(252%2C163%2C17%2C0.22)%3B%20%7D%0A%20%20%20%20%20%20%20%20.card.danger-card%20.card-icon%20%7B%20background%3A%20rgba(230%2C57%2C70%2C0.1)%3B%20color%3A%20var(--danger)%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.card.restricted%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20opacity%3A%200.5%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20not-allowed%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20.card.restricted%3Ahover%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%20var(--shadow)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-color%3A%20var(--border)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20%250%250%20Modals%20%250%250%20*%2F%0A%20%20%20%20%20%20%20%20.modal%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20fixed%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20inset%3A%200%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20rgba(0%2C0%2C0%2C0.45)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20backdrop-filter%3A%20blur(3px)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20z-index%3A%20400%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20justify-content%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20flex-end%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%200%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%40media%20(min-width%3A%20600px)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20.modal%20%7B%20align-items%3A%20center%3B%20padding%3A%2016px%3B%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.modal.open%20%7B%20display%3A%20flex%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.modal-box%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--white)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2018px%2018px%200%200%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20max-width%3A%20480px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2020px%2020px%2032px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20max-height%3A%2090dvh%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20overflow-y%3A%20auto%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20animation%3A%20slideUp%200.25s%20ease%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%40media%20(min-width%3A%20600px)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20.modal-box%20%7B%20border-radius%3A%2018px%3B%20padding%3A%2024px%3B%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%40keyframes%20slideUp%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20from%20%7B%20opacity%3A%200%3B%20transform%3A%20translateY(20px)%3B%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20to%20%20%20%7B%20opacity%3A%201%3B%20transform%3A%20translateY(0)%3B%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.modal-header%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20justify-content%3A%20space-between%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-bottom%3A%2018px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.modal-header%20h3%20%7B%20font-size%3A%2017px%3B%20font-weight%3A%20700%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.close-btn%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%2032px%3B%20height%3A%2032px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%20none%3B%20background%3A%20var(--light)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2050%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20pointer%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2016px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--gray)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%20align-items%3A%20center%3B%20justify-content%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20background%200.2s%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20.close-btn%3Ahover%20%7B%20background%3A%20%23e4e8f5%3B%20color%3A%20var(--dark)%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Form%20*%2F%0A%20%20%20%20%20%20%20%20.form-group%20%7B%20margin-bottom%3A%2016px%3B%20%7D%0A%20%20%20%20%20%20%20%20.form-group%20label%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20block%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20700%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--gray)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20text-transform%3A%20uppercase%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20letter-spacing%3A%200.05em%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-bottom%3A%207px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.form-control%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2011px%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%201.5px%20solid%20var(--border)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-family%3A%20inherit%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2015px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20var(--dark)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20%23fafbff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20border-color%200.2s%2C%20box-shadow%200.2s%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20-webkit-appearance%3A%20none%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20textarea.form-control%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20resize%3A%20vertical%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20min-height%3A%2090px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.form-control%3Afocus%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20outline%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-color%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--white)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%200%200%200%203px%20rgba(67%2C97%2C238%2C0.12)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.btn%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20inline-flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20justify-content%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%208px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2012px%2020px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-family%3A%20inherit%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2015px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20700%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20pointer%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20all%200.2s%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-top%3A%206px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.btn-primary%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20%23fff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%200%203px%2012px%20rgba(67%2C97%2C238%2C0.3)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.btn-primary%3Ahover%3Anot(%3Adisabled)%20%7B%20background%3A%20var(--secondary)%3B%20transform%3A%20translateY(-1px)%3B%20%7D%0A%20%20%20%20%20%20%20%20.btn-primary%3Aactive%3Anot(%3Adisabled)%20%7B%20transform%3A%20scale(0.98)%3B%20%7D%0A%20%20%20%20%20%20%20%20.btn-primary%3Adisabled%20%7B%20opacity%3A%200.6%3B%20cursor%3A%20not-allowed%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.btn-push%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--warning)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20%23fff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20box-shadow%3A%200%203px%2012px%20rgba(252%2C163%2C17%2C0.35)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.btn-push%3Ahover%3Anot(%3Adisabled)%20%7B%20background%3A%20%23e09000%3B%20transform%3A%20translateY(-1px)%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.alert%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%208px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2010px%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%209px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2013.5px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20500%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-bottom%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.alert-danger%20%20%7B%20background%3A%20%23fdecea%3B%20color%3A%20%23b71c2a%3B%20border%3A%201px%20solid%20%23f5c0c3%3B%20%7D%0A%20%20%20%20%20%20%20%20.alert-success%20%7B%20background%3A%20%23edfaf1%3B%20color%3A%20%231a7a3c%3B%20border%3A%201px%20solid%20%23b2e8c4%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20File%20upload%20*%2F%0A%20%20%20%20%20%20%20%20.upload-area%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%202px%20dashed%20var(--border)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2020px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20text-align%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20pointer%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20transition%3A%20border-color%200.2s%2C%20background%200.2s%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-bottom%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.upload-area%3Ahover%20%7B%20border-color%3A%20var(--primary)%3B%20background%3A%20%23fafbff%3B%20%7D%0A%20%20%20%20%20%20%20%20.upload-area%20i%20%7B%20font-size%3A%2028px%3B%20color%3A%20var(--gray)%3B%20margin-bottom%3A%208px%3B%20display%3A%20block%3B%20%7D%0A%20%20%20%20%20%20%20%20.upload-area%20p%20%7B%20font-size%3A%2013px%3B%20color%3A%20var(--gray)%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.upload-preview%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%2090px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20height%3A%2090px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2050%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20object-fit%3A%20cover%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%203px%20solid%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20block%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin%3A%200%20auto%2012px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Loading%20screen%20*%2F%0A%20%20%20%20%20%20%20%20%23loadingScreen%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20position%3A%20fixed%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20inset%3A%200%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--white)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20z-index%3A%20999%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20flex-direction%3A%20column%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20justify-content%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%2016px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%23loadingScreen%20img%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%2060px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20height%3A%2060px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20object-fit%3A%20contain%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20animation%3A%20pulse%201.5s%20ease-in-out%20infinite%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%40keyframes%20pulse%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%200%25%2C%20100%25%20%7B%20opacity%3A%201%3B%20transform%3A%20scale(1)%3B%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%2050%25%20%20%20%20%20%20%20%7B%20opacity%3A%200.7%3B%20transform%3A%20scale(0.95)%3B%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.loading-text%20%7B%20font-size%3A%2014px%3B%20color%3A%20var(--gray)%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.spinner%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%2020px%3B%20height%3A%2020px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%202.5px%20solid%20rgba(67%2C97%2C238%2C0.2)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-top-color%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2050%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20animation%3A%20spin%200.7s%20linear%20infinite%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.btn-spinner%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%2016px%3B%20height%3A%2016px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%202px%20solid%20rgba(255%2C255%2C255%2C0.3)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-top-color%3A%20%23fff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2050%25%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20animation%3A%20spin%200.7s%20linear%20infinite%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%40keyframes%20spin%20%7B%20to%20%7B%20transform%3A%20rotate(360deg)%3B%20%7D%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Login%20prompt%20*%2F%0A%20%20%20%20%20%20%20%20.login-prompt%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20text-align%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2060px%2020px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.login-prompt%20i%20%7B%20font-size%3A%2056px%3B%20color%3A%20var(--gray)%3B%20opacity%3A%200.4%3B%20margin-bottom%3A%2020px%3B%20display%3A%20block%3B%20%7D%0A%20%20%20%20%20%20%20%20.login-prompt%20h2%20%7B%20margin-bottom%3A%2010px%3B%20%7D%0A%20%20%20%20%20%20%20%20.login-prompt%20p%20%20%7B%20color%3A%20var(--gray)%3B%20margin-bottom%3A%2024px%3B%20font-size%3A%2014px%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20.btn-go-login%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20inline-flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%208px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2012px%2028px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20var(--primary)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20%23fff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border%3A%20none%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2010px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2015px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20700%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20cursor%3A%20pointer%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3A%20auto%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Push%20notification%20preview%20*%2F%0A%20%20%20%20%20%20%20%20.push-preview%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20background%3A%20%231a1d2e%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20border-radius%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20padding%3A%2014px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-top%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3A%20%23fff%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20none%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.push-preview%20.pn-title%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2013px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-weight%3A%20700%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20display%3A%20flex%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20align-items%3A%20center%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20gap%3A%206px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20margin-bottom%3A%204px%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20.push-preview%20.pn-body%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20font-size%3A%2012px%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20opacity%3A%200.75%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20line-height%3A%201.4%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F*%20Responsive%20*%2F%0A%20%20%20%20%20%20%20%20%40media%20(max-width%3A%20480px)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20.cards-grid%20%7B%20grid-template-columns%3A%20repeat(2%2C%201fr)%3B%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20.welcome-bar%20h2%20%7B%20font-size%3A%2017px%3B%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20.session-badge%20%7B%20display%3A%20none%3B%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%40media%20(max-width%3A%20360px)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20.cards-grid%20%7B%20grid-template-columns%3A%201fr%3B%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%3C%2Fstyle%3E%0A%0A%20%20%20%20%3Cscript%20src%3D%22https%3A%2F%2Fwww.gstatic.com%2Ffirebasejs%2F8.10.1%2Ffirebase-app.js%22%3E%3C%2Fscript%3E%0A%20%20%20%20%3Cscript%20src%3D%22https%3A%2F%2Fwww.gstatic.com%2Ffirebasejs%2F8.10.1%2Ffirebase-database.js%22%3E%3C%2Fscript%3E%0A%3C%2Fhead%3E%0A%3Cbody%3E%0A%0A%3C!--%20Loading%20screen%20(low-network%20friendly)%20--%3E%0A%3Cdiv%20id%3D%22loadingScreen%22%3E%0A%20%20%20%20%3Cimg%20src%3D%22https%3A%2F%2Fi.imghippo.com%2Ffiles%2FJaE9679Nc.png%22%20alt%3D%22Logo%22%20onerror%3D%22this.style.display%3D\'none\'%22%3E%0A%20%20%20%20%3Cdiv%20class%3D%22spinner%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%3Cp%20class%3D%22loading-text%22%3ELoading%20dashboard...%3C%2Fp%3E%0A%3C%2Fdiv%3E%0A%0A%3C!--%20Header%20--%3E%0A%3Cheader%3E%0A%20%20%20%20%3Cdiv%20class%3D%22header-inner%22%3E%0A%20%20%20%20%20%20%20%20%3C!--%20Company%20logo%20%254%20always%20fixed%2C%20never%20replaced%20--%3E%0A%20%20%20%20%20%20%20%20%3Ca%20class%3D%22logo%22%20href%3D%22%23%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cimg%20src%3D%22https%3A%2F%2Fi.imghippo.com%2Ffiles%2FJaE9679Nc.png%22%20alt%3D%22Aura%20Battle%20Logo%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20onerror%3D%22this.style.display%3D\'none\'%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20%3C%2Fa%3E%0A%0A%20%20%20%20%20%20%20%20%3C!--%20User%20avatar%20(separate%20from%20logo)%20--%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22user-profile%22%20id%3D%22userProfile%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cbutton%20class%3D%22avatar-btn%22%20id%3D%22avatarBtn%22%20aria-label%3D%22Profile%20menu%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cimg%20id%3D%22avatarImg%22%20src%3D%22%22%20alt%3D%22%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cspan%20id%3D%22avatarInitial%22%3EA%3C%2Fspan%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fbutton%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22profile-dropdown%22%20id%3D%22profileDropdown%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22dropdown-user%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22name%22%20id%3D%22ddUsername%22%3EAdmin%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cspan%20class%3D%22role-badge%22%20id%3D%22ddRole%22%3EAdmin%3C%2Fspan%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cul%20class%3D%22profile-menu%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cli%20onclick%3D%22openModal(\'settingsModal\')%22%3E%3Ci%20class%3D%22fas%20fa-cog%22%3E%3C%2Fi%3E%20Settings%3C%2Fli%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cli%20onclick%3D%22openModal(\'passwordModal\')%22%3E%3Ci%20class%3D%22fas%20fa-key%22%3E%3C%2Fi%3E%20Change%20Password%3C%2Fli%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cli%20class%3D%22danger%22%20onclick%3D%22logout()%22%3E%3Ci%20class%3D%22fas%20fa-sign-out-alt%22%3E%3C%2Fi%3E%20Logout%3C%2Fli%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Ful%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%3C%2Fdiv%3E%0A%3C%2Fheader%3E%0A%0A%3C!--%20Main%20--%3E%0A%3Cdiv%20class%3D%22main%22%20id%3D%22mainArea%22%20style%3D%22display%3Anone%3B%22%3E%0A%0A%20%20%20%20%3C!--%20Welcome%20bar%20--%3E%0A%20%20%20%20%3Cdiv%20class%3D%22welcome-bar%22%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch2%3EWelcome%20back%2C%20%3Cspan%20id%3D%22welcomeName%22%3EAdmin%3C%2Fspan%3E%20%25D%25B%3C%2Fh2%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3EManage%20your%20Aura%20Battle%20platform%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22session-badge%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ci%20class%3D%22fas%20fa-clock%22%3E%3C%2Fi%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20Session%3A%20%3Cspan%20id%3D%22sessionTimer%22%3E30%3A00%3C%2Fspan%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%3C!--%20Search%20--%3E%0A%20%20%20%20%3Cdiv%20class%3D%22search-wrap%22%3E%0A%20%20%20%20%20%20%20%20%3Ci%20class%3D%22fas%20fa-search%22%3E%3C%2Fi%3E%0A%20%20%20%20%20%20%20%20%3Cinput%20type%3D%22text%22%20class%3D%22search-bar%22%20id%3D%22searchInput%22%20placeholder%3D%22Search%20dashboard%20options...%22%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22search-results%22%20id%3D%22searchResults%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%3C!--%20Dashboard%20cards%20--%3E%0A%20%20%20%20%3Cdiv%20class%3D%22cards-grid%22%20id%3D%22cardsGrid%22%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card%22%20id%3D%22adminCard%22%20onclick%3D%22navigateTo(\'manage-admins.html\')%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card-icon%22%3E%3Ci%20class%3D%22fas%20fa-users-cog%22%3E%3C%2Fi%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EManage%20Admins%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3EAdd%2C%20edit%20or%20remove%20admin%20accounts%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card%22%20onclick%3D%22navigateTo(\'hoster.html\')%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card-icon%22%3E%3Ci%20class%3D%22fas%20fa-server%22%3E%3C%2Fi%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EManage%20Hosters%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3EConfigure%20and%20manage%20server%20hosts%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card%22%20onclick%3D%22navigateTo(\'ubdate.html\')%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card-icon%22%3E%3Ci%20class%3D%22fas%20fa-sync-alt%22%3E%3C%2Fi%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EUpdate%20Version%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3EManage%20application%20updates%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card%22%20onclick%3D%22navigateTo(\'maintanace.html\')%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card-icon%22%3E%3Ci%20class%3D%22fas%20fa-tools%22%3E%3C%2Fi%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EMaintenance%20Control%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3EEnable%2Fdisable%20maintenance%20mode%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card%22%20onclick%3D%22navigateTo(\'ad-banner.html\')%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card-icon%22%3E%3Ci%20class%3D%22fas%20fa-ad%22%3E%3C%2Fi%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EAd%20Banner%20Management%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3EManage%20advertisement%20banners%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card%22%20onclick%3D%22navigateTo(\'manageuser.html\')%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card-icon%22%3E%3Ci%20class%3D%22fas%20fa-user-friends%22%3E%3C%2Fi%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EManage%20Users%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3EView%20and%20manage%20user%20accounts%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card%22%20onclick%3D%22navigateTo(\'mantch.html\')%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card-icon%22%3E%3Ci%20class%3D%22fas%20fa-trophy%22%3E%3C%2Fi%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EManage%20Tournament%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3ECreate%20and%20manage%20tournaments%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3C!--%20Push%20Notification%20Sender%20--%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card%20push%22%20onclick%3D%22navigateTo(\'push.html\')%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22card-icon%22%3E%3Ci%20class%3D%22fas%20fa-bell%22%3E%3C%2Fi%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EPush%20Notification%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3ESend%20messages%20to%20all%20users%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%3C%2Fdiv%3E%0A%3C%2Fdiv%3E%0A%0A%3C!--%20Login%20Prompt%20--%3E%0A%3Cdiv%20class%3D%22login-prompt%22%20id%3D%22loginPrompt%22%3E%0A%20%20%20%20%3Ci%20class%3D%22fas%20fa-ban%22%3E%3C%2Fi%3E%0A%20%20%20%20%3Ch2%3EYou%20Don\'t%20Have%20Access%3C%2Fh2%3E%0A%20%20%20%20%3Cp%3EYou%20need%20to%20be%20logged%20in%20to%20view%20this%20page.%3Cbr%3EPlease%20sign%20in%20with%20your%20admin%20account.%3C%2Fp%3E%0A%20%20%20%20%3Cbutton%20class%3D%22btn-go-login%22%20onclick%3D%22window.location.href%3D\'index.html\'%22%3E%0A%20%20%20%20%20%20%20%20%3Ci%20class%3D%22fas%20fa-sign-in-alt%22%3E%3C%2Fi%3E%20Go%20to%20Login%0A%20%20%20%20%3C%2Fbutton%3E%0A%3C%2Fdiv%3E%0A%0A%3C!--%20%250%250%250%20MODALS%20%250%250%250%20--%3E%0A%0A%3C!--%20Settings%20Modal%20--%3E%0A%3Cdiv%20class%3D%22modal%22%20id%3D%22settingsModal%22%3E%0A%20%20%20%20%3Cdiv%20class%3D%22modal-box%22%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22modal-header%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EProfile%20Settings%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cbutton%20class%3D%22close-btn%22%20onclick%3D%22closeModal(\'settingsModal\')%22%3E%3Ci%20class%3D%22fas%20fa-times%22%3E%3C%2Fi%3E%3C%2Fbutton%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22alert%20alert-danger%22%20%20id%3D%22settingsError%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22alert%20alert-success%22%20id%3D%22settingsSuccess%22%3E%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3C!--%20Avatar%20preview%20--%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20style%3D%22text-align%3Acenter%3Bmargin-bottom%3A16px%3B%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cimg%20id%3D%22profileImagePreview%22%20class%3D%22upload-preview%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20src%3D%22https%3A%2F%2Fvia.placeholder.com%2F90%22%20alt%3D%22Preview%22%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Clabel%20for%3D%22profileImageUpload%22%20class%3D%22upload-area%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ci%20class%3D%22fas%20fa-cloud-upload-alt%22%3E%3C%2Fi%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cp%3EClick%20to%20choose%20a%20profile%20image%3C%2Fp%3E%0A%20%20%20%20%20%20%20%20%3C%2Flabel%3E%0A%20%20%20%20%20%20%20%20%3Cinput%20type%3D%22file%22%20id%3D%22profileImageUpload%22%20accept%3D%22image%2F*%22%20style%3D%22display%3Anone%3B%22%3E%0A%0A%20%20%20%20%20%20%20%20%3Cbutton%20class%3D%22btn%20btn-primary%22%20id%3D%22uploadProfileImageBtn%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22btn-spinner%22%20id%3D%22uploadSpinner%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cspan%20id%3D%22uploadBtnText%22%3E%3Ci%20class%3D%22fas%20fa-upload%22%3E%3C%2Fi%3E%20Upload%20Image%3C%2Fspan%3E%0A%20%20%20%20%20%20%20%20%3C%2Fbutton%3E%0A%0A%20%20%20%20%20%20%20%20%3Chr%20style%3D%22border%3Anone%3Bborder-top%3A1px%20solid%20var(--border)%3Bmargin%3A18px%200%3B%22%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22form-group%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Clabel%3EUsername%3C%2Flabel%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cinput%20type%3D%22text%22%20class%3D%22form-control%22%20id%3D%22settingsUsername%22%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cbutton%20class%3D%22btn%20btn-primary%22%20id%3D%22updateProfileBtn%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22btn-spinner%22%20id%3D%22updateSpinner%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cspan%20id%3D%22updateBtnText%22%3EUpdate%20Profile%3C%2Fspan%3E%0A%20%20%20%20%20%20%20%20%3C%2Fbutton%3E%0A%20%20%20%20%3C%2Fdiv%3E%0A%3C%2Fdiv%3E%0A%0A%3C!--%20Password%20Modal%20--%3E%0A%3Cdiv%20class%3D%22modal%22%20id%3D%22passwordModal%22%3E%0A%20%20%20%20%3Cdiv%20class%3D%22modal-box%22%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22modal-header%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Ch3%3EChange%20Password%3C%2Fh3%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cbutton%20class%3D%22close-btn%22%20onclick%3D%22closeModal(\'passwordModal\')%22%3E%3Ci%20class%3D%22fas%20fa-times%22%3E%3C%2Fi%3E%3C%2Fbutton%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22alert%20alert-danger%22%20%20id%3D%22passwordError%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22alert%20alert-success%22%20id%3D%22passwordSuccess%22%3E%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22form-group%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Clabel%3ECurrent%20Password%3C%2Flabel%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cinput%20type%3D%22password%22%20class%3D%22form-control%22%20id%3D%22currentPassword%22%20placeholder%3D%22Enter%20current%20password%22%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22form-group%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Clabel%3ENew%20Password%3C%2Flabel%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cinput%20type%3D%22password%22%20class%3D%22form-control%22%20id%3D%22newPassword%22%20placeholder%3D%22Min.%206%20characters%22%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22form-group%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Clabel%3EConfirm%20New%20Password%3C%2Flabel%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cinput%20type%3D%22password%22%20class%3D%22form-control%22%20id%3D%22confirmPassword%22%20placeholder%3D%22Repeat%20new%20password%22%3E%0A%20%20%20%20%20%20%20%20%3C%2Fdiv%3E%0A%0A%20%20%20%20%20%20%20%20%3Cbutton%20class%3D%22btn%20btn-primary%22%20id%3D%22changePasswordBtn%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cdiv%20class%3D%22btn-spinner%22%20id%3D%22pwSpinner%22%3E%3C%2Fdiv%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cspan%20id%3D%22pwBtnText%22%3EChange%20Password%3C%2Fspan%3E%0A%20%20%20%20%20%20%20%20%3C%2Fbutton%3E%0A%20%20%20%20%3C%2Fdiv%3E%0A%3C%2Fdiv%3E%0A%0A%0A%0A%3Cscript%3E%0A%20%20%20%20%2F%2F%20%250%250%20Firebase%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20const%20firebaseConfig%20%3D%20%7B%0A%20%20%20%20%20%20%20%20apiKey%3A%20%22AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040%22%2C%0A%20%20%20%20%20%20%20%20authDomain%3A%20%22aura-battle-main.firebaseapp.com%22%2C%0A%20%20%20%20%20%20%20%20databaseURL%3A%20%22https%3A%2F%2Faura-battle-main-default-rtdb.firebaseio.com%22%2C%0A%20%20%20%20%20%20%20%20projectId%3A%20%22aura-battle-main%22%2C%0A%20%20%20%20%20%20%20%20storageBucket%3A%20%22aura-battle-main.firebasestorage.app%22%2C%0A%20%20%20%20%20%20%20%20messagingSenderId%3A%20%22763779990289%22%2C%0A%20%20%20%20%20%20%20%20appId%3A%20%221%3A763779990289%3Aweb%3A5caa7bc861e80b6f0b02b0%22%0A%20%20%20%20%7D%3B%0A%0A%20%20%20%20firebase.initializeApp(firebaseConfig)%3B%0A%20%20%20%20const%20db%20%3D%20firebase.database()%3B%0A%0A%20%20%20%20const%20IMGBB_KEY%20%20%20%20%20%20%3D%20\'a7dcfb1d31cf1961024c9dcc608cc0e4\'%3B%0A%20%20%20%20const%20SESSION_MS%20%20%20%20%20%3D%2030%20*%2060%20*%201000%3B%20%2F%2F%2030%20minutes%0A%20%20%20%20let%20%20%20sessionInterval%20%3D%20null%3B%0A%0A%20%20%20%20%2F%2F%20%250%250%20On%20load%3A%20verify%20session%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20window.addEventListener(\'DOMContentLoaded\'%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20const%20username%20%20%3D%20localStorage.getItem(\'adminUsername\')%3B%0A%20%20%20%20%20%20%20%20const%20loginTime%20%3D%20parseInt(localStorage.getItem(\'loginTime\')%20%7C%7C%20\'0\')%3B%0A%0A%20%20%20%20%20%20%20%20if%20(!username%20%7C%7C%20(Date.now()%20-%20loginTime)%20%3E%3D%20SESSION_MS)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20clearSession()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20hideLoading()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20showLoginPrompt()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Verify%20in%20Firebase%20DB%0A%20%20%20%20%20%20%20%20db.ref(\'admins%2F\'%20%2B%20username).once(\'value\')%0A%20%20%20%20%20%20%20%20%20%20%20%20.then(snap%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20(snap.exists())%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20data%20%3D%20snap.val()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20hideLoading()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showDashboard(data)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20clearSession()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20hideLoading()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showLoginPrompt()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20.catch(()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20Network%20issue%20%254%20allow%20access%20with%20cached%20data%20(low-network%20friendly)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20hideLoading()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showDashboard(%7B%20username%3A%20username%2C%20password%3A%20\'\'%20%7D)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20%2F%2F%20%250%250%20Show%20%2F%20hide%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20function%20hideLoading()%20%7B%0A%20%20%20%20%20%20%20%20document.getElementById(\'loadingScreen\').style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20showDashboard(admin)%20%7B%0A%20%20%20%20%20%20%20%20document.getElementById(\'mainArea\').style.display%20%3D%20\'block\'%3B%0A%20%20%20%20%20%20%20%20document.getElementById(\'loginPrompt\').style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%20%20%20%20document.getElementById(\'userProfile\').style.display%20%3D%20\'block\'%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Welcome%20text%0A%20%20%20%20%20%20%20%20document.getElementById(\'welcomeName\').textContent%20%3D%20admin.username%20%7C%7C%20\'Admin\'%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Dropdown%20info%0A%20%20%20%20%20%20%20%20document.getElementById(\'ddUsername\').textContent%20%3D%20admin.username%20%7C%7C%20\'Admin\'%3B%0A%20%20%20%20%20%20%20%20document.getElementById(\'ddRole\').textContent%20%20%20%20%20%3D%20admin.role%20%7C%7C%20\'Admin\'%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Avatar%3A%20initial%20letter%20(not%20company%20logo!)%0A%20%20%20%20%20%20%20%20const%20initial%20%3D%20(admin.username%20%7C%7C%20\'A\').charAt(0).toUpperCase()%3B%0A%20%20%20%20%20%20%20%20document.getElementById(\'avatarInitial\').textContent%20%3D%20initial%3B%0A%0A%20%20%20%20%20%20%20%20if%20(admin.profileImage)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20img%20%3D%20document.getElementById(\'avatarImg\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20img.src%20%3D%20admin.profileImage%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20img.style.display%20%3D%20\'block\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'avatarInitial\').style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'profileImagePreview\').src%20%3D%20admin.profileImage%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Settings%20form%0A%20%20%20%20%20%20%20%20document.getElementById(\'settingsUsername\').value%20%3D%20admin.username%20%7C%7C%20\'\'%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Restrict%20admin%20card%20for%20non-founder%0A%20%20%20%20%20%20%20%20if%20(admin.role%20%26%26%20admin.role%20!%3D%3D%20\'founder\')%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'adminCard\').classList.add(\'restricted\')%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20startSessionTimer()%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20showLoginPrompt()%20%7B%0A%20%20%20%20%20%20%20%20document.getElementById(\'mainArea\').style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%20%20%20%20document.getElementById(\'loginPrompt\').style.display%20%3D%20\'block\'%3B%0A%20%20%20%20%20%20%20%20document.getElementById(\'userProfile\').style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20%2F%2F%20%250%250%20Session%20countdown%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20function%20startSessionTimer()%20%7B%0A%20%20%20%20%20%20%20%20const%20loginTime%20%3D%20parseInt(localStorage.getItem(\'loginTime\')%20%7C%7C%20Date.now().toString())%3B%0A%0A%20%20%20%20%20%20%20%20function%20tick()%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20remaining%20%3D%20SESSION_MS%20-%20(Date.now()%20-%20loginTime)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20(remaining%20%3C%3D%200)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20logout()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20m%20%3D%20Math.floor(remaining%20%2F%2060000)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20s%20%3D%20Math.floor((remaining%20%25%2060000)%20%2F%201000)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20el%20%3D%20document.getElementById(\'sessionTimer\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20(el)%20el.textContent%20%3D%20m%20%2B%20\'%3A\'%20%2B%20String(s).padStart(2%2C%20\'0\')%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20tick()%3B%0A%20%20%20%20%20%20%20%20sessionInterval%20%3D%20setInterval(tick%2C%201000)%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20%2F%2F%20%250%250%20Navigation%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20function%20navigateTo(page)%20%7B%0A%20%20%20%20%20%20%20%20if%20(page%20%3D%3D%3D%20\'manage-admins.html\'%20%7C%7C%20page%20%3D%3D%3D%20\'admin.html\')%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20role%20%3D%20localStorage.getItem(\'adminRole\')%20%7C%7C%20\'\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20(role%20%26%26%20role%20!%3D%3D%20\'founder\')%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20alert(\'Access%20denied.%20Only%20founder%20admins%20can%20access%20this%20page.\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20window.location.href%20%3D%20page%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20%2F%2F%20%250%250%20Profile%20dropdown%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20document.getElementById(\'avatarBtn\').addEventListener(\'click\'%2C%20e%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20e.stopPropagation()%3B%0A%20%20%20%20%20%20%20%20document.getElementById(\'profileDropdown\').classList.toggle(\'active\')%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20document.addEventListener(\'click\'%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20document.getElementById(\'profileDropdown\').classList.remove(\'active\')%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20%2F%2F%20%250%250%20Modal%20helpers%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20function%20openModal(id)%20%7B%0A%20%20%20%20%20%20%20%20document.getElementById(id).classList.add(\'open\')%3B%0A%20%20%20%20%20%20%20%20document.getElementById(\'profileDropdown\').classList.remove(\'active\')%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20closeModal(id)%20%7B%0A%20%20%20%20%20%20%20%20document.getElementById(id).classList.remove(\'open\')%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20%2F%2F%20Close%20modal%20on%20backdrop%20click%0A%20%20%20%20document.querySelectorAll(\'.modal\').forEach(m%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20m.addEventListener(\'click\'%2C%20e%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20(e.target%20%3D%3D%3D%20m)%20closeModal(m.id)%3B%0A%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20%2F%2F%20%250%250%20Logout%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20function%20logout()%20%7B%0A%20%20%20%20%20%20%20%20if%20(sessionInterval)%20clearInterval(sessionInterval)%3B%0A%20%20%20%20%20%20%20%20clearSession()%3B%0A%20%20%20%20%20%20%20%20window.location.href%20%3D%20\'index.html\'%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20clearSession()%20%7B%0A%20%20%20%20%20%20%20%20%5B\'adminUsername\'%2C%20\'adminRole\'%2C%20\'adminEmail\'%2C%20\'loginTime\'%5D.forEach(k%20%3D%3E%20localStorage.removeItem(k))%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20%2F%2F%20%250%250%20Search%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20const%20cardData%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%7B%20title%3A%20%22Manage%20Admins%22%2C%20%20%20%20%20%20%20%20%20%20icon%3A%20%22fas%20fa-users-cog%22%2C%20%20%20%20link%3A%20%22manage-admins.html%22%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%20title%3A%20%22Manage%20Hosters%22%2C%20%20%20%20%20%20%20%20%20icon%3A%20%22fas%20fa-server%22%2C%20%20%20%20%20%20%20link%3A%20%22hoster.html%22%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%20title%3A%20%22Update%20Version%22%2C%20%20%20%20%20%20%20%20%20icon%3A%20%22fas%20fa-sync-alt%22%2C%20%20%20%20%20link%3A%20%22ubdate.html%22%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%20title%3A%20%22Maintenance%20Control%22%2C%20%20%20%20icon%3A%20%22fas%20fa-tools%22%2C%20%20%20%20%20%20%20%20link%3A%20%22maintanace.html%22%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%20title%3A%20%22Ad%20Banner%20Management%22%2C%20%20%20icon%3A%20%22fas%20fa-ad%22%2C%20%20%20%20%20%20%20%20%20%20%20link%3A%20%22ad-banner.html%22%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%20title%3A%20%22Manage%20Users%22%2C%20%20%20%20%20%20%20%20%20%20%20icon%3A%20%22fas%20fa-user-friends%22%2C%20link%3A%20%22manageuser.html%22%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%20title%3A%20%22Manage%20Tournament%22%2C%20%20%20%20%20%20icon%3A%20%22fas%20fa-trophy%22%2C%20%20%20%20%20%20%20link%3A%20%22mantch.html%22%20%7D%2C%0A%20%20%20%20%20%20%20%20%7B%20title%3A%20%22Push%20Notification%22%2C%20%20%20%20%20%20icon%3A%20%22fas%20fa-bell%22%2C%20%20%20%20%20%20%20%20%20link%3A%20%22push.html%22%20%7D%0A%20%20%20%20%5D%3B%0A%0A%20%20%20%20const%20searchInput%20%20%20%3D%20document.getElementById(\'searchInput\')%3B%0A%20%20%20%20const%20searchResults%20%3D%20document.getElementById(\'searchResults\')%3B%0A%0A%20%20%20%20searchInput.addEventListener(\'input\'%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20const%20q%20%3D%20searchInput.value.toLowerCase().trim()%3B%0A%20%20%20%20%20%20%20%20searchResults.innerHTML%20%3D%20\'\'%3B%0A%20%20%20%20%20%20%20%20if%20(!q)%20%7B%20searchResults.style.display%20%3D%20\'none\'%3B%20return%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20const%20hits%20%3D%20cardData.filter(c%20%3D%3E%20c.title.toLowerCase().includes(q))%3B%0A%0A%20%20%20%20%20%20%20%20if%20(!hits.length)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20searchResults.innerHTML%20%3D%20\'%3Cdiv%20class%3D%22search-item%22%20style%3D%22color%3Avar(--gray)%3B%22%3ENo%20results%20found%3C%2Fdiv%3E\'%3B%0A%20%20%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20hits.forEach(c%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20el%20%3D%20document.createElement(\'div\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20el.className%20%3D%20\'search-item\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20el.innerHTML%20%3D%20%60%3Ci%20class%3D%22%24%7Bc.icon%7D%22%3E%3C%2Fi%3E%3Cspan%3E%24%7Bc.title%7D%3C%2Fspan%3E%60%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20el.addEventListener(\'click\'%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20searchResults.style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20searchInput.value%20%3D%20\'\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20(c.action)%20c.action()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20else%20navigateTo(c.link)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20searchResults.appendChild(el)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20searchResults.style.display%20%3D%20\'block\'%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20document.addEventListener(\'click\'%2C%20e%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20if%20(!e.target.closest(\'.search-wrap\'))%20searchResults.style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20%2F%2F%20%250%250%20Profile%20image%20upload%20(ImgBB)%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20document.getElementById(\'profileImageUpload\').addEventListener(\'change\'%2C%20function%20()%20%7B%0A%20%20%20%20%20%20%20%20const%20file%20%3D%20this.files%5B0%5D%3B%0A%20%20%20%20%20%20%20%20if%20(!file)%20return%3B%0A%20%20%20%20%20%20%20%20if%20(!file.type.startsWith(\'image%2F\'))%20%7B%20showAlert(\'settingsError\'%2C%20\'Please%20select%20an%20image%20file.\')%3B%20return%3B%20%7D%0A%20%20%20%20%20%20%20%20if%20(file.size%20%3E%205%20*%201024%20*%201024)%20%20%20%20%7B%20showAlert(\'settingsError\'%2C%20\'File%20must%20be%20under%205%20MB.\')%3B%20return%3B%20%7D%0A%20%20%20%20%20%20%20%20const%20reader%20%3D%20new%20FileReader()%3B%0A%20%20%20%20%20%20%20%20reader.onload%20%3D%20e%20%3D%3E%20%7B%20document.getElementById(\'profileImagePreview\').src%20%3D%20e.target.result%3B%20%7D%3B%0A%20%20%20%20%20%20%20%20reader.readAsDataURL(file)%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20document.getElementById(\'uploadProfileImageBtn\').addEventListener(\'click\'%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20const%20file%20%3D%20document.getElementById(\'profileImageUpload\').files%5B0%5D%3B%0A%20%20%20%20%20%20%20%20if%20(!file)%20%7B%20showAlert(\'settingsError\'%2C%20\'Please%20select%20an%20image%20first.\')%3B%20return%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20setBtnLoading(\'uploadSpinner\'%2C%20\'uploadBtnText\'%2C%20true%2C%20\'Uploading...\')%3B%0A%0A%20%20%20%20%20%20%20%20const%20reader%20%3D%20new%20FileReader()%3B%0A%20%20%20%20%20%20%20%20reader.readAsDataURL(file)%3B%0A%20%20%20%20%20%20%20%20reader.onload%20%3D%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20b64%20%3D%20reader.result.split(\'%2C\')%5B1%5D%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20const%20fd%20%20%3D%20new%20FormData()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20fd.append(\'key\'%2C%20IMGBB_KEY)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20fd.append(\'image\'%2C%20b64)%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20fetch(\'https%3A%2F%2Fapi.imgbb.com%2F1%2Fupload\'%2C%20%7B%20method%3A%20\'POST\'%2C%20body%3A%20fd%20%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20.then(r%20%3D%3E%20r.json())%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20.then(data%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20(data.success)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20url%20%3D%20data.data.url%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20Update%20avatar%20(not%20company%20logo!)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20img%20%3D%20document.getElementById(\'avatarImg\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20img.src%20%3D%20url%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20img.style.display%20%3D%20\'block\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'avatarInitial\').style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'profileImagePreview\').src%20%3D%20url%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20Save%20to%20Firebase%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20uname%20%3D%20localStorage.getItem(\'adminUsername\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20db.ref(\'admins%2F\'%20%2B%20uname).update(%7B%20profileImage%3A%20url%20%7D)%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'settingsSuccess\'%2C%20\'Profile%20image%20updated!\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'settingsError\'%2C%20\'Upload%20failed%3A%20\'%20%2B%20(data.error%3F.message%20%7C%7C%20\'Unknown\'))%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'uploadSpinner\'%2C%20\'uploadBtnText\'%2C%20false%2C%20\'%3Ci%20class%3D%22fas%20fa-upload%22%3E%3C%2Fi%3E%20Upload%20Image\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20.catch(err%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'settingsError\'%2C%20\'Error%3A%20\'%20%2B%20err.message)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'uploadSpinner\'%2C%20\'uploadBtnText\'%2C%20false%2C%20\'%3Ci%20class%3D%22fas%20fa-upload%22%3E%3C%2Fi%3E%20Upload%20Image\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%20%20%20%20%7D%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20%2F%2F%20%250%250%20Update%20profile%20username%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20document.getElementById(\'updateProfileBtn\').addEventListener(\'click\'%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20const%20newUsername%20%3D%20document.getElementById(\'settingsUsername\').value.trim()%3B%0A%20%20%20%20%20%20%20%20const%20oldUsername%20%3D%20localStorage.getItem(\'adminUsername\')%3B%0A%0A%20%20%20%20%20%20%20%20if%20(!newUsername)%20%7B%20showAlert(\'settingsError\'%2C%20\'Username%20cannot%20be%20empty.\')%3B%20return%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20setBtnLoading(\'updateSpinner\'%2C%20\'updateBtnText\'%2C%20true%2C%20\'Updating...\')%3B%0A%0A%20%20%20%20%20%20%20%20db.ref(\'admins%2F\'%20%2B%20oldUsername).update(%7B%20username%3A%20newUsername%20%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20.then(()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20localStorage.setItem(\'adminUsername\'%2C%20newUsername)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'ddUsername\').textContent%20%20%20%3D%20newUsername%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'welcomeName\').textContent%20%20%3D%20newUsername%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'avatarInitial\').textContent%20%3D%20newUsername.charAt(0).toUpperCase()%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'settingsSuccess\'%2C%20\'Profile%20updated!\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'updateSpinner\'%2C%20\'updateBtnText\'%2C%20false%2C%20\'Update%20Profile\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20.catch(err%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'settingsError\'%2C%20\'Error%3A%20\'%20%2B%20err.message)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'updateSpinner\'%2C%20\'updateBtnText\'%2C%20false%2C%20\'Update%20Profile\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20%2F%2F%20%250%250%20Change%20password%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20document.getElementById(\'changePasswordBtn\').addEventListener(\'click\'%2C%20()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20const%20curr%20%20%20%20%3D%20document.getElementById(\'currentPassword\').value%3B%0A%20%20%20%20%20%20%20%20const%20newPw%20%20%20%3D%20document.getElementById(\'newPassword\').value%3B%0A%20%20%20%20%20%20%20%20const%20confirm%20%3D%20document.getElementById(\'confirmPassword\').value%3B%0A%20%20%20%20%20%20%20%20const%20uname%20%20%20%3D%20localStorage.getItem(\'adminUsername\')%3B%0A%0A%20%20%20%20%20%20%20%20if%20(!curr%20%7C%7C%20!newPw%20%7C%7C%20!confirm)%20%7B%20showAlert(\'passwordError\'%2C%20\'Please%20fill%20in%20all%20fields.\')%3B%20return%3B%20%7D%0A%20%20%20%20%20%20%20%20if%20(newPw%20!%3D%3D%20confirm)%20%20%20%20%20%20%20%20%20%20%20%7B%20showAlert(\'passwordError\'%2C%20\'Passwords%20do%20not%20match.\')%3B%20return%3B%20%7D%0A%20%20%20%20%20%20%20%20if%20(newPw.length%20%3C%206)%20%20%20%20%20%20%20%20%20%20%20%20%7B%20showAlert(\'passwordError\'%2C%20\'Password%20must%20be%20at%20least%206%20characters.\')%3B%20return%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20setBtnLoading(\'pwSpinner\'%2C%20\'pwBtnText\'%2C%20true%2C%20\'Updating...\')%3B%0A%0A%20%20%20%20%20%20%20%20db.ref(\'admins%2F\'%20%2B%20uname).once(\'value\').then(snap%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20(!snap.exists()%20%7C%7C%20snap.val().password%20!%3D%3D%20curr)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'passwordError\'%2C%20\'Current%20password%20is%20incorrect.\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'pwSpinner\'%2C%20\'pwBtnText\'%2C%20false%2C%20\'Change%20Password\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20db.ref(\'admins%2F\'%20%2B%20uname).update(%7B%20password%3A%20newPw%20%7D).then(()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'passwordSuccess\'%2C%20\'Password%20changed%20successfully!\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'pwSpinner\'%2C%20\'pwBtnText\'%2C%20false%2C%20\'Change%20Password\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'currentPassword\').value%20%3D%20\'\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'newPassword\').value%20%20%20%20%20%3D%20\'\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'confirmPassword\').value%20%3D%20\'\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setTimeout(()%20%3D%3E%20closeModal(\'passwordModal\')%2C%202000)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D).catch(err%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'passwordError\'%2C%20\'Error%3A%20\'%20%2B%20err.message)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'pwSpinner\'%2C%20\'pwBtnText\'%2C%20false%2C%20\'Change%20Password\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%20%20%20%20%7D).catch(err%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'passwordError\'%2C%20\'DB%20Error%3A%20\'%20%2B%20err.message)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'pwSpinner\'%2C%20\'pwBtnText\'%2C%20false%2C%20\'Change%20Password\')%3B%0A%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%7D)%3B%0A%0A%20%20%20%20%2F%2F%20%250%250%20Push%20Notification%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20function%20updatePushPreview()%20%7B%0A%20%20%20%20%20%20%20%20const%20title%20%3D%20document.getElementById(\'pushTitle\').value.trim()%3B%0A%20%20%20%20%20%20%20%20const%20body%20%20%3D%20document.getElementById(\'pushBody\').value.trim()%3B%0A%20%20%20%20%20%20%20%20const%20prev%20%20%3D%20document.getElementById(\'pushPreview\')%3B%0A%0A%20%20%20%20%20%20%20%20if%20(title%20%7C%7C%20body)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20prev.style.display%20%3D%20\'block\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'previewTitle\').textContent%20%3D%20title%20%7C%7C%20\'Notification%20Title\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'previewBody\').textContent%20%20%3D%20body%20%20%7C%7C%20\'Your%20message%20will%20appear%20here...\'%3B%0A%20%20%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20prev.style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20sendPushNotification()%20%7B%0A%20%20%20%20%20%20%20%20const%20title%20%3D%20document.getElementById(\'pushTitle\').value.trim()%3B%0A%20%20%20%20%20%20%20%20const%20body%20%20%3D%20document.getElementById(\'pushBody\').value.trim()%3B%0A%20%20%20%20%20%20%20%20const%20topic%20%3D%20document.getElementById(\'pushTopic\').value.trim()%20%7C%7C%20\'all\'%3B%0A%20%20%20%20%20%20%20%20const%20admin%20%3D%20localStorage.getItem(\'adminUsername\')%20%7C%7C%20\'unknown\'%3B%0A%0A%20%20%20%20%20%20%20%20if%20(!title)%20%7B%20showAlert(\'pushError\'%2C%20\'Please%20enter%20a%20notification%20title.\')%3B%20return%3B%20%7D%0A%20%20%20%20%20%20%20%20if%20(!body)%20%20%7B%20showAlert(\'pushError\'%2C%20\'Please%20enter%20a%20message%20body.\')%3B%20return%3B%20%7D%0A%0A%20%20%20%20%20%20%20%20setBtnLoading(\'pushSpinner\'%2C%20\'pushBtnText\'%2C%20true%2C%20\'Sending...\')%3B%0A%0A%20%20%20%20%20%20%20%20const%20payload%20%3D%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20title%3A%20%20%20%20%20title%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20body%3A%20%20%20%20%20%20body%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20topic%3A%20%20%20%20%20topic%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20sentBy%3A%20%20%20%20admin%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20sentAt%3A%20%20%20%20new%20Date().toISOString()%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20timestamp%3A%20firebase.database.ServerValue.TIMESTAMP%0A%20%20%20%20%20%20%20%20%7D%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20Save%20to%20Firebase%20%2Fnotifications%20%254%20your%20FCM%20server%20can%20watch%20this%20node%0A%20%20%20%20%20%20%20%20db.ref(\'notifications\').push(payload)%0A%20%20%20%20%20%20%20%20%20%20%20%20.then(()%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'pushSuccess\'%2C%20\'%253%20Notification%20saved!%20Your%20FCM%20server%20will%20dispatch%20it.\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'pushSpinner\'%2C%20\'pushBtnText\'%2C%20false%2C%20\'%3Ci%20class%3D%22fas%20fa-paper-plane%22%3E%3C%2Fi%3E%20Send%20Notification\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'pushTitle\').value%20%3D%20\'\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'pushBody\').value%20%20%3D%20\'\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'pushTopic\').value%20%3D%20\'all\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(\'pushPreview\').style.display%20%3D%20\'none\'%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20.catch(err%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20showAlert(\'pushError\'%2C%20\'Error%3A%20\'%20%2B%20err.message)%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20setBtnLoading(\'pushSpinner\'%2C%20\'pushBtnText\'%2C%20false%2C%20\'%3Ci%20class%3D%22fas%20fa-paper-plane%22%3E%3C%2Fi%3E%20Send%20Notification\')%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20%2F%2F%20%250%250%20Helpers%20%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%250%0A%20%20%20%20function%20setBtnLoading(spinnerId%2C%20textId%2C%20loading%2C%20text)%20%7B%0A%20%20%20%20%20%20%20%20document.getElementById(spinnerId).style.display%20%3D%20loading%20%3F%20\'block\'%20%3A%20\'none\'%3B%0A%20%20%20%20%20%20%20%20document.getElementById(textId).innerHTML%20%3D%20loading%20%3F%20\'\'%20%3A%20text%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20showAlert(id%2C%20msg)%20%7B%0A%20%20%20%20%20%20%20%20const%20el%20%3D%20document.getElementById(id)%3B%0A%20%20%20%20%20%20%20%20el.innerHTML%20%3D%20msg%3B%0A%20%20%20%20%20%20%20%20el.style.display%20%3D%20\'flex\'%3B%0A%20%20%20%20%20%20%20%20setTimeout(()%20%3D%3E%20%7B%20el.style.display%20%3D%20\'none\'%3B%20%7D%2C%205000)%3B%0A%20%20%20%20%7D%0A%3C%2Fscript%3E%0A%3C%2Fbody%3E%0A%3C%2Fhtml%3E'));
+    // %0%0 Firebase %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
+        authDomain: "aura-battle-main.firebaseapp.com",
+        databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
+        projectId: "aura-battle-main",
+        storageBucket: "aura-battle-main.firebasestorage.app",
+        messagingSenderId: "763779990289",
+        appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const IMGBB_KEY      = \'a7dcfb1d31cf1961024c9dcc608cc0e4\';
+    const SESSION_MS     = 30 * 60 * 1000; // 30 minutes
+    let   sessionInterval = null;
+
+    // %0%0 On load: verify session %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    window.addEventListener(\'DOMContentLoaded\', () => {
+        const username  = localStorage.getItem(\'adminUsername\');
+        const loginTime = parseInt(localStorage.getItem(\'loginTime\') || \'0\');
+
+        if (!username || (Date.now() - loginTime) >= SESSION_MS) {
+            clearSession();
+            hideLoading();
+            showLoginPrompt();
+            return;
+        }
+
+        // Verify in Firebase DB
+        db.ref(\'admins/\' + username).once(\'value\')
+            .then(snap => {
+                if (snap.exists()) {
+                    const data = snap.val();
+                    hideLoading();
+                    showDashboard(data);
+                } else {
+                    clearSession();
+                    hideLoading();
+                    showLoginPrompt();
+                }
+            })
+            .catch(() => {
+                // Network issue %4 allow access with cached data (low-network friendly)
+                hideLoading();
+                showDashboard({ username: username, password: \'\' });
+            });
+    });
+
+    // %0%0 Show / hide %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    function hideLoading() {
+        document.getElementById(\'loadingScreen\').style.display = \'none\';
+    }
+
+    function showDashboard(admin) {
+        document.getElementById(\'mainArea\').style.display = \'block\';
+        document.getElementById(\'loginPrompt\').style.display = \'none\';
+        document.getElementById(\'userProfile\').style.display = \'block\';
+
+        // Welcome text
+        document.getElementById(\'welcomeName\').textContent = admin.username || \'Admin\';
+
+        // Dropdown info
+        document.getElementById(\'ddUsername\').textContent = admin.username || \'Admin\';
+        document.getElementById(\'ddRole\').textContent     = admin.role || \'Admin\';
+
+        // Avatar: initial letter (not company logo!)
+        const initial = (admin.username || \'A\').charAt(0).toUpperCase();
+        document.getElementById(\'avatarInitial\').textContent = initial;
+
+        if (admin.profileImage) {
+            const img = document.getElementById(\'avatarImg\');
+            img.src = admin.profileImage;
+            img.style.display = \'block\';
+            document.getElementById(\'avatarInitial\').style.display = \'none\';
+            document.getElementById(\'profileImagePreview\').src = admin.profileImage;
+        }
+
+        // Settings form
+        document.getElementById(\'settingsUsername\').value = admin.username || \'\';
+
+        // Restrict admin card for non-founder
+        if (admin.role && admin.role !== \'founder\') {
+            document.getElementById(\'adminCard\').classList.add(\'restricted\');
+        }
+
+        startSessionTimer();
+    }
+
+    function showLoginPrompt() {
+        document.getElementById(\'mainArea\').style.display = \'none\';
+        document.getElementById(\'loginPrompt\').style.display = \'block\';
+        document.getElementById(\'userProfile\').style.display = \'none\';
+    }
+
+    // %0%0 Session countdown %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    function startSessionTimer() {
+        const loginTime = parseInt(localStorage.getItem(\'loginTime\') || Date.now().toString());
+
+        function tick() {
+            const remaining = SESSION_MS - (Date.now() - loginTime);
+            if (remaining <= 0) {
+                logout();
+                return;
+            }
+            const m = Math.floor(remaining / 60000);
+            const s = Math.floor((remaining % 60000) / 1000);
+            const el = document.getElementById(\'sessionTimer\');
+            if (el) el.textContent = m + \':\' + String(s).padStart(2, \'0\');
+        }
+
+        tick();
+        sessionInterval = setInterval(tick, 1000);
+    }
+
+    // %0%0 Navigation %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    function navigateTo(page) {
+        if (page === \'manage-admins.html\' || page === \'admin.html\') {
+            const role = localStorage.getItem(\'adminRole\') || \'\';
+            if (role && role !== \'founder\') {
+                alert(\'Access denied. Only founder admins can access this page.\');
+                return;
+            }
+        }
+        window.location.href = page;
+    }
+
+    // %0%0 Profile dropdown %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    document.getElementById(\'avatarBtn\').addEventListener(\'click\', e => {
+        e.stopPropagation();
+        document.getElementById(\'profileDropdown\').classList.toggle(\'active\');
+    });
+
+    document.addEventListener(\'click\', () => {
+        document.getElementById(\'profileDropdown\').classList.remove(\'active\');
+    });
+
+    // %0%0 Modal helpers %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    function openModal(id) {
+        document.getElementById(id).classList.add(\'open\');
+        document.getElementById(\'profileDropdown\').classList.remove(\'active\');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove(\'open\');
+    }
+
+    // Close modal on backdrop click
+    document.querySelectorAll(\'.modal\').forEach(m => {
+        m.addEventListener(\'click\', e => {
+            if (e.target === m) closeModal(m.id);
+        });
+    });
+
+    // %0%0 Logout %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    function logout() {
+        if (sessionInterval) clearInterval(sessionInterval);
+        clearSession();
+        window.location.href = \'index.html\';
+    }
+
+    function clearSession() {
+        [\'adminUsername\', \'adminRole\', \'adminEmail\', \'loginTime\'].forEach(k => localStorage.removeItem(k));
+    }
+
+    // %0%0 Search %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    const cardData = [
+        { title: "Manage Admins",          icon: "fas fa-users-cog",    link: "manage-admins.html" },
+        { title: "Manage Hosters",         icon: "fas fa-server",       link: "hoster.html" },
+        { title: "Update Version",         icon: "fas fa-sync-alt",     link: "ubdate.html" },
+        { title: "Maintenance Control",    icon: "fas fa-tools",        link: "maintanace.html" },
+        { title: "Ad Banner Management",   icon: "fas fa-ad",           link: "ad-banner.html" },
+        { title: "Manage Users",           icon: "fas fa-user-friends", link: "manageuser.html" },
+        { title: "Manage Tournament",      icon: "fas fa-trophy",       link: "mantch.html" },
+        { title: "Push Notification",      icon: "fas fa-bell",         link: "push.html" }
+    ];
+
+    const searchInput   = document.getElementById(\'searchInput\');
+    const searchResults = document.getElementById(\'searchResults\');
+
+    searchInput.addEventListener(\'input\', () => {
+        const q = searchInput.value.toLowerCase().trim();
+        searchResults.innerHTML = \'\';
+        if (!q) { searchResults.style.display = \'none\'; return; }
+
+        const hits = cardData.filter(c => c.title.toLowerCase().includes(q));
+
+        if (!hits.length) {
+            searchResults.innerHTML = \'<div class="search-item" style="color:var(--gray);">No results found</div>\';
+        } else {
+            hits.forEach(c => {
+                const el = document.createElement(\'div\');
+                el.className = \'search-item\';
+                el.innerHTML = `<i class="${c.icon}"></i><span>${c.title}</span>`;
+                el.addEventListener(\'click\', () => {
+                    searchResults.style.display = \'none\';
+                    searchInput.value = \'\';
+                    if (c.action) c.action();
+                    else navigateTo(c.link);
+                });
+                searchResults.appendChild(el);
+            });
+        }
+
+        searchResults.style.display = \'block\';
+    });
+
+    document.addEventListener(\'click\', e => {
+        if (!e.target.closest(\'.search-wrap\')) searchResults.style.display = \'none\';
+    });
+
+    // %0%0 Profile image upload (ImgBB) %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    document.getElementById(\'profileImageUpload\').addEventListener(\'change\', function () {
+        const file = this.files[0];
+        if (!file) return;
+        if (!file.type.startsWith(\'image/\')) { showAlert(\'settingsError\', \'Please select an image file.\'); return; }
+        if (file.size > 5 * 1024 * 1024)    { showAlert(\'settingsError\', \'File must be under 5 MB.\'); return; }
+        const reader = new FileReader();
+        reader.onload = e => { document.getElementById(\'profileImagePreview\').src = e.target.result; };
+        reader.readAsDataURL(file);
+    });
+
+    document.getElementById(\'uploadProfileImageBtn\').addEventListener(\'click\', () => {
+        const file = document.getElementById(\'profileImageUpload\').files[0];
+        if (!file) { showAlert(\'settingsError\', \'Please select an image first.\'); return; }
+
+        setBtnLoading(\'uploadSpinner\', \'uploadBtnText\', true, \'Uploading...\');
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            const b64 = reader.result.split(\',\')[1];
+            const fd  = new FormData();
+            fd.append(\'key\', IMGBB_KEY);
+            fd.append(\'image\', b64);
+
+            fetch(\'https://api.imgbb.com/1/upload\', { method: \'POST\', body: fd })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        const url = data.data.url;
+                        // Update avatar (not company logo!)
+                        const img = document.getElementById(\'avatarImg\');
+                        img.src = url;
+                        img.style.display = \'block\';
+                        document.getElementById(\'avatarInitial\').style.display = \'none\';
+                        document.getElementById(\'profileImagePreview\').src = url;
+
+                        // Save to Firebase
+                        const uname = localStorage.getItem(\'adminUsername\');
+                        db.ref(\'admins/\' + uname).update({ profileImage: url });
+
+                        showAlert(\'settingsSuccess\', \'Profile image updated!\');
+                    } else {
+                        showAlert(\'settingsError\', \'Upload failed: \' + (data.error?.message || \'Unknown\'));
+                    }
+                    setBtnLoading(\'uploadSpinner\', \'uploadBtnText\', false, \'<i class="fas fa-upload"></i> Upload Image\');
+                })
+                .catch(err => {
+                    showAlert(\'settingsError\', \'Error: \' + err.message);
+                    setBtnLoading(\'uploadSpinner\', \'uploadBtnText\', false, \'<i class="fas fa-upload"></i> Upload Image\');
+                });
+        };
+    });
+
+    // %0%0 Update profile username %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    document.getElementById(\'updateProfileBtn\').addEventListener(\'click\', () => {
+        const newUsername = document.getElementById(\'settingsUsername\').value.trim();
+        const oldUsername = localStorage.getItem(\'adminUsername\');
+
+        if (!newUsername) { showAlert(\'settingsError\', \'Username cannot be empty.\'); return; }
+
+        setBtnLoading(\'updateSpinner\', \'updateBtnText\', true, \'Updating...\');
+
+        db.ref(\'admins/\' + oldUsername).update({ username: newUsername })
+            .then(() => {
+                localStorage.setItem(\'adminUsername\', newUsername);
+                document.getElementById(\'ddUsername\').textContent   = newUsername;
+                document.getElementById(\'welcomeName\').textContent  = newUsername;
+                document.getElementById(\'avatarInitial\').textContent = newUsername.charAt(0).toUpperCase();
+                showAlert(\'settingsSuccess\', \'Profile updated!\');
+                setBtnLoading(\'updateSpinner\', \'updateBtnText\', false, \'Update Profile\');
+            })
+            .catch(err => {
+                showAlert(\'settingsError\', \'Error: \' + err.message);
+                setBtnLoading(\'updateSpinner\', \'updateBtnText\', false, \'Update Profile\');
+            });
+    });
+
+    // %0%0 Change password %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    document.getElementById(\'changePasswordBtn\').addEventListener(\'click\', () => {
+        const curr    = document.getElementById(\'currentPassword\').value;
+        const newPw   = document.getElementById(\'newPassword\').value;
+        const confirm = document.getElementById(\'confirmPassword\').value;
+        const uname   = localStorage.getItem(\'adminUsername\');
+
+        if (!curr || !newPw || !confirm) { showAlert(\'passwordError\', \'Please fill in all fields.\'); return; }
+        if (newPw !== confirm)           { showAlert(\'passwordError\', \'Passwords do not match.\'); return; }
+        if (newPw.length < 6)            { showAlert(\'passwordError\', \'Password must be at least 6 characters.\'); return; }
+
+        setBtnLoading(\'pwSpinner\', \'pwBtnText\', true, \'Updating...\');
+
+        db.ref(\'admins/\' + uname).once(\'value\').then(snap => {
+            if (!snap.exists() || snap.val().password !== curr) {
+                showAlert(\'passwordError\', \'Current password is incorrect.\');
+                setBtnLoading(\'pwSpinner\', \'pwBtnText\', false, \'Change Password\');
+                return;
+            }
+            db.ref(\'admins/\' + uname).update({ password: newPw }).then(() => {
+                showAlert(\'passwordSuccess\', \'Password changed successfully!\');
+                setBtnLoading(\'pwSpinner\', \'pwBtnText\', false, \'Change Password\');
+                document.getElementById(\'currentPassword\').value = \'\';
+                document.getElementById(\'newPassword\').value     = \'\';
+                document.getElementById(\'confirmPassword\').value = \'\';
+                setTimeout(() => closeModal(\'passwordModal\'), 2000);
+            }).catch(err => {
+                showAlert(\'passwordError\', \'Error: \' + err.message);
+                setBtnLoading(\'pwSpinner\', \'pwBtnText\', false, \'Change Password\');
+            });
+        }).catch(err => {
+            showAlert(\'passwordError\', \'DB Error: \' + err.message);
+            setBtnLoading(\'pwSpinner\', \'pwBtnText\', false, \'Change Password\');
+        });
+    });
+
+    // %0%0 Push Notification %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    function updatePushPreview() {
+        const title = document.getElementById(\'pushTitle\').value.trim();
+        const body  = document.getElementById(\'pushBody\').value.trim();
+        const prev  = document.getElementById(\'pushPreview\');
+
+        if (title || body) {
+            prev.style.display = \'block\';
+            document.getElementById(\'previewTitle\').textContent = title || \'Notification Title\';
+            document.getElementById(\'previewBody\').textContent  = body  || \'Your message will appear here...\';
+        } else {
+            prev.style.display = \'none\';
+        }
+    }
+
+    function sendPushNotification() {
+        const title = document.getElementById(\'pushTitle\').value.trim();
+        const body  = document.getElementById(\'pushBody\').value.trim();
+        const topic = document.getElementById(\'pushTopic\').value.trim() || \'all\';
+        const admin = localStorage.getItem(\'adminUsername\') || \'unknown\';
+
+        if (!title) { showAlert(\'pushError\', \'Please enter a notification title.\'); return; }
+        if (!body)  { showAlert(\'pushError\', \'Please enter a message body.\'); return; }
+
+        setBtnLoading(\'pushSpinner\', \'pushBtnText\', true, \'Sending...\');
+
+        const payload = {
+            title:     title,
+            body:      body,
+            topic:     topic,
+            sentBy:    admin,
+            sentAt:    new Date().toISOString(),
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        // Save to Firebase /notifications %4 your FCM server can watch this node
+        db.ref(\'notifications\').push(payload)
+            .then(() => {
+                showAlert(\'pushSuccess\', \'%3 Notification saved! Your FCM server will dispatch it.\');
+                setBtnLoading(\'pushSpinner\', \'pushBtnText\', false, \'<i class="fas fa-paper-plane"></i> Send Notification\');
+                document.getElementById(\'pushTitle\').value = \'\';
+                document.getElementById(\'pushBody\').value  = \'\';
+                document.getElementById(\'pushTopic\').value = \'all\';
+                document.getElementById(\'pushPreview\').style.display = \'none\';
+            })
+            .catch(err => {
+                showAlert(\'pushError\', \'Error: \' + err.message);
+                setBtnLoading(\'pushSpinner\', \'pushBtnText\', false, \'<i class="fas fa-paper-plane"></i> Send Notification\');
+            });
+    }
+
+    // %0%0 Helpers %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
+    function setBtnLoading(spinnerId, textId, loading, text) {
+        document.getElementById(spinnerId).style.display = loading ? \'block\' : \'none\';
+        document.getElementById(textId).innerHTML = loading ? \'\' : text;
+    }
+
+    function showAlert(id, msg) {
+        const el = document.getElementById(id);
+        el.innerHTML = msg;
+        el.style.display = \'flex\';
+        setTimeout(() => { el.style.display = \'none\'; }, 5000);
+    }
 </script>
+</body>
+</html>
