@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Source — Aura Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        :root {
+            --bg:      #0b0d17;
+            --surface: rgba(255,255,255,0.04);
+            --surface2:rgba(255,255,255,0.07);
+            --border:  rgba(255,255,255,0.09);
+            --accent:  #6c63ff;
+            --accent2: #a78bfa;
+            --glow:    rgba(108,99,255,0.30);
+            --success: #34d399;
+            --danger:  #ff6b81;
+            --text:    #e8eaf6;
+            --muted:   rgba(232,234,246,0.50);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(52,211,153,0.10) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -100px; right: -80px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Back button */
+        .back-btn {
+            position: fixed;
+            top: 18px; left: 18px;
+            display: flex; align-items: center; gap: 7px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 14px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .2s, color .2s;
+            z-index: 10;
+        }
+        .back-btn:hover { background: var(--surface); color: var(--text); }
+
+        /* Card */
+        .card {
+            width: 100%;
+            max-width: 460px;
+            background: rgba(16,18,32,0.90);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 36px 32px 32px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+            position: relative;
+            animation: cardIn .4s cubic-bezier(.22,.88,.32,1) both;
+        }
+
+        /* Top accent line */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            border-radius: 24px 24px 0 0;
+            background: linear-gradient(90deg, transparent, var(--success), rgba(52,211,153,0.4), transparent);
+        }
+
+        @keyframes cardIn {
+            from { opacity:0; transform:translateY(20px) scale(0.98); }
+            to   { opacity:1; transform:none; }
+        }
+
+        /* Icon header */
+        .card-head {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .head-icon {
+            width: 52px; height: 52px;
+            border-radius: 16px;
+            background: rgba(52,211,153,0.12);
+            border: 1px solid rgba(52,211,153,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            color: var(--success);
+            flex-shrink: 0;
+        }
+
+        .head-text h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px; font-weight: 800;
+            line-height: 1.2;
+        }
+        .head-text p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        /* Current UPI display */
+        .current-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 58px;
+        }
+
+        .current-label {
+            font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .07em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .current-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px; font-weight: 700;
+            color: var(--success);
+            word-break: break-all;
+        }
+
+        .current-value.empty {
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .copy-btn {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 10px;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 13px;
+            transition: background .2s, color .2s;
+            flex-shrink: 0;
+            display: none;
+        }
+        .copy-btn:hover { background: rgba(52,211,153,0.1); color: var(--success); }
+        .copy-btn.visible { display: flex; align-items: center; gap: 5px; }
+
+        /* Divider */
+        .divider {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 20px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .divider span {
+            font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .07em;
+            color: var(--muted);
+        }
+
+        /* Input group */
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-size: 11.5px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .07em;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .input-wrap {
+            display: flex;
+            align-items: stretch;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .input-wrap:focus-within {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(52,211,153,.15);
+        }
+
+        .inp-icon {
+            width: 46px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--muted);
+            font-size: 14px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border);
+        }
+
+        .form-control {
+            flex: 1;
+            padding: 13px 14px;
+            background: transparent;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            color: var(--text);
+            -webkit-appearance: none;
+        }
+        .form-control::placeholder { color: rgba(232,234,246,0.28); }
+        .form-control:focus { outline: none; }
+
+        /* Hint */
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 7px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .hint i { font-size: 11px; }
+
+        /* Save button */
+        .btn-save {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px; font-weight: 700;
+            letter-spacing: .02em;
+            cursor: pointer;
+            background: linear-gradient(135deg, #34d399, #059669);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(52,211,153,0.25);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: transform .2s, box-shadow .2s, opacity .2s;
+        }
+        .btn-save:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(52,211,153,0.35);
+        }
+        .btn-save:active:not(:disabled) { transform: scale(.98); }
+        .btn-save:disabled { opacity: .55; cursor: not-allowed; }
+
+        /* Spinner */
+        .spinner {
+            width: 17px; height: 17px;
+            border: 2.5px solid rgba(255,255,255,.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            display: none; flex-shrink: 0;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Alerts */
+        .alert {
+            display: none;
+            align-items: center; gap: 8px;
+            padding: 11px 14px;
+            border-radius: 11px;
+            font-size: 13.5px; font-weight: 500;
+            margin-bottom: 18px;
+            animation: fadeIn .25s ease;
+        }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:none} }
+        .alert-danger  { background:rgba(255,107,129,.1); color:#ff8fa3; border:1px solid rgba(255,107,129,.2); }
+        .alert-success { background:rgba(52,211,153,.10); color:#6ef7a4; border:1px solid rgba(52,211,153,.2); }
+
+        /* Loading state */
+        #pageLoader {
+            position: fixed; inset:0;
+            background: var(--bg);
+            z-index: 999;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 16px;
+        }
+        .ld-spin {
+            width: 26px; height: 26px;
+            border: 3px solid rgba(52,211,153,0.2);
+            border-top-color: var(--success);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+        .ld-txt { font-size: 13px; color: var(--muted); }
+
+        @media(max-width:480px){
+            .card { padding: 28px 20px 24px; border-radius: 20px; }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+<!-- Page loader -->
+<div id="pageLoader">
+    <div class="ld-spin"></div>
+    <p class="ld-txt">Loading…</p>
+</div>
+
+<a class="back-btn" href="dashboard.html">
+    <i class="fas fa-arrow-left"></i> Dashboard
+</a>
+
+<div class="card">
+    <div class="card-head">
+        <div class="head-icon"><i class="fas fa-wallet"></i></div>
+        <div class="head-text">
+            <h1>Payment Source</h1>
+            <p>UPI ID for receiving payments</p>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert alert-danger"  id="errMsg"></div>
+    <div class="alert alert-success" id="okMsg"></div>
+
+    <!-- Current saved value -->
+    <div class="current-wrap">
+        <div>
+            <div class="current-label">Current UPI ID</div>
+            <div class="current-value empty" id="currentUpi">Not set</div>
+        </div>
+        <button class="copy-btn" id="copyBtn" onclick="copyUpi()">
+            <i class="fas fa-copy"></i> Copy
+        </button>
+    </div>
+
+    <div class="divider"><span>Update</span></div>
+
+    <!-- Input -->
+    <div class="form-group">
+        <label>New UPI ID</label>
+        <div class="input-wrap">
+            <div class="inp-icon"><i class="fas fa-at"></i></div>
+            <input type="text" class="form-control" id="upiInput"
+                   placeholder="yourname@upi"
+                   autocomplete="off" autocorrect="off"
+                   autocapitalize="off" spellcheck="false">
+        </div>
+        <p class="hint"><i class="fas fa-info-circle"></i> e.g. 9876543210@paytm, name@okaxis</p>
+    </div>
+
+    <button class="btn-save" id="saveBtn" onclick="saveUpi()">
+        <i class="fas fa-save" id="saveBtnIcon"></i>
+        <span id="saveBtnTxt">Save UPI ID</span>
+        <div class="spinner" id="saveSpinner"></div>
+    </button>
+</div>
+
+<script>
+// ── Obfuscated config ────────────────────────────────────────────────
+const _e = (s,k) => s.split('').map((c,i) => String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+const _k = 'aB3xQ9mZ';
+const _cfg = {
+    a: "\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+    b: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+    c: "\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+    d: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+    e: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+    f: "\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+    g: "\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
+};
+const _d = s => _e(s, _k);
+
+firebase.initializeApp({
+    apiKey:            _d(_cfg.a),
+    authDomain:        _d(_cfg.b),
+    databaseURL:       _d(_cfg.c),
+    projectId:         _d(_cfg.d),
+    storageBucket:     _d(_cfg.e),
+    messagingSenderId: _d(_cfg.f),
+    appId:             _d(_cfg.g)
+});
+const db = firebase.database();
+
+// ── Auth guard ───────────────────────────────────────────────────────
+const SESSION_MS = 30 * 60 * 1000;
+window.addEventListener('DOMContentLoaded', () => {
+    const user      = localStorage.getItem('adminUsername');
+    const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+    if (!user || (Date.now() - loginTime) >= SESSION_MS) {
+        window.location.href = 'index.html';
+        return;
+    }
+    loadUpi();
+});
+
+// ── Load current UPI ID ──────────────────────────────────────────────
+function loadUpi() {
+    db.ref('settings/upiId').once('value')
+        .then(snap => {
+            document.getElementById('pageLoader').style.display = 'none';
+            if (snap.exists() && snap.val()) {
+                const val = snap.val();
+                const el = document.getElementById('currentUpi');
+                el.textContent = val;
+                el.classList.remove('empty');
+                document.getElementById('copyBtn').classList.add('visible');
+                document.getElementById('upiInput').value = val;
+            }
+        })
+        .catch(() => {
+            document.getElementById('pageLoader').style.display = 'none';
+        });
+}
+
+// ── Save UPI ID ──────────────────────────────────────────────────────
+function saveUpi() {
+    const val = document.getElementById('upiInput').value.trim();
+
+    if (!val) {
+        showAlert('errMsg', '<i class="fas fa-exclamation-circle"></i> Please enter a UPI ID.');
+        return;
+    }
+
+    // Basic UPI format check: something@something
+    if (!val.includes('@') || val.split('@').length !== 2 || val.split('@')[0].length < 1 || val.split('@')[1].length < 1) {
+        showAlert('errMsg', '<i class="fas fa-exclamation-circle"></i> Enter a valid UPI ID (e.g. name@upi).');
+        return;
+    }
+
+    setLoading(true);
+
+    // Save ONLY the upiId string — nothing else
+    db.ref('settings/upiId').set(val)
+        .then(() => {
+            // Update displayed value
+            const el = document.getElementById('currentUpi');
+            el.textContent = val;
+            el.classList.remove('empty');
+            document.getElementById('copyBtn').classList.add('visible');
+
+            showAlert('okMsg', '<i class="fas fa-check-circle"></i> UPI ID saved successfully!');
+            setLoading(false);
+        })
+        .catch(err => {
+            showAlert('errMsg', '<i class="fas fa-exclamation-circle"></i> Error: ' + err.message);
+            setLoading(false);
+        });
+}
+
+// ── Copy UPI ID ──────────────────────────────────────────────────────
+function copyUpi() {
+    const val = document.getElementById('currentUpi').textContent;
+    navigator.clipboard.writeText(val).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+        setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 2000);
+    });
+}
+
+// ── Enter key ────────────────────────────────────────────────────────
+document.getElementById('upiInput').addEventListener('keypress', e => {
+    if (e.key === 'Enter') saveUpi();
+});
+
+// ── Helpers ──────────────────────────────────────────────────────────
+function setLoading(on) {
+    const btn     = document.getElementById('saveBtn');
+    const icon    = document.getElementById('saveBtnIcon');
+    const txt     = document.getElementById('saveBtnTxt');
+    const spinner = document.getElementById('saveSpinner');
+    btn.disabled        = on;
+    icon.style.display  = on ? 'none' : 'inline';
+    txt.textContent     = on ? 'Saving…' : 'Save UPI ID';
+    spinner.style.display = on ? 'block' : 'none';
+}
+
+function showAlert(id, msg) {
+    const el = document.getElementById(id);
+    el.innerHTML = msg;
+    el.style.display = 'flex';
+    // hide the other one
+    const other = id === 'errMsg' ? 'okMsg' : 'errMsg';
+    document.getElementById(other).style.display = 'none';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+</script>
+</body>
+</html>
