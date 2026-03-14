@@ -665,6 +665,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const username  = localStorage.getItem('adminUsername');
     const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
 
+    // No session → go to login
     if (!username || (Date.now() - loginTime) >= SESSION_MS) {
         clearSession();
         hideLoading();
@@ -672,45 +673,31 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Try direct key lookup first
-    db.ref('admins/' + username).once('value')
-        .then(snap => {
-            if (snap.exists()) {
-                hideLoading();
-                showDashboard(snap.val());
-            } else {
-                // Key didn't match — scan all admins for matching username field
-                return db.ref('admins').once('value').then(allSnap => {
-                    let found = null;
-                    allSnap.forEach(child => {
-                        const a = child.val();
-                        if (a.username === username || child.key === username) {
-                            found = a;
-                            return true;
-                        }
-                    });
-                    hideLoading();
-                    if (found) {
-                        showDashboard(found);
-                    } else {
-                        // Session valid but node not found — show dashboard with cached info
-                        // (don't force logout on DB structure issues)
-                        showDashboard({
-                            username: localStorage.getItem('adminDisplayName') || username,
-                            role: localStorage.getItem('adminRole') || 'Admin'
-                        });
+    // ── SHOW DASHBOARD IMMEDIATELY from localStorage ──
+    // Never wait for Firebase — avoids infinite loading screen
+    hideLoading();
+    showDashboard({
+        username:     localStorage.getItem('adminDisplayName') || username,
+        role:         localStorage.getItem('adminRole') || 'Admin',
+        profileImage: localStorage.getItem('adminProfileImage') || ''
+    });
+
+    // ── Then silently sync fresh data from Firebase in background ──
+    try {
+        db.ref('admins/' + username).once('value')
+            .then(snap => {
+                const data = snap.exists() ? snap.val() : null;
+                if (data) {
+                    if (data.profileImage) {
+                        localStorage.setItem('adminProfileImage', data.profileImage);
+                        refreshProfileUI(data);
                     }
-                });
-            }
-        })
-        .catch(() => {
-            // Network error — always show dashboard if session is valid
-            hideLoading();
-            showDashboard({
-                username: localStorage.getItem('adminDisplayName') || username,
-                role: localStorage.getItem('adminRole') || 'Admin'
-            });
-        });
+                    if (data.role)     localStorage.setItem('adminRole', data.role);
+                    if (data.username) localStorage.setItem('adminDisplayName', data.username);
+                }
+            })
+            .catch(() => {}); // ignore — dashboard already shown
+    } catch(e) {}
 });
 
 // ── Show/hide ────────────────────────────────────────────────────────
@@ -746,6 +733,25 @@ function showLoginPrompt() {
     document.getElementById('mainArea').style.display = 'none';
     document.getElementById('loginPrompt').style.display = 'block';
     document.getElementById('userProfile').style.display = 'none';
+}
+
+function refreshProfileUI(admin) {
+    if (admin.profileImage) {
+        const img = document.getElementById('avatarImg');
+        img.src = admin.profileImage;
+        img.style.display = 'block';
+        document.getElementById('avatarInitial').style.display = 'none';
+        document.getElementById('profileImagePreview').src = admin.profileImage;
+    }
+    if (admin.username) {
+        document.getElementById('welcomeName').textContent   = admin.username;
+        document.getElementById('ddUsername').textContent    = admin.username;
+        document.getElementById('settingsUsername').value    = admin.username;
+        document.getElementById('avatarInitial').textContent = admin.username.charAt(0).toUpperCase();
+    }
+    if (admin.role) {
+        document.getElementById('ddRole').textContent = admin.role;
+    }
 }
 
 // ── Session timer ────────────────────────────────────────────────────
@@ -933,16 +939,6 @@ document.getElementById('changePasswordBtn').addEventListener('click', () => {
             showAlert('passwordError','Error: ' + err.message);
             setBtnLoading('pwSpinner','pwBtnText', false,'Change Password');
         });
-});
-            setTimeout(() => closeModal('passwordModal'), 2000);
-        }).catch(err => {
-            showAlert('passwordError','Error: ' + err.message);
-            setBtnLoading('pwSpinner','pwBtnText', false,'Change Password');
-        });
-    }).catch(err => {
-        showAlert('passwordError','DB Error: ' + err.message);
-        setBtnLoading('pwSpinner','pwBtnText', false,'Change Password');
-    });
 });
 
 // ── Push notification ────────────────────────────────────────────────
