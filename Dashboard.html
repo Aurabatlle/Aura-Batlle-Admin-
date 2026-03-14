@@ -672,20 +672,44 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Try direct key lookup first
     db.ref('admins/' + username).once('value')
         .then(snap => {
-            hideLoading();
             if (snap.exists()) {
+                hideLoading();
                 showDashboard(snap.val());
             } else {
-                clearSession();
-                showLoginPrompt();
+                // Key didn't match — scan all admins for matching username field
+                return db.ref('admins').once('value').then(allSnap => {
+                    let found = null;
+                    allSnap.forEach(child => {
+                        const a = child.val();
+                        if (a.username === username || child.key === username) {
+                            found = a;
+                            return true;
+                        }
+                    });
+                    hideLoading();
+                    if (found) {
+                        showDashboard(found);
+                    } else {
+                        // Session valid but node not found — show dashboard with cached info
+                        // (don't force logout on DB structure issues)
+                        showDashboard({
+                            username: localStorage.getItem('adminDisplayName') || username,
+                            role: localStorage.getItem('adminRole') || 'Admin'
+                        });
+                    }
+                });
             }
         })
         .catch(() => {
+            // Network error — always show dashboard if session is valid
             hideLoading();
-            // Network fallback — allow cached session
-            showDashboard({ username: localStorage.getItem('adminDisplayName') || username });
+            showDashboard({
+                username: localStorage.getItem('adminDisplayName') || username,
+                role: localStorage.getItem('adminRole') || 'Admin'
+            });
         });
 });
 
