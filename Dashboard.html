@@ -3,639 +3,487 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Aura Battle</title>
+    <title>Dashboard — Aura Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --light: #f5f7fb;
-            --dark: #1a1d2e;
-            --danger: #e63946;
-            --warning: #fca311;
-            --gray: #6c757d;
-            --white: #ffffff;
-            --border: #e4e8f5;
-            --shadow: 0 2px 12px rgba(67,97,238,0.09);
+            --bg:       #0b0d17;
+            --bg2:      #10121f;
+            --surface:  rgba(255,255,255,0.04);
+            --surface2: rgba(255,255,255,0.07);
+            --border:   rgba(255,255,255,0.09);
+            --accent:   #6c63ff;
+            --accent2:  #a78bfa;
+            --glow:     rgba(108,99,255,0.30);
+            --text:     #e8eaf6;
+            --muted:    rgba(232,234,246,0.50);
+            --danger:   #ff6b81;
+            --warning:  #fbbf24;
+            --success:  #34d399;
+            --header-h: 64px;
         }
 
         body {
-            font-family: \'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--light);
-            color: var(--dark);
-            line-height: 1.5;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100dvh;
         }
 
-        /* %0%0 Header %0%0 */
+        /* ── Loading screen ── */
+        #loadingScreen {
+            position: fixed; inset: 0;
+            background: var(--bg);
+            z-index: 999;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 18px;
+        }
+        #loadingScreen img {
+            width: 60px; height: 60px; object-fit: contain;
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        .ld-spin {
+            width: 28px; height: 28px;
+            border: 3px solid rgba(108,99,255,0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+        .ld-txt { font-size: 13px; color: var(--muted); }
+
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.65;transform:scale(.94)} }
+        @keyframes spin  { to{ transform:rotate(360deg); } }
+        @keyframes fadeUp{ from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+
+        /* ── Header ── */
         header {
-            background: var(--white);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            padding: 0 20px;
-            height: 60px;
-            position: sticky;
-            top: 0;
-            z-index: 200;
-            display: flex;
-            align-items: center;
+            background: rgba(11,13,23,0.92);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+            height: var(--header-h);
+            position: sticky; top: 0; z-index: 200;
+            display: flex; align-items: center; padding: 0 20px;
         }
 
         .header-inner {
-            width: 100%;
-            max-width: 1200px;
+            width: 100%; max-width: 1200px;
             margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 12px;
         }
 
-        /* Logo %4 always company logo */
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            flex-shrink: 0;
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; flex-shrink: 0;
         }
-
         .logo img {
-            height: 36px;
-            width: 36px;
+            height: 34px; width: 34px;
             object-fit: contain;
-            flex-shrink: 0;
+        }
+        .logo-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .logo span {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary);
-            white-space: nowrap;
-        }
-
-        /* Profile avatar %4 separate from logo */
-        .user-profile {
-            display: none;
-            position: relative;
-            flex-shrink: 0;
-        }
+        /* Profile area */
+        .user-profile { display:none; position:relative; flex-shrink:0; }
 
         .avatar-btn {
-            width: 38px;
-            height: 38px;
+            width: 38px; height: 38px;
             border-radius: 50%;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
             color: #fff;
-            font-size: 16px;
-            font-weight: 700;
-            border: 2px solid var(--primary);
+            font-family: 'Syne', sans-serif;
+            font-size: 15px; font-weight: 700;
+            border: 2px solid rgba(108,99,255,0.4);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             overflow: hidden;
-            transition: box-shadow 0.2s;
+            transition: box-shadow .2s;
         }
-
-        .avatar-btn img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none; /* shown only if profileImage exists */
-        }
-
-        .avatar-btn:hover { box-shadow: 0 0 0 3px rgba(67,97,238,0.2); }
+        .avatar-btn img { width:100%; height:100%; object-fit:cover; display:none; }
+        .avatar-btn:hover { box-shadow: 0 0 0 3px rgba(108,99,255,.3); }
 
         /* Dropdown */
         .profile-dropdown {
             display: none;
-            position: absolute;
-            top: calc(100% + 10px);
-            right: 0;
-            background: var(--white);
+            position: absolute; top: calc(100% + 10px); right: 0;
+            background: #13152a;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.5);
+            border-radius: 16px;
             width: 220px;
-            z-index: 300;
-            overflow: hidden;
+            z-index: 300; overflow: hidden;
         }
+        .profile-dropdown.active { display: block; animation: fadeUp .2s ease; }
 
-        .profile-dropdown.active { display: block; }
-
-        .dropdown-user {
+        .dd-user {
             padding: 14px 16px;
             border-bottom: 1px solid var(--border);
-            background: #fafbff;
+            background: var(--surface);
+        }
+        .dd-user .name { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; }
+        .dd-user .role-badge {
+            display: inline-block; margin-top: 5px;
+            padding: 2px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            background: rgba(108,99,255,.18); color: var(--accent2);
         }
 
-        .dropdown-user .name {
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--dark);
-        }
-
-        .dropdown-user .role-badge {
-            display: inline-block;
-            margin-top: 4px;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            background: rgba(67,97,238,0.12);
-            color: var(--primary);
-        }
-
-        .profile-menu { list-style: none; padding: 6px 0; }
-
+        .profile-menu { list-style:none; padding: 6px 0; }
         .profile-menu li {
-            padding: 10px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: background 0.15s;
+            padding: 10px 16px; cursor: pointer;
+            font-size: 14px; display:flex; align-items:center; gap: 10px;
+            transition: background .15s; color: var(--text);
         }
-
-        .profile-menu li:hover { background: var(--light); }
+        .profile-menu li:hover { background: var(--surface2); }
         .profile-menu li.danger { color: var(--danger); }
-        .profile-menu li i { width: 16px; text-align: center; }
+        .profile-menu li i { width:16px; text-align:center; opacity:.7; }
 
-        /* %0%0 Main %0%0 */
+        /* ── Main ── */
         .main {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 24px 16px 60px;
+            padding: 28px 16px 72px;
+            animation: fadeUp .4s ease both;
         }
 
         /* Welcome bar */
         .welcome-bar {
-            background: linear-gradient(135deg, var(--primary) 0%, #6c63ff 100%);
-            border-radius: 14px;
-            padding: 20px 24px;
-            color: #fff;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
+            background: linear-gradient(135deg, rgba(108,99,255,.18) 0%, rgba(167,139,250,.12) 100%);
+            border: 1px solid rgba(108,99,255,.2);
+            border-radius: 18px;
+            padding: 22px 26px;
+            margin-bottom: 26px;
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 12px; flex-wrap: wrap;
+            position: relative; overflow: hidden;
+        }
+        .welcome-bar::before {
+            content:'';
+            position: absolute; top:-40px; right:-40px;
+            width:160px; height:160px;
+            border-radius:50%;
+            background: radial-gradient(circle, rgba(167,139,250,.2), transparent 70%);
         }
 
-        .welcome-bar h2 { font-size: 20px; font-weight: 700; }
-        .welcome-bar p  { font-size: 13px; opacity: 0.85; margin-top: 3px; }
+        .welcome-bar h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 21px; font-weight: 800;
+        }
+        .welcome-bar p { font-size: 13px; color: var(--muted); margin-top: 3px; }
 
         .session-badge {
-            background: rgba(255,255,255,0.18);
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
+            background: rgba(255,255,255,.07);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 14px; font-size: 13px;
+            display: flex; align-items:center; gap: 6px;
+            color: var(--muted); white-space: nowrap;
         }
+        .session-badge i { color: var(--accent2); }
 
         /* Search */
-        .search-wrap {
-            position: relative;
-            margin-bottom: 22px;
+        .search-wrap { position: relative; margin-bottom: 24px; }
+        .search-wrap i.si {
+            position:absolute; left:14px; top:50%;
+            transform:translateY(-50%); color:var(--muted); font-size:14px;
         }
-
-        .search-wrap i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            font-size: 14px;
-        }
-
         .search-bar {
             width: 100%;
-            padding: 11px 14px 11px 40px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            background: var(--white);
-            color: var(--dark);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            padding: 12px 14px 12px 42px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px; color: var(--text);
+            transition: border-color .2s, box-shadow .2s;
         }
-
-        .search-bar:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
-        }
+        .search-bar::placeholder { color: var(--muted); }
+        .search-bar:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,99,255,.15); }
 
         .search-results {
             display: none;
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            width: 100%;
-            background: var(--white);
+            position: absolute; top: calc(100% + 4px); left:0; width:100%;
+            background: #13152a;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            max-height: 260px;
-            overflow-y: auto;
-            z-index: 150;
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0,0,0,.4);
+            max-height: 260px; overflow-y:auto; z-index:150;
         }
-
         .search-item {
             padding: 11px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            border-bottom: 1px solid #f0f3ff;
-            transition: background 0.15s;
+            display:flex; align-items:center; gap:10px;
+            cursor:pointer; font-size:14px;
+            border-bottom: 1px solid rgba(255,255,255,.05);
+            transition: background .15s; color: var(--text);
         }
+        .search-item:last-child { border-bottom:none; }
+        .search-item:hover { background: var(--surface2); }
+        .search-item i { color:var(--accent2); width:18px; text-align:center; }
 
-        .search-item:last-child { border-bottom: none; }
-        .search-item:hover { background: var(--light); }
-        .search-item i { color: var(--primary); width: 18px; text-align: center; }
-
-        /* Cards grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .card {
-            background: var(--white);
-            border: 1.5px solid var(--border);
-            border-radius: 14px;
-            padding: 22px 18px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-            box-shadow: var(--shadow);
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(67,97,238,0.14);
-            border-color: rgba(67,97,238,0.3);
-        }
-
-        .card:active { transform: scale(0.97); }
-
-        .card-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background: rgba(67,97,238,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 14px;
-            font-size: 22px;
-            color: var(--primary);
-            transition: background 0.2s;
-        }
-
-        .card:hover .card-icon { background: rgba(67,97,238,0.18); }
-
-        .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
-        .card p  { font-size: 12px; color: var(--gray); line-height: 1.4; }
-
-        /* Special card colors */
-        .card.push .card-icon    { background: rgba(252,163,17,0.12); color: var(--warning); }
-        .card.push:hover .card-icon { background: rgba(252,163,17,0.22); }
-        .card.danger-card .card-icon { background: rgba(230,57,70,0.1); color: var(--danger); }
-
-        .card.restricted {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .card.restricted:hover {
-            transform: none;
-            box-shadow: var(--shadow);
-            border-color: var(--border);
-        }
-
-        /* %0%0 Modals %0%0 */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.45);
-            backdrop-filter: blur(3px);
-            z-index: 400;
-            justify-content: center;
-            align-items: flex-end;
-            padding: 0;
-        }
-
-        @media (min-width: 600px) {
-            .modal { align-items: center; padding: 16px; }
-        }
-
-        .modal.open { display: flex; }
-
-        .modal-box {
-            background: var(--white);
-            border-radius: 18px 18px 0 0;
-            width: 100%;
-            max-width: 480px;
-            padding: 20px 20px 32px;
-            max-height: 90dvh;
-            overflow-y: auto;
-            animation: slideUp 0.25s ease;
-        }
-
-        @media (min-width: 600px) {
-            .modal-box { border-radius: 18px; padding: 24px; }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-        }
-
-        .modal-header h3 { font-size: 17px; font-weight: 700; }
-
-        .close-btn {
-            width: 32px; height: 32px;
-            border: none; background: var(--light);
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 16px;
-            color: var(--gray);
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
-        }
-        .close-btn:hover { background: #e4e8f5; color: var(--dark); }
-
-        /* Form */
-        .form-group { margin-bottom: 16px; }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 7px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 15px;
-            color: var(--dark);
-            background: #fafbff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            -webkit-appearance: none;
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 90px;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: var(--white);
-            box-shadow: 0 0 0 3px rgba(67,97,238,0.12);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            margin-top: 6px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: #fff;
-            box-shadow: 0 3px 12px rgba(67,97,238,0.3);
-        }
-
-        .btn-primary:hover:not(:disabled) { background: var(--secondary); transform: translateY(-1px); }
-        .btn-primary:active:not(:disabled) { transform: scale(0.98); }
-        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .btn-push {
-            background: var(--warning);
-            color: #fff;
-            box-shadow: 0 3px 12px rgba(252,163,17,0.35);
-        }
-
-        .btn-push:hover:not(:disabled) { background: #e09000; transform: translateY(-1px); }
-
-        .alert {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            border-radius: 9px;
-            font-size: 13.5px;
-            font-weight: 500;
+        /* Cards */
+        .section-label {
+            font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .08em;
+            color: var(--muted);
             margin-bottom: 14px;
         }
 
-        .alert-danger  { background: #fdecea; color: #b71c2a; border: 1px solid #f5c0c3; }
-        .alert-success { background: #edfaf1; color: #1a7a3c; border: 1px solid #b2e8c4; }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 14px;
+        }
 
-        /* File upload */
-        .upload-area {
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 20px;
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px 18px;
             text-align: center;
             cursor: pointer;
-            transition: border-color 0.2s, background 0.2s;
-            margin-bottom: 12px;
+            transition: transform .2s, box-shadow .2s, border-color .2s, background .2s;
+            position: relative; overflow: hidden;
+        }
+        .card::before {
+            content:'';
+            position:absolute; top:0; left:0; right:0; height:1px;
+            background: linear-gradient(90deg,transparent,rgba(167,139,250,.35),transparent);
+            opacity:0; transition: opacity .2s;
+        }
+        .card:hover { transform:translateY(-4px); box-shadow:0 10px 30px rgba(0,0,0,.35); border-color:rgba(108,99,255,.3); background:rgba(255,255,255,.07); }
+        .card:hover::before { opacity:1; }
+        .card:active { transform:scale(.97); }
+
+        .card-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: rgba(108,99,255,.12);
+            display:flex; align-items:center; justify-content:center;
+            margin: 0 auto 14px;
+            font-size: 22px; color: var(--accent2);
+            transition: background .2s;
+        }
+        .card:hover .card-icon { background: rgba(108,99,255,.22); }
+
+        .card h3 { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; margin-bottom:5px; }
+        .card p  { font-size:12px; color:var(--muted); line-height:1.45; }
+
+        /* Special card colours */
+        .card.push .card-icon       { background:rgba(251,191,36,.12); color:var(--warning); }
+        .card.push:hover .card-icon { background:rgba(251,191,36,.22); }
+        .card.danger-card .card-icon{ background:rgba(255,107,129,.1); color:var(--danger); }
+
+        .card.restricted { opacity:.45; cursor:not-allowed; }
+        .card.restricted:hover { transform:none; box-shadow:none; border-color:var(--border); background:var(--surface); }
+
+        /* ── Modals ── */
+        .modal {
+            display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,.6);
+            backdrop-filter:blur(6px);
+            -webkit-backdrop-filter:blur(6px);
+            z-index:400; justify-content:center; align-items:flex-end; padding:0;
+        }
+        @media(min-width:600px){ .modal { align-items:center; padding:16px; } }
+        .modal.open { display:flex; }
+
+        .modal-box {
+            background: #13152a;
+            border: 1px solid var(--border);
+            border-radius: 22px 22px 0 0;
+            width:100%; max-width:480px;
+            padding: 22px 22px 34px;
+            max-height: 90dvh; overflow-y:auto;
+            animation: fadeUp .25s ease;
+        }
+        @media(min-width:600px){ .modal-box { border-radius:22px; padding:26px; } }
+
+        .modal-header {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:20px;
+        }
+        .modal-header h3 {
+            font-family:'Syne',sans-serif;
+            font-size:18px; font-weight:800;
         }
 
-        .upload-area:hover { border-color: var(--primary); background: #fafbff; }
-        .upload-area i { font-size: 28px; color: var(--gray); margin-bottom: 8px; display: block; }
-        .upload-area p { font-size: 13px; color: var(--gray); }
+        .close-btn {
+            width:32px; height:32px;
+            border:none; background:var(--surface2);
+            border-radius:50%; cursor:pointer;
+            font-size:15px; color:var(--muted);
+            display:flex; align-items:center; justify-content:center;
+            transition: background .2s, color .2s;
+        }
+        .close-btn:hover { background:rgba(255,107,129,.15); color:var(--danger); }
+
+        .form-group { margin-bottom:16px; }
+        .form-group label {
+            display:block; font-size:11.5px; font-weight:600;
+            color:var(--muted); text-transform:uppercase;
+            letter-spacing:.06em; margin-bottom:7px;
+        }
+
+        .form-control {
+            width:100%; padding:11px 14px;
+            background: rgba(255,255,255,.04);
+            border: 1px solid var(--border);
+            border-radius:11px;
+            font-family:'DM Sans',sans-serif;
+            font-size:15px; color:var(--text);
+            transition: border-color .2s, box-shadow .2s;
+            -webkit-appearance:none;
+        }
+        .form-control::placeholder { color:rgba(232,234,246,.3); }
+        .form-control:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,99,255,.15); background:rgba(255,255,255,.06); }
+        textarea.form-control { resize:vertical; min-height:90px; }
+
+        .btn {
+            display:inline-flex; align-items:center; justify-content:center;
+            gap:8px; padding:12px 20px; border:none;
+            border-radius:11px; font-family:'Syne',sans-serif;
+            font-size:15px; font-weight:700; cursor:pointer;
+            transition:all .2s; width:100%; margin-top:6px;
+        }
+        .btn-primary {
+            background:linear-gradient(135deg, var(--accent), var(--accent2));
+            color:#fff; box-shadow:0 4px 18px var(--glow);
+        }
+        .btn-primary:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 6px 24px var(--glow); }
+        .btn-primary:active:not(:disabled){ transform:scale(.98); }
+        .btn-primary:disabled { opacity:.55; cursor:not-allowed; }
+
+        .btn-push { background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#fff; box-shadow:0 4px 18px rgba(251,191,36,.3); }
+        .btn-push:hover:not(:disabled){ transform:translateY(-1px); }
+
+        .alert {
+            display:none; align-items:center; gap:8px;
+            padding:10px 14px; border-radius:10px;
+            font-size:13.5px; font-weight:500; margin-bottom:14px;
+        }
+        .alert-danger  { background:rgba(255,107,129,.1); color:#ff8fa3; border:1px solid rgba(255,107,129,.2); }
+        .alert-success { background:rgba(52,211,153,.1); color:#6ef7a4; border:1px solid rgba(52,211,153,.2); }
+
+        /* Upload area */
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,.1);
+            border-radius:12px; padding:20px;
+            text-align:center; cursor:pointer;
+            transition: border-color .2s, background .2s;
+            margin-bottom:12px;
+        }
+        .upload-area:hover { border-color:var(--accent); background:rgba(108,99,255,.06); }
+        .upload-area i { font-size:28px; color:var(--muted); margin-bottom:8px; display:block; }
+        .upload-area p { font-size:13px; color:var(--muted); }
 
         .upload-preview {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--primary);
-            display: block;
-            margin: 0 auto 12px;
+            width:90px; height:90px; border-radius:50%;
+            object-fit:cover;
+            border: 3px solid var(--accent);
+            display:block; margin: 0 auto 12px;
         }
-
-        /* Loading screen */
-        #loadingScreen {
-            position: fixed;
-            inset: 0;
-            background: var(--white);
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-        }
-
-        #loadingScreen img {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50%       { opacity: 0.7; transform: scale(0.95); }
-        }
-
-        .loading-text { font-size: 14px; color: var(--gray); }
-
-        .spinner {
-            width: 20px; height: 20px;
-            border: 2.5px solid rgba(67,97,238,0.2);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-
-        .btn-spinner {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            display: none;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Login prompt */
         .login-prompt {
-            text-align: center;
-            padding: 60px 20px;
-            display: none;
+            text-align:center; padding:80px 20px; display:none;
         }
-
-        .login-prompt i { font-size: 56px; color: var(--gray); opacity: 0.4; margin-bottom: 20px; display: block; }
-        .login-prompt h2 { margin-bottom: 10px; }
-        .login-prompt p  { color: var(--gray); margin-bottom: 24px; font-size: 14px; }
+        .login-prompt .lp-icon {
+            width:80px; height:80px; border-radius:24px;
+            background:rgba(255,107,129,.1); display:flex;
+            align-items:center; justify-content:center;
+            margin:0 auto 24px; font-size:36px; color:var(--danger);
+        }
+        .login-prompt h2 { font-family:'Syne',sans-serif; font-size:22px; margin-bottom:10px; }
+        .login-prompt p  { color:var(--muted); font-size:14px; margin-bottom:28px; }
 
         .btn-go-login {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 28px;
-            background: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            width: auto;
+            display:inline-flex; align-items:center; gap:8px;
+            padding:13px 30px;
+            background:linear-gradient(135deg,var(--accent),var(--accent2));
+            color:#fff; border:none; border-radius:12px;
+            font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
+            cursor:pointer; box-shadow:0 4px 20px var(--glow);
         }
 
-        /* Push notification preview */
+        /* Push preview */
         .push-preview {
-            background: #1a1d2e;
-            border-radius: 12px;
-            padding: 14px;
-            margin-top: 12px;
-            color: #fff;
-            display: none;
+            background: rgba(255,255,255,.04);
+            border: 1px solid var(--border);
+            border-radius:12px; padding:14px;
+            margin-top:12px; display:none;
+        }
+        .push-preview .pn-title { font-size:13px; font-weight:700; display:flex; align-items:center; gap:6px; margin-bottom:4px; color:var(--text); }
+        .push-preview .pn-body  { font-size:12px; color:var(--muted); line-height:1.4; }
+
+        /* Spinner */
+        .btn-spinner {
+            width:16px; height:16px;
+            border:2px solid rgba(255,255,255,.25);
+            border-top-color:#fff;
+            border-radius:50%;
+            animation:spin .7s linear infinite;
+            display:none;
         }
 
-        .push-preview .pn-title {
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 4px;
-        }
+        /* HR */
+        hr { border:none; border-top:1px solid var(--border); margin:18px 0; }
 
-        .push-preview .pn-body {
-            font-size: 12px;
-            opacity: 0.75;
-            line-height: 1.4;
-        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:rgba(108,99,255,.3); border-radius:3px; }
 
         /* Responsive */
-        @media (max-width: 480px) {
-            .cards-grid { grid-template-columns: repeat(2, 1fr); }
-            .welcome-bar h2 { font-size: 17px; }
-            .session-badge { display: none; }
+        @media(max-width:480px){
+            .cards-grid { grid-template-columns:repeat(2,1fr); }
+            .welcome-bar h2 { font-size:18px; }
+            .session-badge  { display:none; }
         }
-
-        @media (max-width: 360px) {
-            .cards-grid { grid-template-columns: 1fr; }
-        }
+        @media(max-width:360px){ .cards-grid { grid-template-columns:1fr; } }
     </style>
-
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-<!-- Loading screen (low-network friendly) -->
+<!-- Loading -->
 <div id="loadingScreen">
-    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Logo" onerror="this.style.display=\'none\'">
-    <div class="spinner"></div>
-    <p class="loading-text">Loading dashboard...</p>
+    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Logo" onerror="this.style.display='none'">
+    <div class="ld-spin"></div>
+    <p class="ld-txt">Loading dashboard…</p>
 </div>
 
 <!-- Header -->
 <header>
     <div class="header-inner">
-        <!-- Company logo %4 always fixed, never replaced -->
         <a class="logo" href="#">
-            <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo"
-                 onerror="this.style.display=\'none\'">
-            
+            <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle" onerror="this.style.display='none'">
+            <span class="logo-name">Aura Battle</span>
         </a>
-
-        <!-- User avatar (separate from logo) -->
         <div class="user-profile" id="userProfile">
             <button class="avatar-btn" id="avatarBtn" aria-label="Profile menu">
                 <img id="avatarImg" src="" alt="">
                 <span id="avatarInitial">A</span>
             </button>
             <div class="profile-dropdown" id="profileDropdown">
-                <div class="dropdown-user">
+                <div class="dd-user">
                     <div class="name" id="ddUsername">Admin</div>
                     <span class="role-badge" id="ddRole">Admin</span>
                 </div>
                 <ul class="profile-menu">
-                    <li onclick="openModal(\'settingsModal\')"><i class="fas fa-cog"></i> Settings</li>
-                    <li onclick="openModal(\'passwordModal\')"><i class="fas fa-key"></i> Change Password</li>
+                    <li onclick="openModal('settingsModal')"><i class="fas fa-sliders-h"></i> Settings</li>
+                    <li onclick="openModal('passwordModal')"><i class="fas fa-key"></i> Change Password</li>
                     <li class="danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
                 </ul>
             </div>
@@ -643,14 +491,13 @@
     </div>
 </header>
 
-<!-- Main -->
+<!-- Dashboard -->
 <div class="main" id="mainArea" style="display:none;">
 
-    <!-- Welcome bar -->
     <div class="welcome-bar">
         <div>
-            <h2>Welcome back, <span id="welcomeName">Admin</span> %D%B</h2>
-            <p>Manage your Aura Battle platform</p>
+            <h2>Welcome back, <span id="welcomeName">Admin</span> 👋</h2>
+            <p>Aura Battle Admin Panel · Manage your platform</p>
         </div>
         <div class="session-badge">
             <i class="fas fa-clock"></i>
@@ -658,60 +505,58 @@
         </div>
     </div>
 
-    <!-- Search -->
     <div class="search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" class="search-bar" id="searchInput" placeholder="Search dashboard options...">
+        <i class="fas fa-search si"></i>
+        <input type="text" class="search-bar" id="searchInput" placeholder="Search dashboard options…">
         <div class="search-results" id="searchResults"></div>
     </div>
 
-    <!-- Dashboard cards -->
+    <p class="section-label">Management Tools</p>
     <div class="cards-grid" id="cardsGrid">
 
-        <div class="card" id="adminCard" onclick="navigateTo(\'manage-admins.html\')">
+        <div class="card" id="adminCard" onclick="navigateTo('manage-admins.html')">
             <div class="card-icon"><i class="fas fa-users-cog"></i></div>
             <h3>Manage Admins</h3>
             <p>Add, edit or remove admin accounts</p>
         </div>
 
-        <div class="card" onclick="navigateTo(\'hoster.html\')">
+        <div class="card" onclick="navigateTo('hoster.html')">
             <div class="card-icon"><i class="fas fa-server"></i></div>
             <h3>Manage Hosters</h3>
             <p>Configure and manage server hosts</p>
         </div>
 
-        <div class="card" onclick="navigateTo(\'ubdate.html\')">
+        <div class="card" onclick="navigateTo('ubdate.html')">
             <div class="card-icon"><i class="fas fa-sync-alt"></i></div>
             <h3>Update Version</h3>
             <p>Manage application updates</p>
         </div>
 
-        <div class="card" onclick="navigateTo(\'maintanace.html\')">
+        <div class="card" onclick="navigateTo('maintanace.html')">
             <div class="card-icon"><i class="fas fa-tools"></i></div>
-            <h3>Maintenance Control</h3>
-            <p>Enable/disable maintenance mode</p>
+            <h3>Maintenance</h3>
+            <p>Enable / disable maintenance mode</p>
         </div>
 
-        <div class="card" onclick="navigateTo(\'ad-banner.html\')">
-            <div class="card-icon"><i class="fas fa-ad"></i></div>
-            <h3>Ad Banner Management</h3>
+        <div class="card" onclick="navigateTo('ad-banner.html')">
+            <div class="card-icon"><i class="fas fa-rectangle-ad"></i></div>
+            <h3>Ad Banners</h3>
             <p>Manage advertisement banners</p>
         </div>
 
-        <div class="card" onclick="navigateTo(\'manageuser.html\')">
+        <div class="card" onclick="navigateTo('manageuser.html')">
             <div class="card-icon"><i class="fas fa-user-friends"></i></div>
             <h3>Manage Users</h3>
             <p>View and manage user accounts</p>
         </div>
 
-        <div class="card" onclick="navigateTo(\'mantch.html\')">
+        <div class="card" onclick="navigateTo('mantch.html')">
             <div class="card-icon"><i class="fas fa-trophy"></i></div>
-            <h3>Manage Tournament</h3>
+            <h3>Tournament</h3>
             <p>Create and manage tournaments</p>
         </div>
 
-        <!-- Push Notification Sender -->
-        <div class="card push" onclick="navigateTo(\'push.html\')">
+        <div class="card push" onclick="openModal('pushModal')">
             <div class="card-icon"><i class="fas fa-bell"></i></div>
             <h3>Push Notification</h3>
             <p>Send messages to all users</p>
@@ -722,30 +567,28 @@
 
 <!-- Login Prompt -->
 <div class="login-prompt" id="loginPrompt">
-    <i class="fas fa-ban"></i>
-    <h2>You Don\'t Have Access</h2>
-    <p>You need to be logged in to view this page.<br>Please sign in with your admin account.</p>
-    <button class="btn-go-login" onclick="window.location.href=\'index.html\'">
+    <div class="lp-icon"><i class="fas fa-ban"></i></div>
+    <h2>Access Denied</h2>
+    <p>You need to be logged in to view this page.<br>Please sign in with your admin credentials.</p>
+    <button class="btn-go-login" onclick="window.location.href='index.html'">
         <i class="fas fa-sign-in-alt"></i> Go to Login
     </button>
 </div>
 
-<!-- %0%0%0 MODALS %0%0%0 -->
+<!-- ── Modals ── -->
 
-<!-- Settings Modal -->
+<!-- Settings -->
 <div class="modal" id="settingsModal">
     <div class="modal-box">
         <div class="modal-header">
             <h3>Profile Settings</h3>
-            <button class="close-btn" onclick="closeModal(\'settingsModal\')"><i class="fas fa-times"></i></button>
+            <button class="close-btn" onclick="closeModal('settingsModal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="alert alert-danger"  id="settingsError"></div>
         <div class="alert alert-success" id="settingsSuccess"></div>
 
-        <!-- Avatar preview -->
         <div style="text-align:center;margin-bottom:16px;">
-            <img id="profileImagePreview" class="upload-preview"
-                 src="https://via.placeholder.com/90" alt="Preview">
+            <img id="profileImagePreview" class="upload-preview" src="https://via.placeholder.com/90/13152a/6c63ff?text=?" alt="Preview">
         </div>
 
         <label for="profileImageUpload" class="upload-area">
@@ -759,13 +602,12 @@
             <span id="uploadBtnText"><i class="fas fa-upload"></i> Upload Image</span>
         </button>
 
-        <hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">
+        <hr>
 
         <div class="form-group">
             <label>Username</label>
-            <input type="text" class="form-control" id="settingsUsername">
+            <input type="text" class="form-control" id="settingsUsername" placeholder="Your username">
         </div>
-
         <button class="btn btn-primary" id="updateProfileBtn">
             <div class="btn-spinner" id="updateSpinner"></div>
             <span id="updateBtnText">Update Profile</span>
@@ -773,12 +615,12 @@
     </div>
 </div>
 
-<!-- Password Modal -->
+<!-- Password -->
 <div class="modal" id="passwordModal">
     <div class="modal-box">
         <div class="modal-header">
             <h3>Change Password</h3>
-            <button class="close-btn" onclick="closeModal(\'passwordModal\')"><i class="fas fa-times"></i></button>
+            <button class="close-btn" onclick="closeModal('passwordModal')"><i class="fas fa-times"></i></button>
         </div>
         <div class="alert alert-danger"  id="passwordError"></div>
         <div class="alert alert-success" id="passwordSuccess"></div>
@@ -795,7 +637,6 @@
             <label>Confirm New Password</label>
             <input type="password" class="form-control" id="confirmPassword" placeholder="Repeat new password">
         </div>
-
         <button class="btn btn-primary" id="changePasswordBtn">
             <div class="btn-spinner" id="pwSpinner"></div>
             <span id="pwBtnText">Change Password</span>
@@ -803,398 +644,403 @@
     </div>
 </div>
 
+<!-- Push Notification -->
+<div class="modal" id="pushModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Push Notification</h3>
+            <button class="close-btn" onclick="closeModal('pushModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="alert alert-danger"  id="pushError"></div>
+        <div class="alert alert-success" id="pushSuccess"></div>
 
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-control" id="pushTitle" placeholder="Notification title" oninput="updatePushPreview()">
+        </div>
+        <div class="form-group">
+            <label>Message</label>
+            <textarea class="form-control" id="pushBody" placeholder="Your message…" oninput="updatePushPreview()"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Topic (leave blank for all)</label>
+            <input type="text" class="form-control" id="pushTopic" placeholder="all">
+        </div>
+
+        <div class="push-preview" id="pushPreview">
+            <div class="pn-title"><i class="fas fa-bell" style="color:var(--warning)"></i> <span id="previewTitle">Notification Title</span></div>
+            <div class="pn-body" id="previewBody">Your message will appear here…</div>
+        </div>
+
+        <button class="btn btn-push" onclick="sendPushNotification()">
+            <div class="btn-spinner" id="pushSpinner"></div>
+            <span id="pushBtnText"><i class="fas fa-paper-plane"></i> Send Notification</span>
+        </button>
+    </div>
+</div>
 
 <script>
-    // %0%0 Firebase %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    const firebaseConfig = {
-        apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-        authDomain: "aura-battle-main.firebaseapp.com",
-        databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-        projectId: "aura-battle-main",
-        storageBucket: "aura-battle-main.firebasestorage.app",
-        messagingSenderId: "763779990289",
-        appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0"
+// ── Obfuscated config ────────────────────────────────────────────────
+const _e = (s,k) => s.split('').map((c,i) => String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+const _k = 'aB3xQ9mZ';
+
+const _cfg = {
+    a: "\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+    b: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+    c: "\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+    d: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+    e: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+    f: "\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+    g: "\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51",
+    // ImgBB key
+    h: "\x00\x75\x57\x1b\x37\x5b\x5c\x3e\x52\x73\x50\x1e\x60\x00\x5b\x6b\x51\x70\x07\x1b\x68\x5d\x0e\x39\x57\x72\x0b\x1b\x32\x09\x08\x6e"
+};
+
+const _d   = s => _e(s, _k);
+const IMGBB_KEY = _d(_cfg.h);
+
+function _getConfig() {
+    return {
+        apiKey:            _d(_cfg.a),
+        authDomain:        _d(_cfg.b),
+        databaseURL:       _d(_cfg.c),
+        projectId:         _d(_cfg.d),
+        storageBucket:     _d(_cfg.e),
+        messagingSenderId: _d(_cfg.f),
+        appId:             _d(_cfg.g)
     };
+}
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+firebase.initializeApp(_getConfig());
+const db = firebase.database();
 
-    const IMGBB_KEY      = \'a7dcfb1d31cf1961024c9dcc608cc0e4\';
-    const SESSION_MS     = 30 * 60 * 1000; // 30 minutes
-    let   sessionInterval = null;
+const SESSION_MS = 30 * 60 * 1000;
+let sessionInterval = null;
 
-    // %0%0 On load: verify session %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    window.addEventListener(\'DOMContentLoaded\', () => {
-        const username  = localStorage.getItem(\'adminUsername\');
-        const loginTime = parseInt(localStorage.getItem(\'loginTime\') || \'0\');
+// ── Session check ────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+    const username  = localStorage.getItem('adminUsername');
+    const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
 
-        if (!username || (Date.now() - loginTime) >= SESSION_MS) {
-            clearSession();
+    if (!username || (Date.now() - loginTime) >= SESSION_MS) {
+        clearSession();
+        hideLoading();
+        showLoginPrompt();
+        return;
+    }
+
+    db.ref('admins/' + username).once('value')
+        .then(snap => {
             hideLoading();
-            showLoginPrompt();
+            if (snap.exists()) {
+                showDashboard(snap.val());
+            } else {
+                clearSession();
+                showLoginPrompt();
+            }
+        })
+        .catch(() => {
+            hideLoading();
+            // Network fallback — allow cached session
+            showDashboard({ username: localStorage.getItem('adminDisplayName') || username });
+        });
+});
+
+// ── Show/hide ────────────────────────────────────────────────────────
+function hideLoading() {
+    document.getElementById('loadingScreen').style.display = 'none';
+}
+
+function showDashboard(admin) {
+    document.getElementById('mainArea').style.display = 'block';
+    document.getElementById('loginPrompt').style.display = 'none';
+    document.getElementById('userProfile').style.display = 'block';
+
+    const uname = admin.username || localStorage.getItem('adminDisplayName') || 'Admin';
+
+    document.getElementById('welcomeName').textContent    = uname;
+    document.getElementById('ddUsername').textContent     = uname;
+    document.getElementById('ddRole').textContent         = admin.role || 'Admin';
+    document.getElementById('avatarInitial').textContent  = uname.charAt(0).toUpperCase();
+    document.getElementById('settingsUsername').value     = uname;
+
+    if (admin.profileImage) {
+        const img = document.getElementById('avatarImg');
+        img.src = admin.profileImage;
+        img.style.display = 'block';
+        document.getElementById('avatarInitial').style.display = 'none';
+        document.getElementById('profileImagePreview').src = admin.profileImage;
+    }
+
+    if (admin.role && admin.role !== 'founder') {
+        document.getElementById('adminCard').classList.add('restricted');
+    }
+
+    startSessionTimer();
+}
+
+function showLoginPrompt() {
+    document.getElementById('mainArea').style.display = 'none';
+    document.getElementById('loginPrompt').style.display = 'block';
+    document.getElementById('userProfile').style.display = 'none';
+}
+
+// ── Session timer ────────────────────────────────────────────────────
+function startSessionTimer() {
+    const loginTime = parseInt(localStorage.getItem('loginTime') || Date.now().toString());
+
+    function tick() {
+        const rem = SESSION_MS - (Date.now() - loginTime);
+        if (rem <= 0) { logout(); return; }
+        const m = Math.floor(rem / 60000);
+        const s = Math.floor((rem % 60000) / 1000);
+        const el = document.getElementById('sessionTimer');
+        if (el) el.textContent = m + ':' + String(s).padStart(2,'0');
+    }
+
+    tick();
+    sessionInterval = setInterval(tick, 1000);
+}
+
+// ── Navigation ───────────────────────────────────────────────────────
+function navigateTo(page) {
+    if (page === 'manage-admins.html') {
+        const role = localStorage.getItem('adminRole') || '';
+        if (role && role !== 'founder') {
+            showToast('Access denied. Founder only.', 'danger');
             return;
         }
+    }
+    window.location.href = page;
+}
 
-        // Verify in Firebase DB
-        db.ref(\'admins/\' + username).once(\'value\')
-            .then(snap => {
-                if (snap.exists()) {
-                    const data = snap.val();
-                    hideLoading();
-                    showDashboard(data);
+// ── Profile dropdown ─────────────────────────────────────────────────
+document.getElementById('avatarBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('profileDropdown').classList.toggle('active');
+});
+document.addEventListener('click', () => {
+    document.getElementById('profileDropdown').classList.remove('active');
+});
+
+// ── Modals ───────────────────────────────────────────────────────────
+function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.getElementById('profileDropdown').classList.remove('active');
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+});
+
+// ── Logout ───────────────────────────────────────────────────────────
+function logout() {
+    if (sessionInterval) clearInterval(sessionInterval);
+    clearSession();
+    window.location.href = 'index.html';
+}
+function clearSession() {
+    ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime'].forEach(k => localStorage.removeItem(k));
+}
+
+// ── Search ───────────────────────────────────────────────────────────
+const cardData = [
+    { title:"Manage Admins",        icon:"fas fa-users-cog",     link:"manage-admins.html" },
+    { title:"Manage Hosters",       icon:"fas fa-server",        link:"hoster.html" },
+    { title:"Update Version",       icon:"fas fa-sync-alt",      link:"ubdate.html" },
+    { title:"Maintenance Control",  icon:"fas fa-tools",         link:"maintanace.html" },
+    { title:"Ad Banner Management", icon:"fas fa-rectangle-ad",  link:"ad-banner.html" },
+    { title:"Manage Users",         icon:"fas fa-user-friends",  link:"manageuser.html" },
+    { title:"Manage Tournament",    icon:"fas fa-trophy",        link:"mantch.html" },
+    { title:"Push Notification",    icon:"fas fa-bell",          action:()=>openModal('pushModal') }
+];
+
+const searchInput   = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    searchResults.innerHTML = '';
+    if (!q) { searchResults.style.display = 'none'; return; }
+    const hits = cardData.filter(c => c.title.toLowerCase().includes(q));
+    if (!hits.length) {
+        searchResults.innerHTML = '<div class="search-item" style="color:var(--muted)">No results found</div>';
+    } else {
+        hits.forEach(c => {
+            const el = document.createElement('div');
+            el.className = 'search-item';
+            el.innerHTML = `<i class="${c.icon}"></i><span>${c.title}</span>`;
+            el.addEventListener('click', () => {
+                searchResults.style.display = 'none';
+                searchInput.value = '';
+                if (c.action) c.action(); else navigateTo(c.link);
+            });
+            searchResults.appendChild(el);
+        });
+    }
+    searchResults.style.display = 'block';
+});
+document.addEventListener('click', e => {
+    if (!e.target.closest('.search-wrap')) searchResults.style.display = 'none';
+});
+
+// ── Profile image upload ─────────────────────────────────────────────
+document.getElementById('profileImageUpload').addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { showAlert('settingsError','Please select an image file.'); return; }
+    if (file.size > 5*1024*1024)         { showAlert('settingsError','File must be under 5 MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = e => { document.getElementById('profileImagePreview').src = e.target.result; };
+    reader.readAsDataURL(file);
+});
+
+document.getElementById('uploadProfileImageBtn').addEventListener('click', () => {
+    const file = document.getElementById('profileImageUpload').files[0];
+    if (!file) { showAlert('settingsError','Please select an image first.'); return; }
+    setBtnLoading('uploadSpinner','uploadBtnText', true,'Uploading…');
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+        const b64 = reader.result.split(',')[1];
+        const fd  = new FormData();
+        fd.append('key', IMGBB_KEY);
+        fd.append('image', b64);
+
+        fetch('https://api.imgbb.com/1/upload', { method:'POST', body:fd })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const url = data.data.url;
+                    const img = document.getElementById('avatarImg');
+                    img.src = url; img.style.display = 'block';
+                    document.getElementById('avatarInitial').style.display = 'none';
+                    document.getElementById('profileImagePreview').src = url;
+                    db.ref('admins/' + localStorage.getItem('adminUsername')).update({ profileImage: url });
+                    showAlert('settingsSuccess','Profile image updated!');
                 } else {
-                    clearSession();
-                    hideLoading();
-                    showLoginPrompt();
+                    showAlert('settingsError','Upload failed: ' + (data.error?.message || 'Unknown'));
                 }
-            })
-            .catch(() => {
-                // Network issue %4 allow access with cached data (low-network friendly)
-                hideLoading();
-                showDashboard({ username: username, password: \'\' });
-            });
-    });
-
-    // %0%0 Show / hide %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    function hideLoading() {
-        document.getElementById(\'loadingScreen\').style.display = \'none\';
-    }
-
-    function showDashboard(admin) {
-        document.getElementById(\'mainArea\').style.display = \'block\';
-        document.getElementById(\'loginPrompt\').style.display = \'none\';
-        document.getElementById(\'userProfile\').style.display = \'block\';
-
-        // Welcome text
-        document.getElementById(\'welcomeName\').textContent = admin.username || \'Admin\';
-
-        // Dropdown info
-        document.getElementById(\'ddUsername\').textContent = admin.username || \'Admin\';
-        document.getElementById(\'ddRole\').textContent     = admin.role || \'Admin\';
-
-        // Avatar: initial letter (not company logo!)
-        const initial = (admin.username || \'A\').charAt(0).toUpperCase();
-        document.getElementById(\'avatarInitial\').textContent = initial;
-
-        if (admin.profileImage) {
-            const img = document.getElementById(\'avatarImg\');
-            img.src = admin.profileImage;
-            img.style.display = \'block\';
-            document.getElementById(\'avatarInitial\').style.display = \'none\';
-            document.getElementById(\'profileImagePreview\').src = admin.profileImage;
-        }
-
-        // Settings form
-        document.getElementById(\'settingsUsername\').value = admin.username || \'\';
-
-        // Restrict admin card for non-founder
-        if (admin.role && admin.role !== \'founder\') {
-            document.getElementById(\'adminCard\').classList.add(\'restricted\');
-        }
-
-        startSessionTimer();
-    }
-
-    function showLoginPrompt() {
-        document.getElementById(\'mainArea\').style.display = \'none\';
-        document.getElementById(\'loginPrompt\').style.display = \'block\';
-        document.getElementById(\'userProfile\').style.display = \'none\';
-    }
-
-    // %0%0 Session countdown %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    function startSessionTimer() {
-        const loginTime = parseInt(localStorage.getItem(\'loginTime\') || Date.now().toString());
-
-        function tick() {
-            const remaining = SESSION_MS - (Date.now() - loginTime);
-            if (remaining <= 0) {
-                logout();
-                return;
-            }
-            const m = Math.floor(remaining / 60000);
-            const s = Math.floor((remaining % 60000) / 1000);
-            const el = document.getElementById(\'sessionTimer\');
-            if (el) el.textContent = m + \':\' + String(s).padStart(2, \'0\');
-        }
-
-        tick();
-        sessionInterval = setInterval(tick, 1000);
-    }
-
-    // %0%0 Navigation %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    function navigateTo(page) {
-        if (page === \'manage-admins.html\' || page === \'admin.html\') {
-            const role = localStorage.getItem(\'adminRole\') || \'\';
-            if (role && role !== \'founder\') {
-                alert(\'Access denied. Only founder admins can access this page.\');
-                return;
-            }
-        }
-        window.location.href = page;
-    }
-
-    // %0%0 Profile dropdown %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    document.getElementById(\'avatarBtn\').addEventListener(\'click\', e => {
-        e.stopPropagation();
-        document.getElementById(\'profileDropdown\').classList.toggle(\'active\');
-    });
-
-    document.addEventListener(\'click\', () => {
-        document.getElementById(\'profileDropdown\').classList.remove(\'active\');
-    });
-
-    // %0%0 Modal helpers %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    function openModal(id) {
-        document.getElementById(id).classList.add(\'open\');
-        document.getElementById(\'profileDropdown\').classList.remove(\'active\');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.remove(\'open\');
-    }
-
-    // Close modal on backdrop click
-    document.querySelectorAll(\'.modal\').forEach(m => {
-        m.addEventListener(\'click\', e => {
-            if (e.target === m) closeModal(m.id);
-        });
-    });
-
-    // %0%0 Logout %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    function logout() {
-        if (sessionInterval) clearInterval(sessionInterval);
-        clearSession();
-        window.location.href = \'index.html\';
-    }
-
-    function clearSession() {
-        [\'adminUsername\', \'adminRole\', \'adminEmail\', \'loginTime\'].forEach(k => localStorage.removeItem(k));
-    }
-
-    // %0%0 Search %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    const cardData = [
-        { title: "Manage Admins",          icon: "fas fa-users-cog",    link: "manage-admins.html" },
-        { title: "Manage Hosters",         icon: "fas fa-server",       link: "hoster.html" },
-        { title: "Update Version",         icon: "fas fa-sync-alt",     link: "ubdate.html" },
-        { title: "Maintenance Control",    icon: "fas fa-tools",        link: "maintanace.html" },
-        { title: "Ad Banner Management",   icon: "fas fa-ad",           link: "ad-banner.html" },
-        { title: "Manage Users",           icon: "fas fa-user-friends", link: "manageuser.html" },
-        { title: "Manage Tournament",      icon: "fas fa-trophy",       link: "mantch.html" },
-        { title: "Push Notification",      icon: "fas fa-bell",         link: "push.html" }
-    ];
-
-    const searchInput   = document.getElementById(\'searchInput\');
-    const searchResults = document.getElementById(\'searchResults\');
-
-    searchInput.addEventListener(\'input\', () => {
-        const q = searchInput.value.toLowerCase().trim();
-        searchResults.innerHTML = \'\';
-        if (!q) { searchResults.style.display = \'none\'; return; }
-
-        const hits = cardData.filter(c => c.title.toLowerCase().includes(q));
-
-        if (!hits.length) {
-            searchResults.innerHTML = \'<div class="search-item" style="color:var(--gray);">No results found</div>\';
-        } else {
-            hits.forEach(c => {
-                const el = document.createElement(\'div\');
-                el.className = \'search-item\';
-                el.innerHTML = `<i class="${c.icon}"></i><span>${c.title}</span>`;
-                el.addEventListener(\'click\', () => {
-                    searchResults.style.display = \'none\';
-                    searchInput.value = \'\';
-                    if (c.action) c.action();
-                    else navigateTo(c.link);
-                });
-                searchResults.appendChild(el);
-            });
-        }
-
-        searchResults.style.display = \'block\';
-    });
-
-    document.addEventListener(\'click\', e => {
-        if (!e.target.closest(\'.search-wrap\')) searchResults.style.display = \'none\';
-    });
-
-    // %0%0 Profile image upload (ImgBB) %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    document.getElementById(\'profileImageUpload\').addEventListener(\'change\', function () {
-        const file = this.files[0];
-        if (!file) return;
-        if (!file.type.startsWith(\'image/\')) { showAlert(\'settingsError\', \'Please select an image file.\'); return; }
-        if (file.size > 5 * 1024 * 1024)    { showAlert(\'settingsError\', \'File must be under 5 MB.\'); return; }
-        const reader = new FileReader();
-        reader.onload = e => { document.getElementById(\'profileImagePreview\').src = e.target.result; };
-        reader.readAsDataURL(file);
-    });
-
-    document.getElementById(\'uploadProfileImageBtn\').addEventListener(\'click\', () => {
-        const file = document.getElementById(\'profileImageUpload\').files[0];
-        if (!file) { showAlert(\'settingsError\', \'Please select an image first.\'); return; }
-
-        setBtnLoading(\'uploadSpinner\', \'uploadBtnText\', true, \'Uploading...\');
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            const b64 = reader.result.split(\',\')[1];
-            const fd  = new FormData();
-            fd.append(\'key\', IMGBB_KEY);
-            fd.append(\'image\', b64);
-
-            fetch(\'https://api.imgbb.com/1/upload\', { method: \'POST\', body: fd })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        const url = data.data.url;
-                        // Update avatar (not company logo!)
-                        const img = document.getElementById(\'avatarImg\');
-                        img.src = url;
-                        img.style.display = \'block\';
-                        document.getElementById(\'avatarInitial\').style.display = \'none\';
-                        document.getElementById(\'profileImagePreview\').src = url;
-
-                        // Save to Firebase
-                        const uname = localStorage.getItem(\'adminUsername\');
-                        db.ref(\'admins/\' + uname).update({ profileImage: url });
-
-                        showAlert(\'settingsSuccess\', \'Profile image updated!\');
-                    } else {
-                        showAlert(\'settingsError\', \'Upload failed: \' + (data.error?.message || \'Unknown\'));
-                    }
-                    setBtnLoading(\'uploadSpinner\', \'uploadBtnText\', false, \'<i class="fas fa-upload"></i> Upload Image\');
-                })
-                .catch(err => {
-                    showAlert(\'settingsError\', \'Error: \' + err.message);
-                    setBtnLoading(\'uploadSpinner\', \'uploadBtnText\', false, \'<i class="fas fa-upload"></i> Upload Image\');
-                });
-        };
-    });
-
-    // %0%0 Update profile username %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    document.getElementById(\'updateProfileBtn\').addEventListener(\'click\', () => {
-        const newUsername = document.getElementById(\'settingsUsername\').value.trim();
-        const oldUsername = localStorage.getItem(\'adminUsername\');
-
-        if (!newUsername) { showAlert(\'settingsError\', \'Username cannot be empty.\'); return; }
-
-        setBtnLoading(\'updateSpinner\', \'updateBtnText\', true, \'Updating...\');
-
-        db.ref(\'admins/\' + oldUsername).update({ username: newUsername })
-            .then(() => {
-                localStorage.setItem(\'adminUsername\', newUsername);
-                document.getElementById(\'ddUsername\').textContent   = newUsername;
-                document.getElementById(\'welcomeName\').textContent  = newUsername;
-                document.getElementById(\'avatarInitial\').textContent = newUsername.charAt(0).toUpperCase();
-                showAlert(\'settingsSuccess\', \'Profile updated!\');
-                setBtnLoading(\'updateSpinner\', \'updateBtnText\', false, \'Update Profile\');
+                setBtnLoading('uploadSpinner','uploadBtnText', false,'<i class="fas fa-upload"></i> Upload Image');
             })
             .catch(err => {
-                showAlert(\'settingsError\', \'Error: \' + err.message);
-                setBtnLoading(\'updateSpinner\', \'updateBtnText\', false, \'Update Profile\');
+                showAlert('settingsError','Error: ' + err.message);
+                setBtnLoading('uploadSpinner','uploadBtnText', false,'<i class="fas fa-upload"></i> Upload Image');
             });
-    });
+    };
+});
 
-    // %0%0 Change password %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    document.getElementById(\'changePasswordBtn\').addEventListener(\'click\', () => {
-        const curr    = document.getElementById(\'currentPassword\').value;
-        const newPw   = document.getElementById(\'newPassword\').value;
-        const confirm = document.getElementById(\'confirmPassword\').value;
-        const uname   = localStorage.getItem(\'adminUsername\');
+// ── Update username ──────────────────────────────────────────────────
+document.getElementById('updateProfileBtn').addEventListener('click', () => {
+    const newUsername = document.getElementById('settingsUsername').value.trim();
+    const oldKey      = localStorage.getItem('adminUsername');
+    if (!newUsername) { showAlert('settingsError','Username cannot be empty.'); return; }
+    setBtnLoading('updateSpinner','updateBtnText', true,'Updating…');
+    db.ref('admins/' + oldKey).update({ username: newUsername })
+        .then(() => {
+            localStorage.setItem('adminDisplayName', newUsername);
+            document.getElementById('ddUsername').textContent    = newUsername;
+            document.getElementById('welcomeName').textContent   = newUsername;
+            document.getElementById('avatarInitial').textContent = newUsername.charAt(0).toUpperCase();
+            showAlert('settingsSuccess','Profile updated!');
+            setBtnLoading('updateSpinner','updateBtnText', false,'Update Profile');
+        })
+        .catch(err => {
+            showAlert('settingsError','Error: ' + err.message);
+            setBtnLoading('updateSpinner','updateBtnText', false,'Update Profile');
+        });
+});
 
-        if (!curr || !newPw || !confirm) { showAlert(\'passwordError\', \'Please fill in all fields.\'); return; }
-        if (newPw !== confirm)           { showAlert(\'passwordError\', \'Passwords do not match.\'); return; }
-        if (newPw.length < 6)            { showAlert(\'passwordError\', \'Password must be at least 6 characters.\'); return; }
-
-        setBtnLoading(\'pwSpinner\', \'pwBtnText\', true, \'Updating...\');
-
-        db.ref(\'admins/\' + uname).once(\'value\').then(snap => {
-            if (!snap.exists() || snap.val().password !== curr) {
-                showAlert(\'passwordError\', \'Current password is incorrect.\');
-                setBtnLoading(\'pwSpinner\', \'pwBtnText\', false, \'Change Password\');
-                return;
-            }
-            db.ref(\'admins/\' + uname).update({ password: newPw }).then(() => {
-                showAlert(\'passwordSuccess\', \'Password changed successfully!\');
-                setBtnLoading(\'pwSpinner\', \'pwBtnText\', false, \'Change Password\');
-                document.getElementById(\'currentPassword\').value = \'\';
-                document.getElementById(\'newPassword\').value     = \'\';
-                document.getElementById(\'confirmPassword\').value = \'\';
-                setTimeout(() => closeModal(\'passwordModal\'), 2000);
-            }).catch(err => {
-                showAlert(\'passwordError\', \'Error: \' + err.message);
-                setBtnLoading(\'pwSpinner\', \'pwBtnText\', false, \'Change Password\');
-            });
+// ── Change password ──────────────────────────────────────────────────
+document.getElementById('changePasswordBtn').addEventListener('click', () => {
+    const curr    = document.getElementById('currentPassword').value;
+    const newPw   = document.getElementById('newPassword').value;
+    const confirm = document.getElementById('confirmPassword').value;
+    const uname   = localStorage.getItem('adminUsername');
+    if (!curr || !newPw || !confirm) { showAlert('passwordError','Please fill in all fields.'); return; }
+    if (newPw !== confirm)           { showAlert('passwordError','Passwords do not match.'); return; }
+    if (newPw.length < 6)            { showAlert('passwordError','Password must be at least 6 characters.'); return; }
+    setBtnLoading('pwSpinner','pwBtnText', true,'Updating…');
+    db.ref('admins/' + uname).once('value').then(snap => {
+        if (!snap.exists() || snap.val().password !== curr) {
+            showAlert('passwordError','Current password is incorrect.');
+            setBtnLoading('pwSpinner','pwBtnText', false,'Change Password');
+            return;
+        }
+        db.ref('admins/' + uname).update({ password: newPw }).then(() => {
+            showAlert('passwordSuccess','Password changed successfully!');
+            setBtnLoading('pwSpinner','pwBtnText', false,'Change Password');
+            ['currentPassword','newPassword','confirmPassword'].forEach(id => { document.getElementById(id).value=''; });
+            setTimeout(() => closeModal('passwordModal'), 2000);
         }).catch(err => {
-            showAlert(\'passwordError\', \'DB Error: \' + err.message);
-            setBtnLoading(\'pwSpinner\', \'pwBtnText\', false, \'Change Password\');
+            showAlert('passwordError','Error: ' + err.message);
+            setBtnLoading('pwSpinner','pwBtnText', false,'Change Password');
         });
+    }).catch(err => {
+        showAlert('passwordError','DB Error: ' + err.message);
+        setBtnLoading('pwSpinner','pwBtnText', false,'Change Password');
     });
+});
 
-    // %0%0 Push Notification %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    function updatePushPreview() {
-        const title = document.getElementById(\'pushTitle\').value.trim();
-        const body  = document.getElementById(\'pushBody\').value.trim();
-        const prev  = document.getElementById(\'pushPreview\');
+// ── Push notification ────────────────────────────────────────────────
+function updatePushPreview() {
+    const title = document.getElementById('pushTitle').value.trim();
+    const body  = document.getElementById('pushBody').value.trim();
+    const prev  = document.getElementById('pushPreview');
+    if (title || body) {
+        prev.style.display = 'block';
+        document.getElementById('previewTitle').textContent = title || 'Notification Title';
+        document.getElementById('previewBody').textContent  = body  || 'Your message will appear here…';
+    } else { prev.style.display = 'none'; }
+}
 
-        if (title || body) {
-            prev.style.display = \'block\';
-            document.getElementById(\'previewTitle\').textContent = title || \'Notification Title\';
-            document.getElementById(\'previewBody\').textContent  = body  || \'Your message will appear here...\';
-        } else {
-            prev.style.display = \'none\';
-        }
-    }
+function sendPushNotification() {
+    const title = document.getElementById('pushTitle').value.trim();
+    const body  = document.getElementById('pushBody').value.trim();
+    const topic = document.getElementById('pushTopic').value.trim() || 'all';
+    const admin = localStorage.getItem('adminUsername') || 'unknown';
+    if (!title) { showAlert('pushError','Please enter a notification title.'); return; }
+    if (!body)  { showAlert('pushError','Please enter a message body.'); return; }
+    setBtnLoading('pushSpinner','pushBtnText', true,'Sending…');
+    const payload = { title, body, topic, sentBy:admin, sentAt:new Date().toISOString(), timestamp:firebase.database.ServerValue.TIMESTAMP };
+    db.ref('notifications').push(payload)
+        .then(() => {
+            showAlert('pushSuccess','✅ Notification saved! Your FCM server will dispatch it.');
+            setBtnLoading('pushSpinner','pushBtnText', false,'<i class="fas fa-paper-plane"></i> Send Notification');
+            document.getElementById('pushTitle').value = '';
+            document.getElementById('pushBody').value  = '';
+            document.getElementById('pushTopic').value = 'all';
+            document.getElementById('pushPreview').style.display = 'none';
+        })
+        .catch(err => {
+            showAlert('pushError','Error: ' + err.message);
+            setBtnLoading('pushSpinner','pushBtnText', false,'<i class="fas fa-paper-plane"></i> Send Notification');
+        });
+}
 
-    function sendPushNotification() {
-        const title = document.getElementById(\'pushTitle\').value.trim();
-        const body  = document.getElementById(\'pushBody\').value.trim();
-        const topic = document.getElementById(\'pushTopic\').value.trim() || \'all\';
-        const admin = localStorage.getItem(\'adminUsername\') || \'unknown\';
+// ── Helpers ──────────────────────────────────────────────────────────
+function setBtnLoading(spinnerId, textId, loading, text) {
+    document.getElementById(spinnerId).style.display = loading ? 'block' : 'none';
+    document.getElementById(textId).innerHTML = loading ? '' : text;
+}
 
-        if (!title) { showAlert(\'pushError\', \'Please enter a notification title.\'); return; }
-        if (!body)  { showAlert(\'pushError\', \'Please enter a message body.\'); return; }
+function showAlert(id, msg) {
+    const el = document.getElementById(id);
+    el.innerHTML = msg;
+    el.style.display = 'flex';
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
 
-        setBtnLoading(\'pushSpinner\', \'pushBtnText\', true, \'Sending...\');
-
-        const payload = {
-            title:     title,
-            body:      body,
-            topic:     topic,
-            sentBy:    admin,
-            sentAt:    new Date().toISOString(),
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        };
-
-        // Save to Firebase /notifications %4 your FCM server can watch this node
-        db.ref(\'notifications\').push(payload)
-            .then(() => {
-                showAlert(\'pushSuccess\', \'%3 Notification saved! Your FCM server will dispatch it.\');
-                setBtnLoading(\'pushSpinner\', \'pushBtnText\', false, \'<i class="fas fa-paper-plane"></i> Send Notification\');
-                document.getElementById(\'pushTitle\').value = \'\';
-                document.getElementById(\'pushBody\').value  = \'\';
-                document.getElementById(\'pushTopic\').value = \'all\';
-                document.getElementById(\'pushPreview\').style.display = \'none\';
-            })
-            .catch(err => {
-                showAlert(\'pushError\', \'Error: \' + err.message);
-                setBtnLoading(\'pushSpinner\', \'pushBtnText\', false, \'<i class="fas fa-paper-plane"></i> Send Notification\');
-            });
-    }
-
-    // %0%0 Helpers %0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0
-    function setBtnLoading(spinnerId, textId, loading, text) {
-        document.getElementById(spinnerId).style.display = loading ? \'block\' : \'none\';
-        document.getElementById(textId).innerHTML = loading ? \'\' : text;
-    }
-
-    function showAlert(id, msg) {
-        const el = document.getElementById(id);
-        el.innerHTML = msg;
-        el.style.display = \'flex\';
-        setTimeout(() => { el.style.display = \'none\'; }, 5000);
-    }
+function showToast(msg, type='danger') {
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;animation:fadeUp .3s ease;background:${type==='danger'?'rgba(255,107,129,.15)':'rgba(52,211,153,.12)'};color:${type==='danger'?'#ff8fa3':'#6ef7a4'};border:1px solid ${type==='danger'?'rgba(255,107,129,.25)':'rgba(52,211,153,.25)'}`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+}
 </script>
 </body>
 </html>
