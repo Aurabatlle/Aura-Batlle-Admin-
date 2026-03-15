@@ -48,34 +48,23 @@
         .page-hdr h1{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--text)}
         .page-hdr p{font-size:12px;color:var(--muted);margin-top:2px}
 
-        /* Stats */
-        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-        .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:13px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
-        .s-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:2px}
-        .s-icon.red{background:var(--red-soft);color:var(--red2)}
-        .s-icon.gold{background:var(--gold-soft);color:var(--gold)}
-        .s-icon.green{background:var(--green-soft);color:var(--green)}
-        .stat-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);line-height:1}
-        .stat-lbl{font-size:10.5px;color:var(--muted);line-height:1.2}
-
-        /* Tabs */
-        .tabs-wrap{margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-        .tabs-wrap::-webkit-scrollbar{display:none}
-        .tabs-inner{display:flex;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:5px;width:max-content;min-width:100%}
-        .tab-btn{padding:8px 14px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;background:transparent;color:var(--muted);transition:all .2s}
-        .tab-btn.active{background:linear-gradient(135deg,var(--red-dark),var(--red2));color:#fff;box-shadow:0 2px 12px var(--red-glow)}
-        .tab-btn:hover:not(.active){background:var(--surface2);color:var(--text)}
-        .tab-badge{background:rgba(255,255,255,.15);border-radius:20px;padding:1px 7px;font-size:11px;font-weight:700;min-width:20px;text-align:center}
-
-        /* Panels */
-        .panel{display:none}
-        .panel.active{display:block;animation:fadeUp .22s ease both}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+        /* Search Bar */
+        .search-wrap{position:relative;margin-bottom:18px}
+        .search-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px 14px 11px 42px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+        .search-input::placeholder{color:var(--muted)}
+        .search-input:focus{border-color:rgba(224,25,45,.45);box-shadow:0 0 0 3px rgba(224,25,45,.08)}
+        .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
+        .search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--surface2);border:none;color:var(--muted);cursor:pointer;width:22px;height:22px;border-radius:6px;display:none;align-items:center;justify-content:center;font-size:11px;transition:background .2s}
+        .search-clear:hover{background:var(--red-soft);color:var(--red2)}
+        .search-clear.visible{display:flex}
+        .search-hint{font-size:11.5px;color:var(--muted);margin-top:6px;padding-left:2px}
+        .search-hint span{color:var(--red2);font-weight:600}
 
         /* Txn Card */
         .txn-list{display:flex;flex-direction:column;gap:10px}
         .txn-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp .25s ease both;transition:border-color .2s}
         .txn-card:hover{border-color:var(--border-r)}
+        .txn-card.search-match{border-color:rgba(224,25,45,.5);box-shadow:0 0 0 1px rgba(224,25,45,.18)}
         .txn-card-inner{padding:14px 14px 14px 18px;border-left:3px solid var(--red);display:flex;flex-direction:column;gap:10px}
         .txn-top{display:flex;align-items:center;gap:11px}
         .txn-avatar{width:42px;height:42px;border-radius:11px;object-fit:cover;border:2px solid var(--border);flex-shrink:0}
@@ -86,7 +75,9 @@
         .txn-amt{display:flex;align-items:center;gap:5px;background:var(--gold-soft);border:1px solid rgba(245,200,66,.22);border-radius:10px;padding:5px 11px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--gold);flex-shrink:0}
         .txn-amt i{font-size:12px}
         .txn-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-        .txn-id-badge{font-size:10.5px;color:var(--muted);background:var(--surface2);border-radius:6px;padding:3px 8px;font-family:monospace;border:1px solid var(--border)}
+        .txn-id-badge{font-size:10.5px;color:var(--muted);background:var(--surface2);border-radius:6px;padding:3px 8px;font-family:monospace;border:1px solid var(--border);transition:all .2s}
+        .txn-id-badge.highlighted{background:rgba(224,25,45,.18);border-color:rgba(224,25,45,.5);color:var(--red2);font-weight:700;font-size:11px}
+        .txn-id-badge.highlighted mark{background:rgba(224,25,45,.35);color:var(--red2);border-radius:2px;padding:0 1px}
         .txn-dt{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px}
         .txn-dt i{font-size:10px;color:var(--red2)}
         .txn-actions{display:flex;gap:8px}
@@ -139,6 +130,8 @@
         .toast-t{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
         .toast-m{font-size:12px;color:var(--muted);margin-top:1px}
 
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
         @media(min-width:600px){
             .page{padding:28px 20px 80px}
             .modal-overlay{align-items:center;padding:20px}
@@ -171,28 +164,25 @@
         </div>
     </div>
 
-    <div class="stats-row">
-        <div class="stat-card"><div class="s-icon red"><i class="fas fa-clock"></i></div><div class="stat-val" id="statPending">—</div><div class="stat-lbl">Pending</div></div>
-        <div class="stat-card"><div class="s-icon gold"><i class="fas fa-coins"></i></div><div class="stat-val" id="statGold">—</div><div class="stat-lbl">Total Gold</div></div>
-        <div class="stat-card"><div class="s-icon green"><i class="fas fa-users"></i></div><div class="stat-val" id="statUsers">—</div><div class="stat-lbl">Users</div></div>
+    <!-- Search -->
+    <div class="search-wrap">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by Transaction ID…" oninput="onSearch(this.value)" autocomplete="off" inputmode="numeric">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fas fa-times"></i></button>
+        <div class="search-hint" id="searchHint" style="display:none">Showing result for <span id="searchHintVal"></span></div>
     </div>
 
-    <div class="tabs-wrap">
-        <div class="tabs-inner" id="tabsInner">
-            <button class="tab-btn active" id="tabAllBtn" onclick="switchTab('all')">
-                <i class="fas fa-list"></i> All <span class="tab-badge" id="badgeAll">0</span>
-            </button>
-        </div>
-    </div>
-
-    <div class="panel active" id="panelAll">
+    <div id="mainPanel">
         <div class="loading-wrap" id="loadingAll"><div class="spin"></div> Loading…</div>
         <div class="txn-list" id="listAll"></div>
         <div class="empty-state" id="emptyAll" style="display:none">
             <div class="e-icon">✅</div><h3>All Clear!</h3><p>No pending Coin Add requests.</p>
         </div>
+        <div class="empty-state" id="emptySearch" style="display:none">
+            <div class="e-icon"><i class="fas fa-search" style="font-size:22px;color:var(--muted)"></i></div>
+            <h3>Not Found</h3><p>No pending transaction with that ID.</p>
+        </div>
     </div>
-    <div id="userPanelsWrap"></div>
 </div>
 
 <!-- Modal -->
@@ -233,10 +223,15 @@ document.getElementById('navAdminName').textContent=localStorage.getItem('adminD
 
 function doLogout(){['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime'].forEach(k=>localStorage.removeItem(k));location.href='index.html';}
 
-let allTxns=[],userMap={},activeTab='all';
+let allTxns=[],userMap={};
+let searchQuery='';
 
 function init(){
-    db.ref('users').on('value',snap=>{userMap={};snap.forEach(c=>{userMap[c.key]=c.val();});loadTransactions();});
+    db.ref('users').on('value',snap=>{
+        userMap={};
+        snap.forEach(c=>{userMap[c.key]=c.val();});
+        loadTransactions();
+    });
 }
 
 function loadTransactions(){
@@ -249,67 +244,86 @@ function loadTransactions(){
             if(!user.transactions)return;
             Object.values(user.transactions).forEach(t=>{
                 if(t.type==='Coin Add'&&t.status==='pending'){
-                    txns.push({txnId:t.transactionId||'',userId:t.userId||uid,amount:t.amount||0,date:t.date||'',time:t.time||'00:00:00',userName:user.name||uid,userImg:user.profileImage||'',fcmToken:user.fcmToken||''});
+                    txns.push({
+                        txnId:String(t.transactionId||''),
+                        userId:t.userId||uid,
+                        amount:t.amount||0,
+                        date:t.date||'',
+                        time:t.time||'00:00:00',
+                        userName:user.name||uid,
+                        userImg:user.profileImage||'',
+                        fcmToken:user.fcmToken||''   // ← pulled directly from user node
+                    });
                 }
             });
         });
         txns.sort((a,b)=>(a.date+'T'+a.time).localeCompare(b.date+'T'+b.time));
-        allTxns=txns;renderAll();
+        allTxns=txns;
+        renderAll();
     }).catch(err=>{toast('error','Load Error',err.message);document.getElementById('loadingAll').style.display='none';});
 }
 
 function renderAll(){
     document.getElementById('loadingAll').style.display='none';
-    const uniq=[...new Set(allTxns.map(t=>t.userId))];
-    const total=allTxns.reduce((s,t)=>s+Number(t.amount),0);
-    document.getElementById('statPending').textContent=allTxns.length;
-    document.getElementById('statGold').textContent=total;
-    document.getElementById('statUsers').textContent=uniq.length;
-    document.getElementById('badgeAll').textContent=allTxns.length;
+    const q=searchQuery.trim().toLowerCase();
+    const filtered=q?allTxns.filter(t=>t.txnId.toLowerCase().includes(q)):allTxns;
     const listEl=document.getElementById('listAll');
     listEl.innerHTML='';
-    if(allTxns.length===0){document.getElementById('emptyAll').style.display='block';}
-    else{document.getElementById('emptyAll').style.display='none';allTxns.forEach(t=>listEl.appendChild(buildCard(t)));}
-    buildUserTabs(uniq);
+    document.getElementById('emptyAll').style.display='none';
+    document.getElementById('emptySearch').style.display='none';
+    if(allTxns.length===0&&!q){
+        document.getElementById('emptyAll').style.display='block';
+    } else if(filtered.length===0&&q){
+        document.getElementById('emptySearch').style.display='block';
+    } else {
+        filtered.forEach(t=>listEl.appendChild(buildCard(t,q)));
+    }
 }
 
-function buildUserTabs(userIds){
-    document.querySelectorAll('.u-tab').forEach(el=>el.remove());
-    document.getElementById('userPanelsWrap').innerHTML='';
-    userIds.forEach(uid=>{
-        const uTxns=allTxns.filter(t=>t.userId===uid);
-        const uName=uTxns[0]?.userName||uid;
-        const btn=document.createElement('button');
-        btn.className='tab-btn u-tab';btn.id='tab_'+uid;
-        btn.innerHTML=`<i class="fas fa-user"></i> ${escH(uName)} <span class="tab-badge">${uTxns.length}</span>`;
-        btn.onclick=()=>switchTab('user_'+uid);
-        document.getElementById('tabsInner').appendChild(btn);
-        const panel=document.createElement('div');
-        panel.className='panel';panel.id='panel_user_'+uid;
-        if(uTxns.length===0){panel.innerHTML=`<div class="empty-state"><div class="e-icon">✅</div><h3>No Pending</h3><p>No pending requests for this user.</p></div>`;}
-        else{const list=document.createElement('div');list.className='txn-list';uTxns.forEach(t=>list.appendChild(buildCard(t)));panel.appendChild(list);}
-        document.getElementById('userPanelsWrap').appendChild(panel);
-    });
-}
-
-function buildCard(t){
+function buildCard(t,highlightQ){
     const card=document.createElement('div');
-    card.className='txn-card';card.id='card_'+t.txnId;
+    card.className='txn-card'+(highlightQ&&t.txnId.toLowerCase().includes(highlightQ)?' search-match':'');
+    card.id='card_'+t.txnId;
     const av=t.userImg?`<img class="txn-avatar" src="${escH(t.userImg)}" alt="" onerror="this.style.display='none'">`:`<div class="txn-avatar-ph">${escH((t.userName[0]||'?').toUpperCase())}</div>`;
     const dt=fmtDT(t.date,t.time);
     const eid=escH(t.txnId),euid=escH(t.userId),ename=escH(t.userName),amt=Number(t.amount);
-    card.innerHTML=`<div class="txn-card-inner"><div class="txn-top">${av}<div class="txn-info-col"><div class="txn-name">${ename}</div><div class="txn-uid">UID: ${euid}</div></div><div class="txn-amt"><i class="fas fa-coins"></i> ${amt.toLocaleString()}</div></div><div class="txn-meta"><span class="txn-id-badge">#${eid}</span><span class="txn-dt"><i class="fas fa-clock"></i> ${dt}</span></div><div class="txn-actions"><button class="btn-approve" id="approve_${eid}" onclick="confirmAction('approve','${eid}','${euid}',${amt},'${ename}')"><i class="fas fa-check"></i> Approve</button><button class="btn-reject" id="reject_${eid}" onclick="confirmAction('reject','${eid}','${euid}',${amt},'${ename}')"><i class="fas fa-times"></i> Reject</button></div></div>`;
+
+    // Highlighted transaction ID badge
+    let idBadgeContent=`#${eid}`;
+    let idBadgeClass='txn-id-badge';
+    if(highlightQ&&t.txnId.toLowerCase().includes(highlightQ)){
+        idBadgeClass='txn-id-badge highlighted';
+        const regex=new RegExp(`(${escRegex(highlightQ)})`, 'gi');
+        idBadgeContent='#'+eid.replace(regex,'<mark>$1</mark>');
+    }
+
+    card.innerHTML=`<div class="txn-card-inner"><div class="txn-top">${av}<div class="txn-info-col"><div class="txn-name">${ename}</div><div class="txn-uid">UID: ${euid}</div></div><div class="txn-amt"><i class="fas fa-coins"></i> ${amt.toLocaleString()}</div></div><div class="txn-meta"><span class="${idBadgeClass}">${idBadgeContent}</span><span class="txn-dt"><i class="fas fa-clock"></i> ${dt}</span></div><div class="txn-actions"><button class="btn-approve" id="approve_${eid}" onclick="confirmAction('approve','${eid}','${euid}',${amt},'${ename}')"><i class="fas fa-check"></i> Approve</button><button class="btn-reject" id="reject_${eid}" onclick="confirmAction('reject','${eid}','${euid}',${amt},'${ename}')"><i class="fas fa-times"></i> Reject</button></div></div>`;
     return card;
 }
 
-function switchTab(key){
-    activeTab=key;
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    const tBtn=key==='all'?document.getElementById('tabAllBtn'):document.getElementById('tab_'+key.replace('user_',''));
-    if(tBtn){tBtn.classList.add('active');tBtn.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});}
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    const pEl=document.getElementById(key==='all'?'panelAll':'panel_'+key);
-    if(pEl)pEl.classList.add('active');
+function escRegex(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+
+function onSearch(val){
+    searchQuery=val.trim();
+    const clearBtn=document.getElementById('searchClear');
+    const hint=document.getElementById('searchHint');
+    if(searchQuery){
+        clearBtn.classList.add('visible');
+        hint.style.display='block';
+        document.getElementById('searchHintVal').textContent='#'+searchQuery;
+    } else {
+        clearBtn.classList.remove('visible');
+        hint.style.display='none';
+    }
+    renderAll();
+}
+
+function clearSearch(){
+    document.getElementById('searchInput').value='';
+    searchQuery='';
+    document.getElementById('searchClear').classList.remove('visible');
+    document.getElementById('searchHint').style.display='none';
+    renderAll();
 }
 
 let _pa=null;
@@ -337,8 +351,17 @@ async function doApprove(txnId,userId,amount){
         const wRef=db.ref(`users/${userId}/wallet/depositGold`);
         const snap=await wRef.once('value');
         await wRef.set((snap.val()||0)+Number(amount));
-        const user=userMap[userId];
-        if(user&&user.fcmToken)await sendPush(user.fcmToken,amount);
+
+        // FCM: get fcmToken from userMap (live data) — fallback to allTxns entry
+        const txnEntry=allTxns.find(t=>t.txnId===txnId);
+        const fcmToken=(userMap[userId]&&userMap[userId].fcmToken)||txnEntry?.fcmToken||'';
+        if(fcmToken){
+            await sendPush(fcmToken,amount);
+        } else {
+            console.warn('No FCM token for user',userId);
+            toast('info','Note','Approved but no FCM token found for push.');
+        }
+
         allTxns=allTxns.filter(t=>t.txnId!==txnId);
         renderAll();
         toast('success','Approved!',`${amount} Gold credited successfully.`);
@@ -369,9 +392,19 @@ async function setTxnStatus(userId,txnId,status){
 
 async function sendPush(fcmToken,amount){
     try{
-        const res=await fetch('/.netlify/functions/approveCoin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:fcmToken,amount})});
-        if(!res.ok)console.warn('Push failed:',await res.json().catch(()=>{}));
-    }catch(e){console.warn('Push error:',e);}
+        const res=await fetch('/.netlify/functions/approveCoin',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({token:fcmToken,amount:Number(amount)})
+        });
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok){
+            console.warn('Push failed:',data);
+            toast('info','Push Warning','Gold credited but push notification failed.');
+        }
+    }catch(e){
+        console.warn('Push error:',e);
+    }
 }
 
 function setBusy(txnId,busy){
