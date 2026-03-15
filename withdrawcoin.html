@@ -29,9 +29,9 @@
         @keyframes blobB{to{transform:translate(-20px,-15px) scale(1.07)}}
 
         /* Navbar */
-        .navbar{position:sticky;top:0;z-index:200;height:var(--nav-h);background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+        .navbar{position:sticky;top:0;z-index:200;height:var(--nav-h);background:rgba(10,10,10,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
         .navbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.6}
-        .nav-brand{display:flex;align-items:center;gap:9px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);text-decoration:none}
+        .nav-brand{display:flex;align-items:center;gap:9px;text-decoration:none}
         .nav-brand img{height:30px;width:30px;object-fit:contain;border-radius:8px}
         .nav-right{display:flex;align-items:center;gap:10px}
         .nav-admin{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--muted)}
@@ -46,59 +46,85 @@
         .page-hdr h1{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--text)}
         .page-hdr p{font-size:12px;color:var(--muted);margin-top:2px}
 
-        /* Search */
-        .search-wrap{position:relative;margin-bottom:18px}
-        .search-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px 14px 11px 42px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+        /* Tabs */
+        .tabs-wrap{display:flex;gap:0;background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:4px;margin-bottom:16px}
+        .tab-btn{flex:1;padding:9px 10px;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--muted);transition:all .2s}
+        .tab-btn.active{background:linear-gradient(135deg,var(--red-dark),var(--red2));color:#fff;box-shadow:0 2px 12px var(--red-glow)}
+        .tab-btn:hover:not(.active){background:var(--surface2);color:var(--text)}
+        .tab-badge{background:rgba(255,255,255,.18);border-radius:20px;padding:1px 8px;font-size:11px;font-weight:800;min-width:20px;text-align:center}
+        .tab-btn:not(.active) .tab-badge{background:var(--surface2);color:var(--muted)}
+
+        /* Filters */
+        .filters-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+        .search-wrap{position:relative;flex:1;min-width:160px}
+        .search-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:10px 34px 10px 38px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
         .search-input::placeholder{color:var(--muted)}
         .search-input:focus{border-color:rgba(224,25,45,.45);box-shadow:0 0 0 3px rgba(224,25,45,.08)}
-        .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
-        .search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--surface2);border:none;color:var(--muted);cursor:pointer;width:22px;height:22px;border-radius:6px;display:none;align-items:center;justify-content:center;font-size:11px;transition:background .2s}
-        .search-clear:hover{background:var(--red-soft);color:var(--red2)}
+        .search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;pointer-events:none}
+        .search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;width:20px;height:20px;display:none;align-items:center;justify-content:center;font-size:11px}
         .search-clear.visible{display:flex}
-        .search-hint{font-size:11.5px;color:var(--muted);margin-top:6px;padding-left:2px}
-        .search-hint span{color:var(--red2);font-weight:600}
+        .date-filter-wrap{display:flex;gap:6px;align-items:center}
+        .date-input{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:10px 11px;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none;cursor:pointer;width:140px}
+        .date-input:focus{border-color:rgba(224,25,45,.45)}
+        .date-input::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer}
+        .btn-clear-date{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;color:var(--muted);font-size:12px;cursor:pointer;display:none;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap}
+        .btn-clear-date:hover{background:var(--red-soft);color:var(--red2)}
+        .btn-clear-date.visible{display:block}
 
-        /* Txn list */
+        /* List */
         .txn-list{display:flex;flex-direction:column;gap:12px}
 
-        /* Txn Card */
+        /* Card */
         .txn-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp .25s ease both;transition:border-color .2s}
         .txn-card:hover{border-color:var(--border-r)}
         .txn-card.search-match{border-color:rgba(224,25,45,.5);box-shadow:0 0 0 1px rgba(224,25,45,.18)}
+        .txn-card-inner{display:flex;flex-direction:column}
 
-        /* Type accent colors for left border */
-        .txn-card-inner{padding:14px 14px 14px 18px;border-left:3px solid var(--red);display:flex;flex-direction:column;gap:11px}
-        .txn-card-inner.upi{border-left-color:#4CAF50}
-        .txn-card-inner.amazon{border-left-color:#FF9900}
-        .txn-card-inner.google{border-left-color:#4285F4}
+        /* Big square logo block */
+        .txn-logo-block{width:100%;height:100px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+        .txn-logo-block.upi{background:linear-gradient(135deg,rgba(76,175,80,.22),rgba(76,175,80,.07));border-bottom:1px solid rgba(76,175,80,.22)}
+        .txn-logo-block.amazon{background:linear-gradient(135deg,rgba(255,153,0,.22),rgba(255,153,0,.07));border-bottom:1px solid rgba(255,153,0,.22)}
+        .txn-logo-block.google{background:linear-gradient(135deg,rgba(66,133,244,.22),rgba(66,133,244,.07));border-bottom:1px solid rgba(66,133,244,.22)}
+        .txn-logo-block img{height:62px;width:auto;max-width:180px;object-fit:contain;filter:drop-shadow(0 3px 10px rgba(0,0,0,.5))}
+        .txn-logo-block::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+        .txn-logo-block.upi::before{background:#4CAF50}
+        .txn-logo-block.amazon::before{background:#FF9900}
+        .txn-logo-block.google::before{background:#4285F4}
 
-        /* Top row: type logo + info + rupee amount */
-        .txn-top{display:flex;align-items:center;gap:11px}
-        .type-logo-wrap{width:44px;height:44px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
-        .type-logo-wrap img{width:28px;height:28px;object-fit:contain}
-        .txn-info-col{flex:1;min-width:0}
-        .txn-type-label{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .txn-uid{font-size:11px;color:var(--muted);margin-top:2px;font-family:monospace}
-
-        /* Rupee amount badge */
-        .txn-amt{display:flex;align-items:center;gap:4px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.22);border-radius:10px;padding:5px 11px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#60a5fa;flex-shrink:0}
-        .txn-amt .rupee{font-size:13px;font-weight:700}
-
-        /* Meta row */
+        /* Card body */
+        .txn-body{padding:13px 14px 14px;display:flex;flex-direction:column;gap:10px}
+        .txn-row1{display:flex;align-items:center;justify-content:space-between;gap:10px}
+        .txn-uid{font-size:12px;color:var(--muted);font-family:monospace}
+        .txn-amt{display:flex;align-items:center;gap:4px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.22);border-radius:10px;padding:5px 12px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#60a5fa;flex-shrink:0}
+        .txn-amt .rupee{font-size:13px}
         .txn-meta{display:flex;flex-direction:column;gap:6px}
         .txn-id-badge{display:block;width:100%;font-size:13px;color:var(--muted);background:var(--surface2);border-radius:9px;padding:8px 12px;font-family:monospace;border:1px solid var(--border);transition:all .2s;letter-spacing:.3px}
         .txn-id-badge.highlighted{background:rgba(224,25,45,.14);border-color:rgba(224,25,45,.55);color:var(--red2);font-weight:700;font-size:15px;padding:11px 14px;border-radius:11px;box-shadow:0 0 0 3px rgba(224,25,45,.10),0 0 18px rgba(224,25,45,.12);letter-spacing:.5px}
         .txn-id-badge.highlighted mark{background:rgba(224,25,45,.32);color:#ff6070;border-radius:3px;padding:1px 3px}
+        .txn-dt-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
         .txn-dt{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px}
         .txn-dt i{font-size:10px;color:var(--red2)}
+
+        /* Status badge */
+        .status-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0}
+        .status-badge.credited{background:var(--green-soft);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+        .status-badge.rejected{background:var(--red-soft);color:var(--red2);border:1px solid rgba(224,25,45,.2)}
+
+        /* Redeem code row */
+        .redeem-code-row{display:flex;align-items:center;gap:8px;background:var(--gold-soft);border:1px solid rgba(245,200,66,.22);border-radius:10px;padding:9px 12px}
+        .redeem-code-row i{color:var(--gold);font-size:13px;flex-shrink:0}
+        .redeem-code-val{font-family:monospace;font-size:13.5px;font-weight:700;color:var(--gold);flex:1;letter-spacing:.5px;word-break:break-all}
+        .redeem-no-code{font-size:12px;color:var(--muted2);font-style:italic;flex:1}
+        .btn-edit-code{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 11px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:'DM Sans',sans-serif;flex-shrink:0}
+        .btn-edit-code:hover{background:var(--gold-soft);border-color:rgba(245,200,66,.3);color:var(--gold)}
 
         /* Actions */
         .txn-actions{display:flex;gap:8px}
         .btn-approve,.btn-reject{flex:1;padding:10px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;touch-action:manipulation}
         .btn-approve{background:var(--green-soft);border:1px solid rgba(34,197,94,.25);color:var(--green)}
-        .btn-approve:hover:not(:disabled),.btn-approve:active:not(:disabled){background:rgba(34,197,94,.22);box-shadow:0 0 14px rgba(34,197,94,.18)}
+        .btn-approve:hover:not(:disabled){background:rgba(34,197,94,.22);box-shadow:0 0 14px rgba(34,197,94,.18)}
         .btn-reject{background:var(--red-soft);border:1px solid rgba(224,25,45,.25);color:var(--red2)}
-        .btn-reject:hover:not(:disabled),.btn-reject:active:not(:disabled){background:rgba(224,25,45,.22);box-shadow:0 0 14px var(--red-glow)}
+        .btn-reject:hover:not(:disabled){background:rgba(224,25,45,.22);box-shadow:0 0 14px var(--red-glow)}
         .btn-approve:disabled,.btn-reject:disabled{opacity:.45;cursor:not-allowed}
 
         /* Empty / Loading */
@@ -111,21 +137,20 @@
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-        /* ── APPROVE MODAL (bottom sheet) ── */
+        /* Modal */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);z-index:500;display:none;align-items:flex-end;justify-content:center;padding:0}
         .modal-overlay.open{display:flex;animation:fadeIn .2s ease}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .modal-box{background:var(--bg2);border:1px solid var(--border);border-top:1px solid var(--border-r);border-radius:22px 22px 0 0;padding:10px 20px 36px;width:100%;max-width:500px;box-shadow:0 -8px 40px rgba(0,0,0,.6);animation:slideUp .28s cubic-bezier(.22,.88,.32,1);position:relative;max-height:92dvh;overflow-y:auto}
+        .modal-box{background:var(--bg2);border:1px solid var(--border);border-top:1px solid var(--border-r);border-radius:22px 22px 0 0;padding:10px 20px 36px;width:100%;max-width:500px;box-shadow:0 -8px 40px rgba(0,0,0,.6);animation:slideUp .28s cubic-bezier(.22,.88,.32,1);max-height:92dvh;overflow-y:auto}
         @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:none;opacity:1}}
         .modal-handle{width:36px;height:4px;background:var(--border-r);border-radius:99px;margin:8px auto 18px}
         .modal-top-icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px}
         .modal-top-icon.approve{background:var(--green-soft)}
         .modal-top-icon.reject{background:var(--red-soft)}
+        .modal-top-icon.edit{background:var(--gold-soft)}
         .modal-box h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);text-align:center;margin-bottom:8px}
         .modal-box p{font-size:13.5px;color:var(--muted);text-align:center;line-height:1.55}
         .modal-box p strong{color:var(--text)}
-
-        /* Code input inside modal (Amazon / Google Play only) */
         .code-input-wrap{margin-top:16px}
         .code-input-label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px}
         .code-input-label i{color:var(--gold)}
@@ -133,14 +158,13 @@
         .code-input:focus{border-color:rgba(245,200,66,.5);box-shadow:0 0 0 3px rgba(245,200,66,.08)}
         .code-input::placeholder{color:var(--muted2);font-family:'DM Sans',sans-serif;letter-spacing:0}
         .code-required-note{font-size:11px;color:rgba(245,200,66,.7);margin-top:5px;display:flex;align-items:center;gap:5px}
-
         .modal-btns{display:flex;gap:10px;margin-top:22px}
         .modal-btns button{flex:1;padding:13px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .15s,transform .15s;touch-action:manipulation}
         .modal-btns button:active{transform:scale(.97)}
         .modal-cancel{background:var(--surface2);color:var(--muted)}
         .modal-confirm.approve{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 3px 14px rgba(34,197,94,.25)}
         .modal-confirm.reject{background:linear-gradient(135deg,var(--red-dark),var(--red2));color:#fff;box-shadow:0 3px 14px var(--red-glow)}
-
+        .modal-confirm.edit{background:linear-gradient(135deg,#a16207,#d97706);color:#fff;box-shadow:0 3px 14px rgba(217,119,6,.25)}
         .btn-spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite}
 
         /* Toast */
@@ -180,43 +204,71 @@
         <div class="page-hdr-icon">💸</div>
         <div>
             <h1>Withdrawal Requests</h1>
-            <p>Approve or reject pending withdrawals</p>
+            <p>Manage pending &amp; approved withdrawals</p>
         </div>
     </div>
 
-    <!-- Search -->
-    <div class="search-wrap">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" class="search-input" id="searchInput" placeholder="Search by Transaction ID…" oninput="onSearch(this.value)" autocomplete="off" inputmode="numeric">
-        <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fas fa-times"></i></button>
-        <div class="search-hint" id="searchHint" style="display:none">Showing result for <span id="searchHintVal"></span></div>
+    <!-- Tabs -->
+    <div class="tabs-wrap">
+        <button class="tab-btn active" id="tabPending" onclick="switchTab('pending')">
+            <i class="fas fa-clock"></i> Pending <span class="tab-badge" id="badgePending">0</span>
+        </button>
+        <button class="tab-btn" id="tabApproved" onclick="switchTab('approved')">
+            <i class="fas fa-check-circle"></i> Approved <span class="tab-badge" id="badgeApproved">0</span>
+        </button>
     </div>
 
-    <div id="mainPanel">
-        <div class="loading-wrap" id="loadingAll"><div class="spin"></div> Loading…</div>
-        <div class="txn-list" id="listAll"></div>
-        <div class="empty-state" id="emptyAll" style="display:none">
+    <!-- Filters -->
+    <div class="filters-bar">
+        <div class="search-wrap">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search Transaction ID…" oninput="onSearch(this.value)" autocomplete="off" inputmode="numeric">
+            <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="date-filter-wrap">
+            <input type="date" class="date-input" id="dateFilter" onchange="onDateFilter(this.value)">
+            <button class="btn-clear-date" id="btnClearDate" onclick="clearDate()"><i class="fas fa-times"></i> Clear</button>
+        </div>
+    </div>
+
+    <!-- Pending Panel -->
+    <div id="panelPending">
+        <div class="loading-wrap" id="loadingPending"><div class="spin"></div> Loading…</div>
+        <div class="txn-list" id="listPending"></div>
+        <div class="empty-state" id="emptyPending" style="display:none">
             <div class="e-icon">✅</div><h3>All Clear!</h3><p>No pending withdrawal requests.</p>
         </div>
-        <div class="empty-state" id="emptySearch" style="display:none">
+        <div class="empty-state" id="emptyPendingFilter" style="display:none">
             <div class="e-icon"><i class="fas fa-search" style="font-size:22px;color:var(--muted)"></i></div>
-            <h3>Not Found</h3><p>No pending transaction with that ID.</p>
+            <h3>No Results</h3><p>No pending transactions match your filter.</p>
+        </div>
+    </div>
+
+    <!-- Approved Panel -->
+    <div id="panelApproved" style="display:none">
+        <div class="txn-list" id="listApproved"></div>
+        <div class="empty-state" id="emptyApproved" style="display:none">
+            <div class="e-icon"><i class="fas fa-inbox" style="font-size:26px;color:var(--muted)"></i></div>
+            <h3>Nothing Here</h3><p>No approved or rejected withdrawals yet.</p>
+        </div>
+        <div class="empty-state" id="emptyApprovedFilter" style="display:none">
+            <div class="e-icon"><i class="fas fa-search" style="font-size:22px;color:var(--muted)"></i></div>
+            <h3>No Results</h3><p>No transactions match your filter.</p>
         </div>
     </div>
 </div>
 
-<!-- Approve / Reject Modal -->
+<!-- Modal -->
 <div class="modal-overlay" id="confirmModal">
     <div class="modal-box">
         <div class="modal-handle"></div>
         <div class="modal-top-icon" id="modalIcon">✅</div>
         <h3 id="modalTitle">Confirm</h3>
         <p id="modalBody"></p>
-        <!-- Code input: shown only for Amazon / Google Play approve -->
         <div class="code-input-wrap" id="codeInputWrap" style="display:none">
             <div class="code-input-label"><i class="fas fa-gift"></i> Gift Card / Redeem Code</div>
             <input type="text" class="code-input" id="codeInput" placeholder="Enter redeem code here…" autocomplete="off">
-            <div class="code-required-note"><i class="fas fa-exclamation-circle"></i> Code is required before approving</div>
+            <div class="code-required-note" id="codeRequiredNote"><i class="fas fa-exclamation-circle"></i> Code is required before approving</div>
         </div>
         <div class="modal-btns">
             <button class="modal-cancel" onclick="closeModal()">Cancel</button>
@@ -228,7 +280,7 @@
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-/* ── Firebase init (same obfuscated config) ── */
+/* ── Firebase ── */
 const _e=(s,k)=>s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
 const _k='aB3xQ9mZ';
 const _cfg={
@@ -244,195 +296,215 @@ function _d(s){return _e(s,_k);}
 firebase.initializeApp({apiKey:_d(_cfg.a),authDomain:_d(_cfg.b),databaseURL:_d(_cfg.c),projectId:_d(_cfg.d),storageBucket:_d(_cfg.e),messagingSenderId:_d(_cfg.f),appId:_d(_cfg.g)});
 const db=firebase.database();
 
-/* ── Session check ── */
+/* ── Session ── */
 const SESSION_MS=30*60*1000;
 if(!localStorage.getItem('adminUsername')||(Date.now()-parseInt(localStorage.getItem('loginTime')||'0'))>=SESSION_MS){location.href='index.html';}
 document.getElementById('navAdminName').textContent=localStorage.getItem('adminDisplayName')||'Admin';
 
 /* ── Helpers ── */
 const WITHDRAWAL_TYPES=['UPI Withdrawal','Amazon Withdrawal','Google Play Withdrawal'];
-
-function typeKey(type){
-    if(type==='UPI Withdrawal')return 'upi';
-    if(type==='Amazon Withdrawal')return 'amazon';
-    if(type==='Google Play Withdrawal')return 'google';
-    return 'upi';
-}
-
-function typeLogo(type){
-    const k=typeKey(type);
-    if(k==='upi')return'upi.png';
-    if(k==='amazon')return'amazone.png';
-    return'googleplay.png';
-}
-
-function typeLabel(type){
-    if(type==='UPI Withdrawal')return'UPI Withdrawal';
-    if(type==='Amazon Withdrawal')return'Amazon Gift Card';
-    if(type==='Google Play Withdrawal')return'Google Play Card';
-    return type;
-}
-
-function needsCode(type){
-    return type==='Amazon Withdrawal'||type==='Google Play Withdrawal';
-}
+function typeKey(t){return t==='UPI Withdrawal'?'upi':t==='Amazon Withdrawal'?'amazon':'google';}
+function typeLogo(t){return t==='UPI Withdrawal'?'up.png':t==='Amazon Withdrawal'?'az.png':'grp.png';}
+function typeLabel(t){return t==='UPI Withdrawal'?'UPI Withdrawal':t==='Amazon Withdrawal'?'Amazon Gift Card':'Google Play Card';}
+function needsCode(t){return t==='Amazon Withdrawal'||t==='Google Play Withdrawal';}
 
 /* ── State ── */
-let allTxns=[];
-let searchQuery='';
+let pendingTxns=[], approvedTxns=[];
+let activeTab='pending', searchQuery='', dateFilter='';
 let _pa=null;
 
 /* ── Init ── */
-function init(){
-    loadTransactions();
-}
+function init(){loadAll();}
 
-function loadTransactions(){
-    document.getElementById('loadingAll').style.display='flex';
-    document.getElementById('listAll').innerHTML='';
+function loadAll(){
+    document.getElementById('loadingPending').style.display='flex';
     db.ref('users').once('value').then(usersSnap=>{
-        const txns=[];
+        const pending=[], approved=[];
         usersSnap.forEach(userSnap=>{
             const uid=userSnap.key, user=userSnap.val();
             if(!user.transactions)return;
             Object.values(user.transactions).forEach(t=>{
-                if(WITHDRAWAL_TYPES.includes(t.type)&&t.status==='pending'){
-                    txns.push({
-                        txnId:String(t.transactionId||''),
-                        userId:t.userId||uid,
-                        firebaseUid:uid,
-                        amount:t.amount||0,
-                        date:t.date||'',
-                        time:t.time||'00:00:00',
-                        type:t.type,
-                        fcmToken:user.fcmToken||''
-                    });
-                }
+                if(!WITHDRAWAL_TYPES.includes(t.type))return;
+                const entry={
+                    txnId:String(t.transactionId||''),
+                    userId:t.userId||uid,
+                    firebaseUid:uid,
+                    amount:t.amount||0,
+                    date:t.date||'',
+                    time:t.time||'00:00:00',
+                    type:t.type,
+                    status:t.status||'pending',
+                    redeemCode:t.redeemCode||'',
+                    fcmToken:user.fcmToken||''
+                };
+                if(t.status==='pending') pending.push(entry);
+                else if(t.status==='credited'||t.status==='rejected') approved.push(entry);
             });
         });
-        txns.sort((a,b)=>(a.date+'T'+a.time).localeCompare(b.date+'T'+b.time));
-        allTxns=txns;
-        renderAll();
+        const sortFn=(a,b)=>(b.date+'T'+b.time).localeCompare(a.date+'T'+a.time);
+        pendingTxns=pending.sort(sortFn);
+        approvedTxns=approved.sort(sortFn);
+        updateBadges();
+        renderActive();
+        document.getElementById('loadingPending').style.display='none';
     }).catch(err=>{
         toast('error','Load Error',err.message);
-        document.getElementById('loadingAll').style.display='none';
+        document.getElementById('loadingPending').style.display='none';
     });
 }
 
-function renderAll(){
-    document.getElementById('loadingAll').style.display='none';
-    const q=searchQuery.trim().toLowerCase();
-    const filtered=q?allTxns.filter(t=>t.txnId.toLowerCase().includes(q)):allTxns;
-    const listEl=document.getElementById('listAll');
-    listEl.innerHTML='';
-    document.getElementById('emptyAll').style.display='none';
-    document.getElementById('emptySearch').style.display='none';
-    if(allTxns.length===0&&!q){
-        document.getElementById('emptyAll').style.display='block';
-    } else if(filtered.length===0&&q){
-        document.getElementById('emptySearch').style.display='block';
-    } else {
-        filtered.forEach(t=>listEl.appendChild(buildCard(t,q)));
-    }
+function updateBadges(){
+    document.getElementById('badgePending').textContent=pendingTxns.length;
+    document.getElementById('badgeApproved').textContent=approvedTxns.length;
 }
 
-function buildCard(t, highlightQ){
+/* ── Tab ── */
+function switchTab(tab){
+    activeTab=tab;
+    document.getElementById('tabPending').classList.toggle('active',tab==='pending');
+    document.getElementById('tabApproved').classList.toggle('active',tab==='approved');
+    document.getElementById('panelPending').style.display=tab==='pending'?'block':'none';
+    document.getElementById('panelApproved').style.display=tab==='approved'?'block':'none';
+    renderActive();
+}
+function renderActive(){
+    if(activeTab==='pending') renderList('pending');
+    else renderList('approved');
+}
+
+/* ── Render ── */
+function renderList(tab){
+    const src=tab==='pending'?pendingTxns:approvedTxns;
+    const listEl=document.getElementById('list'+cap(tab));
+    const emptyEl=document.getElementById('empty'+cap(tab));
+    const emptyFEl=document.getElementById('empty'+cap(tab)+'Filter');
+    let filtered=src.slice();
+    if(searchQuery) filtered=filtered.filter(t=>t.txnId.toLowerCase().includes(searchQuery));
+    if(dateFilter) filtered=filtered.filter(t=>t.date===dateFilter);
+    listEl.innerHTML='';
+    emptyEl.style.display='none';
+    emptyFEl.style.display='none';
+    if(src.length===0&&!searchQuery&&!dateFilter) emptyEl.style.display='block';
+    else if(filtered.length===0) emptyFEl.style.display='block';
+    else filtered.forEach(t=>listEl.appendChild(buildCard(t,tab)));
+}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+/* ── Build card ── */
+function buildCard(t,tab){
     const card=document.createElement('div');
-    const isMatch=highlightQ&&t.txnId.toLowerCase().includes(highlightQ);
+    const isMatch=searchQuery&&t.txnId.toLowerCase().includes(searchQuery);
     card.className='txn-card'+(isMatch?' search-match':'');
     card.id='card_'+t.txnId;
+    const k=typeKey(t.type), logo=typeLogo(t.type), label=typeLabel(t.type);
+    const eid=escH(t.txnId), euid=escH(t.userId), dt=fmtDT(t.date,t.time), amt=Number(t.amount);
 
-    const k=typeKey(t.type);
-    const logo=typeLogo(t.type);
-    const label=typeLabel(t.type);
-    const eid=escH(t.txnId);
-    const euid=escH(t.userId);
-    const dt=fmtDT(t.date,t.time);
-    const amt=Number(t.amount);
-
-    // Transaction ID badge with optional highlight
-    let idBadgeClass='txn-id-badge';
-    let idBadgeContent=`TXN #${eid}`;
+    // TXN ID badge
+    let idClass='txn-id-badge', idContent='TXN #'+eid;
     if(isMatch){
-        idBadgeClass='txn-id-badge highlighted';
-        const regex=new RegExp(`(${escRegex(highlightQ)})`, 'gi');
-        idBadgeContent='TXN #'+eid.replace(regex,'<mark>$1</mark>');
+        idClass='txn-id-badge highlighted';
+        idContent='TXN #'+eid.replace(new RegExp(`(${escRegex(searchQuery)})`,'gi'),'<mark>$1</mark>');
     }
 
-    card.innerHTML=`
-    <div class="txn-card-inner ${k}">
-        <div class="txn-top">
-            <div class="type-logo-wrap">
-                <img src="${escH(logo)}" alt="${escH(label)}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-wallet\\'style=\\'color:var(--muted);font-size:16px\\'></i>'">
-            </div>
-            <div class="txn-info-col">
-                <div class="txn-type-label">${escH(label)}</div>
-                <div class="txn-uid">UID: ${euid}</div>
-            </div>
-            <div class="txn-amt"><span class="rupee">₹</span>${amt.toLocaleString()}</div>
+    // Status badge (approved tab)
+    const statusBadge=tab==='approved'
+        ?`<span class="status-badge ${t.status==='credited'?'credited':'rejected'}">${t.status==='credited'?'✅ Approved':'❌ Rejected'}</span>`:'';
+
+    // Redeem code row
+    let codeRow='';
+    if(tab==='approved'&&needsCode(t.type)){
+        codeRow=t.redeemCode
+            ?`<div class="redeem-code-row"><i class="fas fa-gift"></i><span class="redeem-code-val">${escH(t.redeemCode)}</span><button class="btn-edit-code" onclick="openEditCode('${eid}','${escH(t.firebaseUid)}','${escH(t.redeemCode)}')"><i class="fas fa-pen"></i> Edit</button></div>`
+            :`<div class="redeem-code-row"><i class="fas fa-gift"></i><span class="redeem-no-code">No code added yet</span><button class="btn-edit-code" onclick="openEditCode('${eid}','${escH(t.firebaseUid)}','')"><i class="fas fa-plus"></i> Add Code</button></div>`;
+    }
+
+    // Action buttons
+    const actionBtns=tab==='pending'
+        ?`<div class="txn-actions">
+            <button class="btn-approve" id="approve_${eid}" onclick="confirmAction('approve','${eid}','${escH(t.firebaseUid)}',${amt},'${escH(t.type)}')"><i class="fas fa-check"></i> Approve</button>
+            <button class="btn-reject" id="reject_${eid}" onclick="confirmAction('reject','${eid}','${escH(t.firebaseUid)}',${amt},'${escH(t.type)}')"><i class="fas fa-times"></i> Reject</button>
+          </div>`:'';
+
+    card.innerHTML=`<div class="txn-card-inner">
+        <div class="txn-logo-block ${k}">
+            <img src="${escH(logo)}" alt="${escH(label)}" onerror="this.style.opacity='.25'">
         </div>
-        <div class="txn-meta">
-            <span class="${idBadgeClass}">${idBadgeContent}</span>
-            <span class="txn-dt"><i class="fas fa-clock"></i> ${dt}</span>
-        </div>
-        <div class="txn-actions">
-            <button class="btn-approve" id="approve_${eid}" onclick="confirmAction('approve','${eid}','${escH(t.firebaseUid)}',${amt},'${escH(t.type)}')">
-                <i class="fas fa-check"></i> Approve
-            </button>
-            <button class="btn-reject" id="reject_${eid}" onclick="confirmAction('reject','${eid}','${escH(t.firebaseUid)}',${amt},'${escH(t.type)}')">
-                <i class="fas fa-times"></i> Reject
-            </button>
+        <div class="txn-body">
+            <div class="txn-row1">
+                <span class="txn-uid">UID: ${euid}</span>
+                <div class="txn-amt"><span class="rupee">₹</span>${amt.toLocaleString()}</div>
+            </div>
+            <div class="txn-meta">
+                <span class="${idClass}">${idContent}</span>
+                <div class="txn-dt-row">
+                    <span class="txn-dt"><i class="fas fa-clock"></i> ${dt}</span>
+                    ${statusBadge}
+                </div>
+            </div>
+            ${codeRow}
+            ${actionBtns}
         </div>
     </div>`;
     return card;
 }
 
-/* ── Search ── */
-function onSearch(val){
-    searchQuery=val.trim();
-    const clearBtn=document.getElementById('searchClear');
-    const hint=document.getElementById('searchHint');
-    if(searchQuery){
-        clearBtn.classList.add('visible');
-        hint.style.display='block';
-        document.getElementById('searchHintVal').textContent='#'+searchQuery;
-    } else {
-        clearBtn.classList.remove('visible');
-        hint.style.display='none';
-    }
-    renderAll();
+/* ── Search / Date filter ── */
+function onSearch(v){
+    searchQuery=v.trim().toLowerCase();
+    document.getElementById('searchClear').classList.toggle('visible',!!searchQuery);
+    renderActive();
 }
 function clearSearch(){
     document.getElementById('searchInput').value='';
     searchQuery='';
     document.getElementById('searchClear').classList.remove('visible');
-    document.getElementById('searchHint').style.display='none';
-    renderAll();
+    renderActive();
+}
+function onDateFilter(v){
+    dateFilter=v;
+    document.getElementById('btnClearDate').classList.toggle('visible',!!v);
+    renderActive();
+}
+function clearDate(){
+    document.getElementById('dateFilter').value='';
+    dateFilter='';
+    document.getElementById('btnClearDate').classList.remove('visible');
+    renderActive();
 }
 
-/* ── Modal ── */
-function confirmAction(action, txnId, firebaseUid, amount, type){
-    _pa={action, txnId, firebaseUid, amount, type};
+/* ── Modal: approve / reject ── */
+function confirmAction(action,txnId,firebaseUid,amount,type){
+    _pa={action,txnId,firebaseUid,amount,type,mode:'action'};
     const ok=action==='approve';
     document.getElementById('modalIcon').className='modal-top-icon '+(ok?'approve':'reject');
     document.getElementById('modalIcon').textContent=ok?'✅':'❌';
     document.getElementById('modalTitle').textContent=ok?'Approve Withdrawal':'Reject Withdrawal';
-
-    const label=typeLabel(type);
-    if(ok){
-        document.getElementById('modalBody').innerHTML=`Send <strong>₹${amount}</strong> via <strong>${escH(label)}</strong>?<br><small style="color:var(--muted);font-size:11.5px;">Push notification will be sent.</small>`;
-        // Show code input only for Amazon & Google Play
-        const showCode=needsCode(type);
-        document.getElementById('codeInputWrap').style.display=showCode?'block':'none';
-        document.getElementById('codeInput').value='';
-    } else {
-        document.getElementById('modalBody').innerHTML=`Reject this <strong>${escH(label)}</strong> withdrawal of <strong>₹${amount}</strong>?<br><small style="color:var(--muted);font-size:11.5px;">No amount will be transferred.</small>`;
-        document.getElementById('codeInputWrap').style.display='none';
-    }
-
+    document.getElementById('modalBody').innerHTML=ok
+        ?`Send <strong>₹${amount}</strong> via <strong>${escH(typeLabel(type))}</strong>?<br><small style="color:var(--muted);font-size:11.5px;">Push notification will be sent.</small>`
+        :`Reject <strong>${escH(typeLabel(type))}</strong> withdrawal of <strong>₹${amount}</strong>?`;
+    const showCode=ok&&needsCode(type);
+    document.getElementById('codeInputWrap').style.display=showCode?'block':'none';
+    document.getElementById('codeRequiredNote').style.display='flex';
+    document.getElementById('codeInput').value='';
     const cb=document.getElementById('modalConfirmBtn');
     cb.className='modal-confirm '+(ok?'approve':'reject');
     cb.textContent=ok?'Yes, Approve':'Yes, Reject';
+    document.getElementById('confirmModal').classList.add('open');
+}
+
+/* ── Modal: edit redeem code ── */
+function openEditCode(txnId,firebaseUid,currentCode){
+    _pa={txnId,firebaseUid,mode:'editcode'};
+    document.getElementById('modalIcon').className='modal-top-icon edit';
+    document.getElementById('modalIcon').textContent='🎁';
+    document.getElementById('modalTitle').textContent=currentCode?'Edit Redeem Code':'Add Redeem Code';
+    document.getElementById('modalBody').textContent='Update the gift card redeem code for this transaction.';
+    document.getElementById('codeInputWrap').style.display='block';
+    document.getElementById('codeRequiredNote').style.display='none';
+    document.getElementById('codeInput').value=currentCode||'';
+    const cb=document.getElementById('modalConfirmBtn');
+    cb.className='modal-confirm edit';
+    cb.textContent='Save Code';
     document.getElementById('confirmModal').classList.add('open');
 }
 
@@ -443,15 +515,15 @@ function closeModal(){
 
 async function modalConfirm(){
     if(!_pa)return;
-    const{action,txnId,firebaseUid,amount,type}=_pa;
-
-    // Validate code for Amazon/Google Play approve
-    if(action==='approve'&&needsCode(type)){
+    if(_pa.mode==='editcode'){
         const code=document.getElementById('codeInput').value.trim();
-        if(!code){
-            toast('error','Code Required','Please enter the gift card redeem code.');
-            return;
-        }
+        closeModal();
+        await saveCode(_pa.txnId,_pa.firebaseUid,code);
+        return;
+    }
+    const{action,txnId,firebaseUid,amount,type}=_pa;
+    if(action==='approve'&&needsCode(type)&&!document.getElementById('codeInput').value.trim()){
+        toast('error','Code Required','Please enter the gift card redeem code.');return;
     }
     closeModal();
     if(action==='approve') await doApprove(txnId,firebaseUid,amount,type);
@@ -459,52 +531,57 @@ async function modalConfirm(){
 }
 
 /* ── Approve ── */
-async function doApprove(txnId, firebaseUid, amount, type){
+async function doApprove(txnId,firebaseUid,amount,type){
     setBusy(txnId,true);
-    const code=(needsCode(type)?document.getElementById('codeInput')?.value?.trim():'')||'';
+    const code=needsCode(type)?(document.getElementById('codeInput')?.value?.trim()||''):'';
     try{
-        // 1. Save status = credited + save code if present
-        await setTxnStatusAndCode(firebaseUid, txnId, 'credited', code);
-
-        // 2. Fetch fresh FCM token
+        await setTxnStatusAndCode(firebaseUid,txnId,'credited',code);
         const tokenSnap=await db.ref(`users/${firebaseUid}/fcmToken`).once('value');
-        const fcmToken=tokenSnap.val()||allTxns.find(t=>t.txnId===txnId)?.fcmToken||'';
-
-        // 3. Send push
-        if(fcmToken){
-            await sendWithdrawPush(fcmToken, amount, type);
-        } else {
-            toast('info','Note','Approved but no FCM token — push skipped.');
-        }
-
-        allTxns=allTxns.filter(t=>t.txnId!==txnId);
-        renderAll();
+        const fcmToken=tokenSnap.val()||pendingTxns.find(t=>t.txnId===txnId)?.fcmToken||'';
+        if(fcmToken) await sendWithdrawPush(fcmToken,amount,type);
+        else toast('info','Note','Approved but no FCM token — push skipped.');
+        const idx=pendingTxns.findIndex(t=>t.txnId===txnId);
+        if(idx>-1){approvedTxns.unshift({...pendingTxns[idx],status:'credited',redeemCode:code});pendingTxns.splice(idx,1);}
+        updateBadges();renderActive();
         toast('success','Approved!',`₹${amount} withdrawal approved.`);
-    }catch(err){
-        toast('error','Error',err.message);
-        setBusy(txnId,false);
-    }
+    }catch(err){toast('error','Error',err.message);setBusy(txnId,false);}
 }
 
 /* ── Reject ── */
-async function doReject(txnId, firebaseUid){
+async function doReject(txnId,firebaseUid){
     setBusy(txnId,true);
     try{
-        await setTxnStatusAndCode(firebaseUid, txnId, 'rejected', '');
-        allTxns=allTxns.filter(t=>t.txnId!==txnId);
-        renderAll();
-        toast('info','Rejected','Withdrawal has been rejected.');
-    }catch(err){
-        toast('error','Error',err.message);
-        setBusy(txnId,false);
-    }
+        await setTxnStatusAndCode(firebaseUid,txnId,'rejected','');
+        const idx=pendingTxns.findIndex(t=>t.txnId===txnId);
+        if(idx>-1){approvedTxns.unshift({...pendingTxns[idx],status:'rejected'});pendingTxns.splice(idx,1);}
+        updateBadges();renderActive();
+        toast('info','Rejected','Withdrawal rejected.');
+    }catch(err){toast('error','Error',err.message);setBusy(txnId,false);}
 }
 
-/* ── Firebase helpers ── */
-async function setTxnStatusAndCode(firebaseUid, txnId, status, code){
+/* ── Save code ── */
+async function saveCode(txnId,firebaseUid,code){
+    try{
+        const snap=await db.ref(`users/${firebaseUid}/transactions`).once('value');
+        const updates={};let found=false;
+        snap.forEach(child=>{
+            if(String(child.val().transactionId)===String(txnId)){
+                updates[`users/${firebaseUid}/transactions/${child.key}/redeemCode`]=code;found=true;
+            }
+        });
+        if(!found)throw new Error('Transaction not found.');
+        await db.ref().update(updates);
+        const t=approvedTxns.find(t=>t.txnId===txnId);
+        if(t) t.redeemCode=code;
+        renderActive();
+        toast('success','Saved!','Redeem code updated.');
+    }catch(err){toast('error','Error',err.message);}
+}
+
+/* ── Firebase helper ── */
+async function setTxnStatusAndCode(firebaseUid,txnId,status,code){
     const snap=await db.ref(`users/${firebaseUid}/transactions`).once('value');
-    let found=false;
-    const updates={};
+    let found=false;const updates={};
     snap.forEach(child=>{
         if(String(child.val().transactionId)===String(txnId)){
             updates[`users/${firebaseUid}/transactions/${child.key}/status`]=status;
@@ -512,43 +589,33 @@ async function setTxnStatusAndCode(firebaseUid, txnId, status, code){
             found=true;
         }
     });
-    if(!found) throw new Error('Transaction not found.');
+    if(!found)throw new Error('Transaction not found.');
     await db.ref().update(updates);
 }
 
-/* ── Push notification ── */
-async function sendWithdrawPush(fcmToken, amount, type){
+/* ── Push ── */
+async function sendWithdrawPush(fcmToken,amount,type){
     try{
         const res=await fetch('/.netlify/functions/approveWithdraw',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({token:fcmToken, amount:Number(amount), type})
+            method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({token:fcmToken,amount:Number(amount),type})
         });
         const data=await res.json().catch(()=>({}));
-        if(!res.ok){
-            console.warn('Push failed:',data);
-            toast('info','Push Warning','Approved but push notification failed.');
-        }
-    }catch(e){
-        console.warn('Push error:',e);
-    }
+        if(!res.ok){console.warn('Push failed:',data);toast('info','Push Warning','Approved but push notification failed.');}
+    }catch(e){console.warn('Push error:',e);}
 }
 
 /* ── UI helpers ── */
-function setBusy(txnId, busy){
-    const a=document.getElementById('approve_'+txnId);
-    const r=document.getElementById('reject_'+txnId);
+function setBusy(txnId,busy){
+    const a=document.getElementById('approve_'+txnId),r=document.getElementById('reject_'+txnId);
     if(a){a.disabled=busy;a.innerHTML=busy?`<div class="btn-spin"></div> Wait…`:`<i class="fas fa-check"></i> Approve`;}
     if(r){r.disabled=busy;r.innerHTML=busy?`<div class="btn-spin"></div>`:`<i class="fas fa-times"></i> Reject`;}
 }
-
 function fmtDT(date,time){
     try{const dt=new Date(date+'T'+time);if(isNaN(dt))return`${date} ${time}`;return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+' · '+dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch{return`${date} ${time}`;}
 }
-
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escRegex(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
-
 function toast(type,title,msg){
     const icons={success:'fas fa-check-circle',error:'fas fa-exclamation-circle',info:'fas fa-info-circle'};
     const el=document.createElement('div');el.className=`toast ${type}`;
@@ -556,7 +623,6 @@ function toast(type,title,msg){
     document.getElementById('toastWrap').appendChild(el);
     setTimeout(()=>el.remove(),3800);
 }
-
 document.getElementById('confirmModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 init();
 </script>
