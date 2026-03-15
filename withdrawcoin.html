@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Withdrawals — Aura Battle Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#0a0a0a;--bg2:#111;--bg3:#181818;
+            --surface:rgba(255,255,255,.04);--surface2:rgba(255,255,255,.07);
+            --border:rgba(255,255,255,.09);--border-r:rgba(220,30,50,.25);
+            --red:#e0192d;--red2:#ff3347;--red-dark:#9b0f1e;
+            --red-glow:rgba(224,25,45,.30);--red-soft:rgba(224,25,45,.12);
+            --text:#f0f0f0;--muted:rgba(240,240,240,.50);--muted2:rgba(240,240,240,.30);
+            --gold:#f5c842;--gold-soft:rgba(245,200,66,.13);
+            --green:#22c55e;--green-soft:rgba(34,197,94,.12);
+            --blue:#3b82f6;--blue-soft:rgba(59,130,246,.12);
+            --nav-h:56px
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100dvh;color:var(--text);overflow-x:hidden}
+        body::before{content:'';position:fixed;top:-100px;left:-100px;width:380px;height:380px;background:radial-gradient(circle,rgba(224,25,45,.13) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:0;animation:blobA 9s ease-in-out infinite alternate}
+        body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(180,10,30,.10) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:0;animation:blobB 11s ease-in-out infinite alternate}
+        @keyframes blobA{to{transform:translate(30px,25px) scale(1.1)}}
+        @keyframes blobB{to{transform:translate(-20px,-15px) scale(1.07)}}
+
+        /* Navbar */
+        .navbar{position:sticky;top:0;z-index:200;height:var(--nav-h);background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+        .navbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.6}
+        .nav-brand{display:flex;align-items:center;gap:9px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);text-decoration:none}
+        .nav-brand img{height:30px;width:30px;object-fit:contain;border-radius:8px}
+        .nav-right{display:flex;align-items:center;gap:10px}
+        .nav-admin{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--muted)}
+        .nav-admin i{color:var(--red2);font-size:11px}
+
+        /* Page */
+        .page{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:20px 14px 80px}
+
+        /* Header */
+        .page-hdr{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+        .page-hdr-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--red-dark),var(--red2));box-shadow:0 0 18px var(--red-glow);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+        .page-hdr h1{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--text)}
+        .page-hdr p{font-size:12px;color:var(--muted);margin-top:2px}
+
+        /* Search */
+        .search-wrap{position:relative;margin-bottom:18px}
+        .search-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px 14px 11px 42px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+        .search-input::placeholder{color:var(--muted)}
+        .search-input:focus{border-color:rgba(224,25,45,.45);box-shadow:0 0 0 3px rgba(224,25,45,.08)}
+        .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
+        .search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--surface2);border:none;color:var(--muted);cursor:pointer;width:22px;height:22px;border-radius:6px;display:none;align-items:center;justify-content:center;font-size:11px;transition:background .2s}
+        .search-clear:hover{background:var(--red-soft);color:var(--red2)}
+        .search-clear.visible{display:flex}
+        .search-hint{font-size:11.5px;color:var(--muted);margin-top:6px;padding-left:2px}
+        .search-hint span{color:var(--red2);font-weight:600}
+
+        /* Txn list */
+        .txn-list{display:flex;flex-direction:column;gap:12px}
+
+        /* Txn Card */
+        .txn-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp .25s ease both;transition:border-color .2s}
+        .txn-card:hover{border-color:var(--border-r)}
+        .txn-card.search-match{border-color:rgba(224,25,45,.5);box-shadow:0 0 0 1px rgba(224,25,45,.18)}
+
+        /* Type accent colors for left border */
+        .txn-card-inner{padding:14px 14px 14px 18px;border-left:3px solid var(--red);display:flex;flex-direction:column;gap:11px}
+        .txn-card-inner.upi{border-left-color:#4CAF50}
+        .txn-card-inner.amazon{border-left-color:#FF9900}
+        .txn-card-inner.google{border-left-color:#4285F4}
+
+        /* Top row: type logo + info + rupee amount */
+        .txn-top{display:flex;align-items:center;gap:11px}
+        .type-logo-wrap{width:44px;height:44px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+        .type-logo-wrap img{width:28px;height:28px;object-fit:contain}
+        .txn-info-col{flex:1;min-width:0}
+        .txn-type-label{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .txn-uid{font-size:11px;color:var(--muted);margin-top:2px;font-family:monospace}
+
+        /* Rupee amount badge */
+        .txn-amt{display:flex;align-items:center;gap:4px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.22);border-radius:10px;padding:5px 11px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#60a5fa;flex-shrink:0}
+        .txn-amt .rupee{font-size:13px;font-weight:700}
+
+        /* Meta row */
+        .txn-meta{display:flex;flex-direction:column;gap:6px}
+        .txn-id-badge{display:block;width:100%;font-size:13px;color:var(--muted);background:var(--surface2);border-radius:9px;padding:8px 12px;font-family:monospace;border:1px solid var(--border);transition:all .2s;letter-spacing:.3px}
+        .txn-id-badge.highlighted{background:rgba(224,25,45,.14);border-color:rgba(224,25,45,.55);color:var(--red2);font-weight:700;font-size:15px;padding:11px 14px;border-radius:11px;box-shadow:0 0 0 3px rgba(224,25,45,.10),0 0 18px rgba(224,25,45,.12);letter-spacing:.5px}
+        .txn-id-badge.highlighted mark{background:rgba(224,25,45,.32);color:#ff6070;border-radius:3px;padding:1px 3px}
+        .txn-dt{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px}
+        .txn-dt i{font-size:10px;color:var(--red2)}
+
+        /* Actions */
+        .txn-actions{display:flex;gap:8px}
+        .btn-approve,.btn-reject{flex:1;padding:10px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;touch-action:manipulation}
+        .btn-approve{background:var(--green-soft);border:1px solid rgba(34,197,94,.25);color:var(--green)}
+        .btn-approve:hover:not(:disabled),.btn-approve:active:not(:disabled){background:rgba(34,197,94,.22);box-shadow:0 0 14px rgba(34,197,94,.18)}
+        .btn-reject{background:var(--red-soft);border:1px solid rgba(224,25,45,.25);color:var(--red2)}
+        .btn-reject:hover:not(:disabled),.btn-reject:active:not(:disabled){background:rgba(224,25,45,.22);box-shadow:0 0 14px var(--red-glow)}
+        .btn-approve:disabled,.btn-reject:disabled{opacity:.45;cursor:not-allowed}
+
+        /* Empty / Loading */
+        .empty-state{text-align:center;padding:56px 20px;color:var(--muted)}
+        .e-icon{width:60px;height:60px;border-radius:16px;background:var(--red-soft);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px}
+        .empty-state h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:rgba(240,240,240,.7);margin-bottom:5px}
+        .empty-state p{font-size:12.5px}
+        .loading-wrap{display:flex;align-items:center;justify-content:center;gap:10px;padding:48px 20px;color:var(--muted);font-size:13.5px}
+        .spin{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--red2);border-radius:50%;animation:spin .65s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+        /* ── APPROVE MODAL (bottom sheet) ── */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);z-index:500;display:none;align-items:flex-end;justify-content:center;padding:0}
+        .modal-overlay.open{display:flex;animation:fadeIn .2s ease}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .modal-box{background:var(--bg2);border:1px solid var(--border);border-top:1px solid var(--border-r);border-radius:22px 22px 0 0;padding:10px 20px 36px;width:100%;max-width:500px;box-shadow:0 -8px 40px rgba(0,0,0,.6);animation:slideUp .28s cubic-bezier(.22,.88,.32,1);position:relative;max-height:92dvh;overflow-y:auto}
+        @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:none;opacity:1}}
+        .modal-handle{width:36px;height:4px;background:var(--border-r);border-radius:99px;margin:8px auto 18px}
+        .modal-top-icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px}
+        .modal-top-icon.approve{background:var(--green-soft)}
+        .modal-top-icon.reject{background:var(--red-soft)}
+        .modal-box h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);text-align:center;margin-bottom:8px}
+        .modal-box p{font-size:13.5px;color:var(--muted);text-align:center;line-height:1.55}
+        .modal-box p strong{color:var(--text)}
+
+        /* Code input inside modal (Amazon / Google Play only) */
+        .code-input-wrap{margin-top:16px}
+        .code-input-label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+        .code-input-label i{color:var(--gold)}
+        .code-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:12px 14px;font-family:monospace;font-size:14px;color:var(--text);outline:none;letter-spacing:.5px;transition:border-color .2s,box-shadow .2s}
+        .code-input:focus{border-color:rgba(245,200,66,.5);box-shadow:0 0 0 3px rgba(245,200,66,.08)}
+        .code-input::placeholder{color:var(--muted2);font-family:'DM Sans',sans-serif;letter-spacing:0}
+        .code-required-note{font-size:11px;color:rgba(245,200,66,.7);margin-top:5px;display:flex;align-items:center;gap:5px}
+
+        .modal-btns{display:flex;gap:10px;margin-top:22px}
+        .modal-btns button{flex:1;padding:13px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .15s,transform .15s;touch-action:manipulation}
+        .modal-btns button:active{transform:scale(.97)}
+        .modal-cancel{background:var(--surface2);color:var(--muted)}
+        .modal-confirm.approve{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;box-shadow:0 3px 14px rgba(34,197,94,.25)}
+        .modal-confirm.reject{background:linear-gradient(135deg,var(--red-dark),var(--red2));color:#fff;box-shadow:0 3px 14px var(--red-glow)}
+
+        .btn-spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite}
+
+        /* Toast */
+        .toast-wrap{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:calc(100% - 28px);max-width:400px}
+        .toast{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 6px 24px rgba(0,0,0,.55);animation:toastIn .28s cubic-bezier(.22,.88,.32,1);pointer-events:all}
+        @keyframes toastIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+        .toast-ico{font-size:17px;flex-shrink:0}
+        .toast.success{border-left:3px solid var(--green)}.toast.success .toast-ico{color:var(--green)}
+        .toast.error{border-left:3px solid var(--red2)}.toast.error .toast-ico{color:var(--red2)}
+        .toast.info{border-left:3px solid var(--gold)}.toast.info .toast-ico{color:var(--gold)}
+        .toast-t{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
+        .toast-m{font-size:12px;color:var(--muted);margin-top:1px}
+
+        @media(min-width:600px){
+            .page{padding:28px 20px 80px}
+            .modal-overlay{align-items:center;padding:20px}
+            .modal-box{border-radius:20px;animation:cardIn .28s cubic-bezier(.22,.88,.32,1)}
+            @keyframes cardIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:none}}
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="nav-brand" href="dashboard.html">
+        <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle" onerror="this.style.display='none'">
+    </a>
+    <div class="nav-right">
+        <div class="nav-admin"><i class="fas fa-shield-alt"></i><span id="navAdminName">Admin</span></div>
+    </div>
+</nav>
+
+<div class="page">
+    <div class="page-hdr">
+        <div class="page-hdr-icon">💸</div>
+        <div>
+            <h1>Withdrawal Requests</h1>
+            <p>Approve or reject pending withdrawals</p>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by Transaction ID…" oninput="onSearch(this.value)" autocomplete="off" inputmode="numeric">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fas fa-times"></i></button>
+        <div class="search-hint" id="searchHint" style="display:none">Showing result for <span id="searchHintVal"></span></div>
+    </div>
+
+    <div id="mainPanel">
+        <div class="loading-wrap" id="loadingAll"><div class="spin"></div> Loading…</div>
+        <div class="txn-list" id="listAll"></div>
+        <div class="empty-state" id="emptyAll" style="display:none">
+            <div class="e-icon">✅</div><h3>All Clear!</h3><p>No pending withdrawal requests.</p>
+        </div>
+        <div class="empty-state" id="emptySearch" style="display:none">
+            <div class="e-icon"><i class="fas fa-search" style="font-size:22px;color:var(--muted)"></i></div>
+            <h3>Not Found</h3><p>No pending transaction with that ID.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Approve / Reject Modal -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <div class="modal-handle"></div>
+        <div class="modal-top-icon" id="modalIcon">✅</div>
+        <h3 id="modalTitle">Confirm</h3>
+        <p id="modalBody"></p>
+        <!-- Code input: shown only for Amazon / Google Play approve -->
+        <div class="code-input-wrap" id="codeInputWrap" style="display:none">
+            <div class="code-input-label"><i class="fas fa-gift"></i> Gift Card / Redeem Code</div>
+            <input type="text" class="code-input" id="codeInput" placeholder="Enter redeem code here…" autocomplete="off">
+            <div class="code-required-note"><i class="fas fa-exclamation-circle"></i> Code is required before approving</div>
+        </div>
+        <div class="modal-btns">
+            <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+            <button class="modal-confirm" id="modalConfirmBtn" onclick="modalConfirm()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ── Firebase init (same obfuscated config) ── */
+const _e=(s,k)=>s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+const _k='aB3xQ9mZ';
+const _cfg={
+    a:"\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+    b:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+    c:"\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+    d:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+    e:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+    f:"\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+    g:"\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
+};
+function _d(s){return _e(s,_k);}
+firebase.initializeApp({apiKey:_d(_cfg.a),authDomain:_d(_cfg.b),databaseURL:_d(_cfg.c),projectId:_d(_cfg.d),storageBucket:_d(_cfg.e),messagingSenderId:_d(_cfg.f),appId:_d(_cfg.g)});
+const db=firebase.database();
+
+/* ── Session check ── */
+const SESSION_MS=30*60*1000;
+if(!localStorage.getItem('adminUsername')||(Date.now()-parseInt(localStorage.getItem('loginTime')||'0'))>=SESSION_MS){location.href='index.html';}
+document.getElementById('navAdminName').textContent=localStorage.getItem('adminDisplayName')||'Admin';
+
+/* ── Helpers ── */
+const WITHDRAWAL_TYPES=['UPI Withdrawal','Amazon Withdrawal','Google Play Withdrawal'];
+
+function typeKey(type){
+    if(type==='UPI Withdrawal')return 'upi';
+    if(type==='Amazon Withdrawal')return 'amazon';
+    if(type==='Google Play Withdrawal')return 'google';
+    return 'upi';
+}
+
+function typeLogo(type){
+    const k=typeKey(type);
+    if(k==='upi')return'upi.png';
+    if(k==='amazon')return'amazone.png';
+    return'googleplay.png';
+}
+
+function typeLabel(type){
+    if(type==='UPI Withdrawal')return'UPI Withdrawal';
+    if(type==='Amazon Withdrawal')return'Amazon Gift Card';
+    if(type==='Google Play Withdrawal')return'Google Play Card';
+    return type;
+}
+
+function needsCode(type){
+    return type==='Amazon Withdrawal'||type==='Google Play Withdrawal';
+}
+
+/* ── State ── */
+let allTxns=[];
+let searchQuery='';
+let _pa=null;
+
+/* ── Init ── */
+function init(){
+    loadTransactions();
+}
+
+function loadTransactions(){
+    document.getElementById('loadingAll').style.display='flex';
+    document.getElementById('listAll').innerHTML='';
+    db.ref('users').once('value').then(usersSnap=>{
+        const txns=[];
+        usersSnap.forEach(userSnap=>{
+            const uid=userSnap.key, user=userSnap.val();
+            if(!user.transactions)return;
+            Object.values(user.transactions).forEach(t=>{
+                if(WITHDRAWAL_TYPES.includes(t.type)&&t.status==='pending'){
+                    txns.push({
+                        txnId:String(t.transactionId||''),
+                        userId:t.userId||uid,
+                        firebaseUid:uid,
+                        amount:t.amount||0,
+                        date:t.date||'',
+                        time:t.time||'00:00:00',
+                        type:t.type,
+                        fcmToken:user.fcmToken||''
+                    });
+                }
+            });
+        });
+        txns.sort((a,b)=>(a.date+'T'+a.time).localeCompare(b.date+'T'+b.time));
+        allTxns=txns;
+        renderAll();
+    }).catch(err=>{
+        toast('error','Load Error',err.message);
+        document.getElementById('loadingAll').style.display='none';
+    });
+}
+
+function renderAll(){
+    document.getElementById('loadingAll').style.display='none';
+    const q=searchQuery.trim().toLowerCase();
+    const filtered=q?allTxns.filter(t=>t.txnId.toLowerCase().includes(q)):allTxns;
+    const listEl=document.getElementById('listAll');
+    listEl.innerHTML='';
+    document.getElementById('emptyAll').style.display='none';
+    document.getElementById('emptySearch').style.display='none';
+    if(allTxns.length===0&&!q){
+        document.getElementById('emptyAll').style.display='block';
+    } else if(filtered.length===0&&q){
+        document.getElementById('emptySearch').style.display='block';
+    } else {
+        filtered.forEach(t=>listEl.appendChild(buildCard(t,q)));
+    }
+}
+
+function buildCard(t, highlightQ){
+    const card=document.createElement('div');
+    const isMatch=highlightQ&&t.txnId.toLowerCase().includes(highlightQ);
+    card.className='txn-card'+(isMatch?' search-match':'');
+    card.id='card_'+t.txnId;
+
+    const k=typeKey(t.type);
+    const logo=typeLogo(t.type);
+    const label=typeLabel(t.type);
+    const eid=escH(t.txnId);
+    const euid=escH(t.userId);
+    const dt=fmtDT(t.date,t.time);
+    const amt=Number(t.amount);
+
+    // Transaction ID badge with optional highlight
+    let idBadgeClass='txn-id-badge';
+    let idBadgeContent=`TXN #${eid}`;
+    if(isMatch){
+        idBadgeClass='txn-id-badge highlighted';
+        const regex=new RegExp(`(${escRegex(highlightQ)})`, 'gi');
+        idBadgeContent='TXN #'+eid.replace(regex,'<mark>$1</mark>');
+    }
+
+    card.innerHTML=`
+    <div class="txn-card-inner ${k}">
+        <div class="txn-top">
+            <div class="type-logo-wrap">
+                <img src="${escH(logo)}" alt="${escH(label)}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-wallet\\'style=\\'color:var(--muted);font-size:16px\\'></i>'">
+            </div>
+            <div class="txn-info-col">
+                <div class="txn-type-label">${escH(label)}</div>
+                <div class="txn-uid">UID: ${euid}</div>
+            </div>
+            <div class="txn-amt"><span class="rupee">₹</span>${amt.toLocaleString()}</div>
+        </div>
+        <div class="txn-meta">
+            <span class="${idBadgeClass}">${idBadgeContent}</span>
+            <span class="txn-dt"><i class="fas fa-clock"></i> ${dt}</span>
+        </div>
+        <div class="txn-actions">
+            <button class="btn-approve" id="approve_${eid}" onclick="confirmAction('approve','${eid}','${escH(t.firebaseUid)}',${amt},'${escH(t.type)}')">
+                <i class="fas fa-check"></i> Approve
+            </button>
+            <button class="btn-reject" id="reject_${eid}" onclick="confirmAction('reject','${eid}','${escH(t.firebaseUid)}',${amt},'${escH(t.type)}')">
+                <i class="fas fa-times"></i> Reject
+            </button>
+        </div>
+    </div>`;
+    return card;
+}
+
+/* ── Search ── */
+function onSearch(val){
+    searchQuery=val.trim();
+    const clearBtn=document.getElementById('searchClear');
+    const hint=document.getElementById('searchHint');
+    if(searchQuery){
+        clearBtn.classList.add('visible');
+        hint.style.display='block';
+        document.getElementById('searchHintVal').textContent='#'+searchQuery;
+    } else {
+        clearBtn.classList.remove('visible');
+        hint.style.display='none';
+    }
+    renderAll();
+}
+function clearSearch(){
+    document.getElementById('searchInput').value='';
+    searchQuery='';
+    document.getElementById('searchClear').classList.remove('visible');
+    document.getElementById('searchHint').style.display='none';
+    renderAll();
+}
+
+/* ── Modal ── */
+function confirmAction(action, txnId, firebaseUid, amount, type){
+    _pa={action, txnId, firebaseUid, amount, type};
+    const ok=action==='approve';
+    document.getElementById('modalIcon').className='modal-top-icon '+(ok?'approve':'reject');
+    document.getElementById('modalIcon').textContent=ok?'✅':'❌';
+    document.getElementById('modalTitle').textContent=ok?'Approve Withdrawal':'Reject Withdrawal';
+
+    const label=typeLabel(type);
+    if(ok){
+        document.getElementById('modalBody').innerHTML=`Send <strong>₹${amount}</strong> via <strong>${escH(label)}</strong>?<br><small style="color:var(--muted);font-size:11.5px;">Push notification will be sent.</small>`;
+        // Show code input only for Amazon & Google Play
+        const showCode=needsCode(type);
+        document.getElementById('codeInputWrap').style.display=showCode?'block':'none';
+        document.getElementById('codeInput').value='';
+    } else {
+        document.getElementById('modalBody').innerHTML=`Reject this <strong>${escH(label)}</strong> withdrawal of <strong>₹${amount}</strong>?<br><small style="color:var(--muted);font-size:11.5px;">No amount will be transferred.</small>`;
+        document.getElementById('codeInputWrap').style.display='none';
+    }
+
+    const cb=document.getElementById('modalConfirmBtn');
+    cb.className='modal-confirm '+(ok?'approve':'reject');
+    cb.textContent=ok?'Yes, Approve':'Yes, Reject';
+    document.getElementById('confirmModal').classList.add('open');
+}
+
+function closeModal(){
+    document.getElementById('confirmModal').classList.remove('open');
+    _pa=null;
+}
+
+async function modalConfirm(){
+    if(!_pa)return;
+    const{action,txnId,firebaseUid,amount,type}=_pa;
+
+    // Validate code for Amazon/Google Play approve
+    if(action==='approve'&&needsCode(type)){
+        const code=document.getElementById('codeInput').value.trim();
+        if(!code){
+            toast('error','Code Required','Please enter the gift card redeem code.');
+            return;
+        }
+    }
+    closeModal();
+    if(action==='approve') await doApprove(txnId,firebaseUid,amount,type);
+    else await doReject(txnId,firebaseUid);
+}
+
+/* ── Approve ── */
+async function doApprove(txnId, firebaseUid, amount, type){
+    setBusy(txnId,true);
+    const code=(needsCode(type)?document.getElementById('codeInput')?.value?.trim():'')||'';
+    try{
+        // 1. Save status = credited + save code if present
+        await setTxnStatusAndCode(firebaseUid, txnId, 'credited', code);
+
+        // 2. Fetch fresh FCM token
+        const tokenSnap=await db.ref(`users/${firebaseUid}/fcmToken`).once('value');
+        const fcmToken=tokenSnap.val()||allTxns.find(t=>t.txnId===txnId)?.fcmToken||'';
+
+        // 3. Send push
+        if(fcmToken){
+            await sendWithdrawPush(fcmToken, amount, type);
+        } else {
+            toast('info','Note','Approved but no FCM token — push skipped.');
+        }
+
+        allTxns=allTxns.filter(t=>t.txnId!==txnId);
+        renderAll();
+        toast('success','Approved!',`₹${amount} withdrawal approved.`);
+    }catch(err){
+        toast('error','Error',err.message);
+        setBusy(txnId,false);
+    }
+}
+
+/* ── Reject ── */
+async function doReject(txnId, firebaseUid){
+    setBusy(txnId,true);
+    try{
+        await setTxnStatusAndCode(firebaseUid, txnId, 'rejected', '');
+        allTxns=allTxns.filter(t=>t.txnId!==txnId);
+        renderAll();
+        toast('info','Rejected','Withdrawal has been rejected.');
+    }catch(err){
+        toast('error','Error',err.message);
+        setBusy(txnId,false);
+    }
+}
+
+/* ── Firebase helpers ── */
+async function setTxnStatusAndCode(firebaseUid, txnId, status, code){
+    const snap=await db.ref(`users/${firebaseUid}/transactions`).once('value');
+    let found=false;
+    const updates={};
+    snap.forEach(child=>{
+        if(String(child.val().transactionId)===String(txnId)){
+            updates[`users/${firebaseUid}/transactions/${child.key}/status`]=status;
+            if(code) updates[`users/${firebaseUid}/transactions/${child.key}/redeemCode`]=code;
+            found=true;
+        }
+    });
+    if(!found) throw new Error('Transaction not found.');
+    await db.ref().update(updates);
+}
+
+/* ── Push notification ── */
+async function sendWithdrawPush(fcmToken, amount, type){
+    try{
+        const res=await fetch('/.netlify/functions/approveWithdraw',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({token:fcmToken, amount:Number(amount), type})
+        });
+        const data=await res.json().catch(()=>({}));
+        if(!res.ok){
+            console.warn('Push failed:',data);
+            toast('info','Push Warning','Approved but push notification failed.');
+        }
+    }catch(e){
+        console.warn('Push error:',e);
+    }
+}
+
+/* ── UI helpers ── */
+function setBusy(txnId, busy){
+    const a=document.getElementById('approve_'+txnId);
+    const r=document.getElementById('reject_'+txnId);
+    if(a){a.disabled=busy;a.innerHTML=busy?`<div class="btn-spin"></div> Wait…`:`<i class="fas fa-check"></i> Approve`;}
+    if(r){r.disabled=busy;r.innerHTML=busy?`<div class="btn-spin"></div>`:`<i class="fas fa-times"></i> Reject`;}
+}
+
+function fmtDT(date,time){
+    try{const dt=new Date(date+'T'+time);if(isNaN(dt))return`${date} ${time}`;return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+' · '+dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}catch{return`${date} ${time}`;}
+}
+
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function escRegex(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+
+function toast(type,title,msg){
+    const icons={success:'fas fa-check-circle',error:'fas fa-exclamation-circle',info:'fas fa-info-circle'};
+    const el=document.createElement('div');el.className=`toast ${type}`;
+    el.innerHTML=`<i class="toast-ico ${icons[type]||icons.info}"></i><div><div class="toast-t">${escH(title)}</div><div class="toast-m">${escH(msg)}</div></div>`;
+    document.getElementById('toastWrap').appendChild(el);
+    setTimeout(()=>el.remove(),3800);
+}
+
+document.getElementById('confirmModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+init();
+</script>
+</body>
+</html>
