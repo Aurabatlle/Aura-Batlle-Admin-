@@ -46,13 +46,20 @@ exports.handler = async function (event) {
                     title: 'Payment Successful',
                     body: `${amount} gold successfully credited to your wallet ✅`,
                 },
+                // BUG FIX: android.priority MUST be at the android level, NOT inside android.notification
+                // Previously "priority: HIGH" was inside android.notification which FCM silently ignores
+                // This caused messages to arrive at normal priority (no heads-up / no sound on Android)
                 android: {
+                    priority: 'HIGH',           // ← controls delivery priority (was missing at this level)
+                    ttl: '60s',                 // message expires after 60s if device offline
                     notification: {
                         sound: 'default',
-                        priority: 'HIGH',
                         channel_id: 'coin_add_channel',
+                        notification_priority: 'PRIORITY_HIGH',  // ← controls how notification displays
+                        visibility: 'PUBLIC',
+                        default_sound: true,
+                        default_vibrate_timings: true,
                     },
-                    priority: 'HIGH',
                 },
                 data: {
                     type: 'coin_add',
