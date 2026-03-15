@@ -567,14 +567,13 @@ async function doReject(txnId,firebaseUid){
         const refundId=String(Date.now());
         const pad=n=>String(n).padStart(2,'0');
         const refundDate=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-        const refundTime=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        const refundTime=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
         await db.ref(`users/${firebaseUid}/transactions/${refundId}`).set({
             transactionId:refundId,
             type:'Refund for Withdrawal',
             amount:amount,
             date:refundDate,
-            time:refundTime,
-            userId:txnEntry?.userId||firebaseUid
+            time:refundTime
         });
 
         const idx=pendingTxns.findIndex(t=>t.txnId===txnId);
