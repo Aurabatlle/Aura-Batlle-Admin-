@@ -36,8 +36,7 @@
         .nav-right{display:flex;align-items:center;gap:10px}
         .nav-admin{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--muted)}
         .nav-admin i{color:var(--red2);font-size:11px}
-        .btn-logout{padding:6px 12px;background:rgba(224,25,45,.12);border:1px solid rgba(224,25,45,.25);border-radius:8px;font-size:12px;font-weight:600;color:var(--red2);cursor:pointer;transition:background .2s;font-family:'DM Sans',sans-serif}
-        .btn-logout:hover{background:rgba(224,25,45,.22)}
+
 
         /* Page */
         .page{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:20px 14px 80px}
@@ -73,11 +72,11 @@
         .txn-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .txn-uid{font-size:11px;color:var(--muted);margin-top:1px}
         .txn-amt{display:flex;align-items:center;gap:5px;background:var(--gold-soft);border:1px solid rgba(245,200,66,.22);border-radius:10px;padding:5px 11px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--gold);flex-shrink:0}
-        .txn-amt i{font-size:12px}
-        .txn-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-        .txn-id-badge{font-size:10.5px;color:var(--muted);background:var(--surface2);border-radius:6px;padding:3px 8px;font-family:monospace;border:1px solid var(--border);transition:all .2s}
-        .txn-id-badge.highlighted{background:rgba(224,25,45,.18);border-color:rgba(224,25,45,.5);color:var(--red2);font-weight:700;font-size:11px}
-        .txn-id-badge.highlighted mark{background:rgba(224,25,45,.35);color:var(--red2);border-radius:2px;padding:0 1px}
+        .txn-amt img{width:16px;height:16px;object-fit:contain;flex-shrink:0}
+        .txn-meta{display:flex;flex-direction:column;gap:6px}
+        .txn-id-badge{display:block;width:100%;font-size:13px;color:var(--muted);background:var(--surface2);border-radius:9px;padding:8px 12px;font-family:monospace;border:1px solid var(--border);transition:all .2s;letter-spacing:.3px}
+        .txn-id-badge.highlighted{background:rgba(224,25,45,.14);border-color:rgba(224,25,45,.55);color:var(--red2);font-weight:700;font-size:15px;padding:11px 14px;border-radius:11px;box-shadow:0 0 0 3px rgba(224,25,45,.10),0 0 18px rgba(224,25,45,.12);letter-spacing:.5px}
+        .txn-id-badge.highlighted mark{background:rgba(224,25,45,.32);color:#ff6070;border-radius:3px;padding:1px 3px}
         .txn-dt{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:4px}
         .txn-dt i{font-size:10px;color:var(--red2)}
         .txn-actions{display:flex;gap:8px}
@@ -146,12 +145,10 @@
 
 <nav class="navbar">
     <a class="nav-brand" href="dashboard.html">
-        <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="" onerror="this.style.display='none'">
-        Aura<span class="brand-dot">·</span>Battle
+        <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle" onerror="this.style.display='none'">
     </a>
     <div class="nav-right">
         <div class="nav-admin"><i class="fas fa-shield-alt"></i><span id="navAdminName">Admin</span></div>
-        <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
 </nav>
 
@@ -297,7 +294,7 @@ function buildCard(t,highlightQ){
         idBadgeContent='#'+eid.replace(regex,'<mark>$1</mark>');
     }
 
-    card.innerHTML=`<div class="txn-card-inner"><div class="txn-top">${av}<div class="txn-info-col"><div class="txn-name">${ename}</div><div class="txn-uid">UID: ${euid}</div></div><div class="txn-amt"><i class="fas fa-coins"></i> ${amt.toLocaleString()}</div></div><div class="txn-meta"><span class="${idBadgeClass}">${idBadgeContent}</span><span class="txn-dt"><i class="fas fa-clock"></i> ${dt}</span></div><div class="txn-actions"><button class="btn-approve" id="approve_${eid}" onclick="confirmAction('approve','${eid}','${euid}',${amt},'${ename}')"><i class="fas fa-check"></i> Approve</button><button class="btn-reject" id="reject_${eid}" onclick="confirmAction('reject','${eid}','${euid}',${amt},'${ename}')"><i class="fas fa-times"></i> Reject</button></div></div>`;
+    card.innerHTML=`<div class="txn-card-inner"><div class="txn-top">${av}<div class="txn-info-col"><div class="txn-name">${ename}</div><div class="txn-uid">UID: ${euid}</div></div><div class="txn-amt"><img src="gold.png" alt="gold" onerror="this.style.display='none'"> ${amt.toLocaleString()}</div></div><div class="txn-meta"><span class="${idBadgeClass}">${idBadgeContent}</span><span class="txn-dt"><i class="fas fa-clock"></i> ${dt}</span></div><div class="txn-actions"><button class="btn-approve" id="approve_${eid}" onclick="confirmAction('approve','${eid}','${euid}',${amt},'${ename}')"><i class="fas fa-check"></i> Approve</button><button class="btn-reject" id="reject_${eid}" onclick="confirmAction('reject','${eid}','${euid}',${amt},'${ename}')"><i class="fas fa-times"></i> Reject</button></div></div>`;
     return card;
 }
 
@@ -352,14 +349,15 @@ async function doApprove(txnId,userId,amount){
         const snap=await wRef.once('value');
         await wRef.set((snap.val()||0)+Number(amount));
 
-        // FCM: get fcmToken from userMap (live data) — fallback to allTxns entry
-        const txnEntry=allTxns.find(t=>t.txnId===txnId);
-        const fcmToken=(userMap[userId]&&userMap[userId].fcmToken)||txnEntry?.fcmToken||'';
+        // FCM: always read fresh fcmToken from Firebase at approval time
+        // This ensures we never use a stale token from page-load cache
+        const tokenSnap=await db.ref(`users/${userId}/fcmToken`).once('value');
+        const fcmToken=tokenSnap.val()||(userMap[userId]&&userMap[userId].fcmToken)||'';
         if(fcmToken){
             await sendPush(fcmToken,amount);
         } else {
             console.warn('No FCM token for user',userId);
-            toast('info','Note','Approved but no FCM token found for push.');
+            toast('info','Note','Approved but no FCM token found — push skipped.');
         }
 
         allTxns=allTxns.filter(t=>t.txnId!==txnId);
