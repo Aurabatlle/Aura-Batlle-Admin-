@@ -118,6 +118,14 @@
         .btn-edit-code{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 11px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:'DM Sans',sans-serif;flex-shrink:0}
         .btn-edit-code:hover{background:var(--gold-soft);border-color:rgba(245,200,66,.3);color:var(--gold)}
 
+        /* UPI details box */
+        .upi-details-box{background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.3);border-radius:12px;padding:11px 14px;display:flex;flex-direction:column;gap:7px}
+        .upi-details-row{display:flex;align-items:center;gap:8px}
+        .upi-details-label{font-size:10.5px;color:rgba(76,175,80,.7);font-weight:700;letter-spacing:.8px;text-transform:uppercase;min-width:52px;flex-shrink:0}
+        .upi-details-val{font-family:monospace;font-size:13px;color:#4ade80;font-weight:700;flex:1;letter-spacing:.3px;word-break:break-all}
+        .btn-copy-upi{background:rgba(76,175,80,.15);border:1px solid rgba(76,175,80,.3);border-radius:7px;padding:5px 10px;font-size:11.5px;font-weight:700;color:#4ade80;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:'DM Sans',sans-serif;flex-shrink:0}
+        .btn-copy-upi:hover{background:rgba(76,175,80,.28)}
+
         /* Actions */
         .txn-actions{display:flex;gap:8px}
         .btn-approve,.btn-reject{flex:1;padding:10px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;touch-action:manipulation}
@@ -249,7 +257,7 @@
         <div class="txn-list" id="listApproved"></div>
         <div class="empty-state" id="emptyApproved" style="display:none">
             <div class="e-icon"><i class="fas fa-inbox" style="font-size:26px;color:var(--muted)"></i></div>
-            <h3>Nothing Here</h3><p>No approved or rejected withdrawals yet.</p>
+            <h3>Nothing Here</h3><p>No approved withdrawals yet.</p>
         </div>
         <div class="empty-state" id="emptyApprovedFilter" style="display:none">
             <div class="e-icon"><i class="fas fa-search" style="font-size:22px;color:var(--muted)"></i></div>
@@ -335,10 +343,12 @@ function loadAll(){
                     type:t.type,
                     status:t.status||'pending',
                     redeemCode:t.redeemCode||'',
+                    upiId:t.upiId||'',
+                    upiHolderName:t.upiHolderName||'',
                     fcmToken:user.fcmToken||''
                 };
                 if(t.status==='pending') pending.push(entry);
-                else if(t.status==='credited'||t.status==='rejected') approved.push(entry);
+                else if(t.status==='credited') approved.push(entry); // rejected NOT shown in approved tab
             });
         });
         const sortFn=(a,b)=>(b.date+'T'+b.time).localeCompare(a.date+'T'+a.time);
@@ -406,9 +416,20 @@ function buildCard(t,tab){
         idContent='TXN #'+eid.replace(new RegExp(`(${escRegex(searchQuery)})`,'gi'),'<mark>$1</mark>');
     }
 
-    // Status badge (approved tab)
+    // Status badge (approved tab — only credited shown here now)
     const statusBadge=tab==='approved'
-        ?`<span class="status-badge ${t.status==='credited'?'credited':'rejected'}">${t.status==='credited'?'✅ Approved':'❌ Rejected'}</span>`:'';
+        ?`<span class="status-badge credited">✅ Approved</span>`:'';
+
+    // UPI details box (pending + approved tabs, UPI type only)
+    let upiBox='';
+    if(t.type==='UPI Withdrawal'&&(t.upiId||t.upiHolderName)){
+        const safeUpiId=escH(t.upiId||'');
+        const safeName=escH(t.upiHolderName||'');
+        upiBox=`<div class="upi-details-box">
+            ${safeName?`<div class="upi-details-row"><span class="upi-details-label">Name</span><span class="upi-details-val">${safeName}</span></div>`:''}
+            ${safeUpiId?`<div class="upi-details-row"><span class="upi-details-label">UPI ID</span><span class="upi-details-val">${safeUpiId}</span><button class="btn-copy-upi" onclick="copyUpiId('${safeUpiId}',this)"><i class="fas fa-copy"></i> Copy</button></div>`:''}
+        </div>`;
+    }
 
     // Redeem code row
     let codeRow='';
@@ -441,6 +462,7 @@ function buildCard(t,tab){
                     ${statusBadge}
                 </div>
             </div>
+            ${upiBox}
             ${codeRow}
             ${actionBtns}
         </div>
@@ -536,6 +558,11 @@ async function doApprove(txnId,firebaseUid,amount,type){
     const code=needsCode(type)?(document.getElementById('codeInput')?.value?.trim()||''):'';
     try{
         await setTxnStatusAndCode(firebaseUid,txnId,'credited',code);
+
+        // Delete UPI details from Firebase after approve (UPI only)
+        if(type==='UPI Withdrawal'){
+            await deleteUpiDetails(firebaseUid,txnId);
+        }
         const tokenSnap=await db.ref(`users/${firebaseUid}/fcmToken`).once('value');
         const fcmToken=tokenSnap.val()||pendingTxns.find(t=>t.txnId===txnId)?.fcmToken||'';
         if(fcmToken) await sendWithdrawPush(fcmToken,amount,type);
@@ -556,6 +583,11 @@ async function doReject(txnId,firebaseUid){
 
         // 1. Mark original transaction as rejected
         await setTxnStatusAndCode(firebaseUid,txnId,'rejected','');
+
+        // Delete UPI details from Firebase after reject (UPI only)
+        if(txnEntry?.type==='UPI Withdrawal'){
+            await deleteUpiDetails(firebaseUid,txnId);
+        }
 
         // 2. Refund amount back to winningGold wallet
         const walletRef=db.ref(`users/${firebaseUid}/wallet/winningGold`);
@@ -617,6 +649,21 @@ async function setTxnStatusAndCode(firebaseUid,txnId,status,code){
     await db.ref().update(updates);
 }
 
+/* ── Delete UPI details from transaction after approve/reject ── */
+async function deleteUpiDetails(firebaseUid,txnId){
+    try{
+        const snap=await db.ref(`users/${firebaseUid}/transactions`).once('value');
+        const updates={};
+        snap.forEach(child=>{
+            if(String(child.val().transactionId)===String(txnId)){
+                updates[`users/${firebaseUid}/transactions/${child.key}/upiId`]=null;
+                updates[`users/${firebaseUid}/transactions/${child.key}/upiHolderName`]=null;
+            }
+        });
+        if(Object.keys(updates).length>0) await db.ref().update(updates);
+    }catch(e){console.warn('Could not delete UPI details:',e);}
+}
+
 /* ── Push ── */
 async function sendWithdrawPush(fcmToken,amount,type){
     try{
@@ -627,6 +674,23 @@ async function sendWithdrawPush(fcmToken,amount,type){
         const data=await res.json().catch(()=>({}));
         if(!res.ok){console.warn('Push failed:',data);toast('info','Push Warning','Approved but push notification failed.');}
     }catch(e){console.warn('Push error:',e);}
+}
+
+/* ── Copy UPI ID ── */
+function copyUpiId(upiId,btn){
+    navigator.clipboard.writeText(upiId).then(()=>{
+        const orig=btn.innerHTML;
+        btn.innerHTML='<i class="fas fa-check"></i> Copied';
+        btn.style.background='rgba(34,197,94,.25)';
+        setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},2000);
+    }).catch(()=>{
+        // fallback for older browsers
+        const ta=document.createElement('textarea');
+        ta.value=upiId;ta.style.position='fixed';ta.style.opacity='0';
+        document.body.appendChild(ta);ta.select();document.execCommand('copy');
+        document.body.removeChild(ta);
+        toast('success','Copied','UPI ID copied to clipboard.');
+    });
 }
 
 /* ── UI helpers ── */
