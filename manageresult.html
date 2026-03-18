@@ -134,7 +134,10 @@
         .btn-set-result:hover { box-shadow: 0 6px 22px rgba(230,57,70,.38); }
         .btn-set-result:active { transform: scale(.97); }
         /* Locked button for completed — cannot edit */
-        .btn-locked { width: 100%; padding: 13px 10px; border-radius: 12px; border: 1px solid var(--border); font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface2); color: var(--muted); }
+        .btn-locked { width: 100%; padding: 13px 10px; border-radius: 12px; border: 1px solid var(--border); font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface2); color: var(--muted); margin-bottom: 8px; }
+        .btn-delete-match { width: 100%; padding: 11px 10px; border-radius: 12px; border: 1px solid rgba(230,57,70,.25); font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(230,57,70,.08); color: var(--red); transition: background .2s; }
+        .btn-delete-match:hover { background: rgba(230,57,70,.15); }
+        .btn-delete-match:active { transform: scale(.97); }
 
         /* ── Bottom Sheet ── */
         .sh-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(4px); z-index: 400; align-items: flex-end; justify-content: center; }
@@ -490,6 +493,9 @@
             ${resultHtml}
             <div class="mc-actions">
                 <div class="btn-locked"><i class="fas fa-lock"></i>&nbsp; Result Already Set — Cannot Edit</div>
+                <button class="btn-delete-match" onclick="deleteCompletedMatch('${m._key}','${esc(m.title||m.matchId||m._key)}')">
+                    <i class="fas fa-trash-alt"></i> Delete Match
+                </button>
             </div>
             <div style="height:14px"></div>
         </div>`;
@@ -705,14 +711,39 @@
             updates[`matches/${m._key}/roomPassword`]  = null;
 
             await db.ref().update(updates);
+
+            // ── Delete joined player/team data after result is saved ──────────
+            // Solo: delete matches/{id}/players
+            // Multi: delete matches/{id}/teams
+            if (multi) {
+                await db.ref(`matches/${m._key}/teams`).remove();
+            } else {
+                await db.ref(`matches/${m._key}/players`).remove();
+            }
+
             hideLoader();
-            showToast('Result set! Prizes credited.','success');
+            showToast('Result set! Prizes credited. Player data cleaned up.','success');
             closeSheet();
             setTimeout(() => loadAll(), 700);
         } catch(e) {
             hideLoader();
             shMsg('Failed to submit result. Try again.','error');
         } finally { setShBtn(false); }
+    };
+
+    /* ── Delete completed match (admin only) ── */
+    window.deleteCompletedMatch = async function(matchKey, title) {
+        if (!confirm(`Delete completed match "${title}"?\n\nThis permanently removes all match data. This cannot be undone.`)) return;
+        showLoader('Deleting match...');
+        try {
+            await db.ref('matches').child(matchKey).remove();
+            hideLoader();
+            showToast('Match deleted.', 'success');
+            loadAll();
+        } catch(e) {
+            hideLoader();
+            showToast('Delete failed: ' + e.message, 'error');
+        }
     };
 
     /* ── Helpers ── */
