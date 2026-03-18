@@ -602,22 +602,43 @@ const _cfg = JSON.parse(atob('eyJhcGlLZXkiOiJBSXphU3lEN3BBc2RZcWtKekRiU3NpOHhiTH
 firebase.initializeApp(_cfg);
 const db = firebase.database();
 
-// ── Session (stored as 'a_sess' separate from hosters) ──────────────────────
-const SESS='a_sess', TTL=120*60*1000; // 2 hours
-function getSession(){ try{ const r=localStorage.getItem(SESS); if(!r) return null; const s=JSON.parse(atob(r)); if(Date.now()-s.t>TTL){clearSession();return null;} return s; }catch(_){clearSession();return null;} }
-function setSession(id,username){ localStorage.setItem(SESS,btoa(JSON.stringify({id,username,t:Date.now()}))); }
-function clearSession(){ localStorage.removeItem(SESS); }
+// ── Session — matches index.html exactly ─────────────────────────────────────
+const SESSION_MS = 30 * 60 * 1000; // 30 minutes (same as login page)
+
+function getSession(){
+    const key  = localStorage.getItem('adminUsername');
+    const time = parseInt(localStorage.getItem('loginTime') || '0');
+    if(!key || (Date.now() - time) >= SESSION_MS){ clearSession(); return null; }
+    return {
+        id:          key,
+        username:    localStorage.getItem('adminDisplayName') || key,
+        role:        localStorage.getItem('adminRole')  || '',
+        email:       localStorage.getItem('adminEmail') || ''
+    };
+}
+function refreshSession(){
+    // Bump loginTime on every activity so session stays alive while active
+    if(localStorage.getItem('adminUsername')) localStorage.setItem('loginTime', Date.now().toString());
+}
+function clearSession(){
+    ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime'].forEach(k=>localStorage.removeItem(k));
+}
 
 // ── Auth guard ───────────────────────────────────────────────────────────────
 const sess = getSession();
-if(!sess){ window.location.href='admin-login.html'; }
+if(!sess){ window.location.href='index.html'; }
 else {
+    // Verify admin still exists in DB
     db.ref('admins').child(sess.id).once('value').then(snap=>{
-        if(!snap.exists()){ clearSession(); window.location.href='admin-login.html'; return; }
+        if(!snap.exists()){ clearSession(); window.location.href='index.html'; return; }
         const d = snap.val();
-        setSession(sess.id, d.username);
-        initDashboard(sess.id, d.username);
-    }).catch(()=>{ initDashboard(sess.id, sess.username); });
+        // Update display name in case it changed
+        localStorage.setItem('adminDisplayName', d.username || sess.id);
+        initDashboard(sess.id, d.username || sess.id);
+    }).catch(()=>{
+        // DB unreachable — use cached session
+        initDashboard(sess.id, sess.username);
+    });
 }
 
 function initDashboard(adminId, username){
@@ -939,7 +960,7 @@ window.saveProfile = async function(){
     btn.disabled=true; btn.textContent='Saving...';
     try {
         await db.ref('admins').child(window._aid).update({username:u});
-        setSession(window._aid, u);
+        localStorage.setItem('adminDisplayName', u);
         document.getElementById('greetName').textContent=u;
         document.getElementById('dName').textContent=u;
         sheetMsg('settingsMsg','✅ Username updated!','success');
@@ -966,7 +987,7 @@ window.changePassword = async function(){
     finally { btn.disabled=false; btn.textContent='Update Password'; }
 };
 
-window.doLogout = function(){ clearSession(); window.location.href='admin-login.html'; };
+window.doLogout = function(){ clearSession(); window.location.href='index.html'; };
 
 // ── Drawer & Sheets ───────────────────────────────────────────────────────────
 document.getElementById('avatarBtn').addEventListener('click',()=>{
@@ -999,8 +1020,10 @@ function sheetMsg(id,text,type){
     _st[id]=setTimeout(()=>el.style.display='none',5000);
 }
 
-// Auto session refresh
-setInterval(()=>{ if(!getSession()){ clearSession(); window.location.href='admin-login.html'; } }, 60000);
+// Session expiry check + refresh on activity
+setInterval(()=>{ if(!getSession()){ clearSession(); window.location.href='index.html'; } }, 30000);
+document.addEventListener('click', refreshSession);
+document.addEventListener('keypress', refreshSession);
 
 })();
 </script>
