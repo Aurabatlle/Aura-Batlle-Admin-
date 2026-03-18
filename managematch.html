@@ -797,7 +797,9 @@ window.saveRoomDetails = async function(){
     try {
         await db.ref('matches/'+matchId).update({ roomId, roomPassword: roomPwd });
         sheetMsg('roomMsg','✅ Saved! Notifying players…','success');
-        await sendNotification(matchId, 'room_details');
+        // Pass updated roomId/roomPassword inline — notify.js won't need to re-fetch
+        const matchData = { ...(allMatches[matchId] || {}), roomId, roomPassword: roomPwd };
+        await sendNotification(matchId, 'room_details', null, matchData);
         sheetMsg('roomMsg','✅ Saved & Players notified!','success');
         setTimeout(() => closeSheet('roomSheet'), 1800);
     } catch(e){ sheetMsg('roomMsg','Error: '+e.message,'error'); }
@@ -900,8 +902,9 @@ window.confirmStart = async function(){
     const btn = document.getElementById('confirmStartBtn');
     btn.disabled = true; btn.textContent = 'Starting…';
     try {
+        const matchData = allMatches[matchId] || null;
         await db.ref('matches/'+matchId).update({ status: 'ongoing' });
-        await sendNotification(matchId, 'match_started');
+        await sendNotification(matchId, 'match_started', null, matchData);
         closeSheet('startSheet');
         toast('🔥 Match started! Players notified.', 'success');
     } catch(e){ toast('Error: '+e.message,'error'); }
@@ -972,7 +975,10 @@ window.confirmCancel = async function(){
             }
         }
 
-        await sendNotification(matchId, 'match_cancelled', reason);
+        // Send notification BEFORE deleting — pass matchData inline so
+        // notify.js reads players/teams from the payload, not Firebase.
+        // (By the time notify.js runs on Netlify, the match may be gone.)
+        await sendNotification(matchId, 'match_cancelled', reason, match);
 
         // DELETE entire match node from database after notify + refund
         await db.ref('matches/'+matchId).remove();
@@ -995,19 +1001,29 @@ This removes ALL match data from the database. No refunds will be issued.`)) ret
 };
 
 // ── Notification sender ───────────────────────────────────────────────────────
-// Calls the Netlify notify function directly (FCM push only — no Firebase write).
-async function sendNotification(matchId, type, reason){
+// Passes matchData inline so notify.js never re-fetches from Firebase.
+// This prevents the race condition where the match is deleted before
+// the Netlify function can read it (especially for match_cancelled).
+async function sendNotification(matchId, type, reason, matchData){
     try {
+        const payload = { matchId, type, ...(reason ? { reason } : {}) };
+
+        // Inline the match fields notify.js needs to build the notification text.
+        // If matchData is provided (always pass it!), notify.js skips its own fetch.
+        if (matchData) {
+            payload.matchTitle    = matchData.title        || '';
+            payload.roomId        = matchData.roomId       || '';
+            payload.roomPassword  = matchData.roomPassword || '';
+            // Inline player/team data so notify.js can collect FCM tokens
+            // without a second Firebase read that might race with .remove()
+            if (matchData.players) payload.players = matchData.players;
+            if (matchData.teams)   payload.teams   = matchData.teams;
+        }
+
         const res = await fetch('/.netlify/functions/notify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                matchId,
-                type,
-                sender:  'admin',
-                adminId: adminSess ? adminSess.id : '',
-                ...(reason ? { reason } : {})
-            })
+            body: JSON.stringify(payload)
         });
         const data = await res.json();
         console.log(`[Admin] FCM notified ${data.sent||0} players`);
