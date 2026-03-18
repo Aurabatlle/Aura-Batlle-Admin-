@@ -8,76 +8,66 @@ async function firebaseGet(path, dbUrl) {
 }
 
 // ── FCM send (single token) ───────────────────────────────────────────────────
-async function sendOne(accessToken, projectId, token, title, body, data = {}) {
+async function sendOne(accessToken, projectId, token, title, body, data = {}, channelId = 'high_importance_channel') {
+  const fcmBody = {
+    message: {
+      token,
+      notification: { title, body },
+      data: {
+        ...Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
+        title,
+        body
+      },
+      android: {
+        priority: 'HIGH',
+        notification: {
+          sound:                 'default',
+          channel_id:            channelId,
+          click_action:          'FLUTTER_NOTIFICATION_CLICK',
+          notification_priority: 'PRIORITY_HIGH',
+          visibility:            'PUBLIC'
+        }
+      }
+    }
+  };
+
   const res = await fetch(
     `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
     {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: {
-          token,
-          // Required: triggers system tray in ALL app states (foreground/background/killed)
-          notification: { title, body },
-          // Also in data so Flutter onBackgroundMessage can read when notification is null
-          data: {
-            ...Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
-            title,
-            body
-          },
-          android: {
-            priority: 'HIGH',
-            notification: {
-              sound: 'default',
-              channel_id: 'match_alerts',   // must match your Flutter app's channel id
-              click_action: 'FLUTTER_NOTIFICATION_CLICK',
-              notification_priority: 'PRIORITY_HIGH',
-              visibility: 'PUBLIC'
-            }
-          }
-        }
-      })
+      headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(fcmBody)
     }
   );
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => '(unreadable)');
-    console.error(`[FCM] FAILED token=...${token.slice(-8)} status=${res.status} err=${errText}`);
-    return false;
+  const responseText = await res.text();
+  let responseJson;
+  try { responseJson = JSON.parse(responseText); } catch (_) { responseJson = null; }
+
+  if (!res.ok || (responseJson && responseJson.error)) {
+    console.error(`[FCM] FAILED token=...${token.slice(-8)} status=${res.status} body=${responseText}`);
+    return { ok: false, status: res.status, response: responseJson || responseText };
   }
-  const json = await res.json().catch(() => null);
-  if (json && json.error) {
-    console.warn(`[FCM] ERROR token=...${token.slice(-8)} code=${json.error.code} msg=${json.error.message}`);
-    return false;
-  }
-  return true;
+
+  console.log(`[FCM] OK token=...${token.slice(-8)} messageId=${responseJson?.name}`);
+  return { ok: true, status: res.status, response: responseJson };
 }
 
-// ── Collect userIds from match data (solo + team) ─────────────────────────────
+// ── Collect userIds from match data ───────────────────────────────────────────
 function collectUserIds(match) {
   const ids = new Set();
-
   if (match.players && typeof match.players === 'object') {
-    Object.values(match.players).forEach(p => {
-      if (p && p.userId) ids.add(p.userId);
-    });
+    Object.values(match.players).forEach(p => { if (p && p.userId) ids.add(p.userId); });
   }
-
   if (match.teams && typeof match.teams === 'object') {
     Object.values(match.teams).forEach(team => {
       if (!team) return;
       if (team.leaderId) ids.add(team.leaderId);
       if (team.members && typeof team.members === 'object') {
-        Object.keys(team.members).forEach(uid => {
-          if (!/^p\d+$/.test(uid)) ids.add(uid);
-        });
+        Object.keys(team.members).forEach(uid => { if (!/^p\d+$/.test(uid)) ids.add(uid); });
       }
     });
   }
-
   return [...ids];
 }
 
@@ -110,75 +100,7 @@ exports.handler = async (event) => {
     const SERVICE_ACCOUNT = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
     const DB_URL          = process.env.FIREBASE_DB_URL;
 
-    // ── Match data ────────────────────────────────────────────────────────────
-    // Use inline data from payload if provided (avoids race condition where the
-    // match is deleted before this function can fetch it — e.g. match_cancelled).
-    // Fall back to Firebase fetch only if not provided.
-    let match;
-    const hasInlineData = payload.players !== undefined || payload.teams !== undefined;
-
-    if (hasInlineData) {
-      // Reconstruct match object from inlined payload fields
-      match = {
-        title:        payload.matchTitle    || '',
-        roomId:       payload.roomId        || '',
-        roomPassword: payload.roomPassword  || '',
-        players:      payload.players       || null,
-        teams:        payload.teams         || null,
-      };
-      console.log(`[notify] Using inline match data for matchId=${matchId}`);
-    } else {
-      // Legacy path: fetch from Firebase (hoster page doesn't inline data)
-      match = await firebaseGet(`matches/${matchId}`, DB_URL);
-      if (!match)
-        return { statusCode: 404, headers, body: JSON.stringify({ error: 'Match not found: ' + matchId }) };
-      console.log(`[notify] Fetched match from Firebase for matchId=${matchId}`);
-    }
-
-    // ── result_pending: status-only, no push ──────────────────────────────────
-    if (type === 'result_pending') {
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true, statusUpdated: 'result_pending' }) };
-    }
-
-    // ── Build notification text ───────────────────────────────────────────────
-    let title, body;
-    if (type === 'room_details') {
-      title = `Room Ready - Match #${matchId}`;
-      body  = `Room ID: ${match.roomId || '-'}  Password: ${match.roomPassword || '-'}`;
-    } else if (type === 'match_started') {
-      title = `Match #${matchId} is LIVE!`;
-      body  = `${match.title || 'Your match'} has started. Join the room now!`;
-    } else if (type === 'match_cancelled') {
-      title = `Match #${matchId} Cancelled`;
-      body  = reason ? `Reason: ${reason}` : 'The match has been cancelled.';
-    } else {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown type: ' + type }) };
-    }
-
-    // ── Collect userIds ───────────────────────────────────────────────────────
-    const userIds = collectUserIds(match);
-    if (userIds.length === 0)
-      return { statusCode: 200, headers, body: JSON.stringify({ sent: 0, message: 'No players found in match data.' }) };
-
-    // ── Fetch FCM tokens from Firebase ────────────────────────────────────────
-    // We still need to read /users/{uid}/fcmToken — this is always safe because
-    // user records are never deleted when a match is cancelled.
-    const tokenResults = await Promise.allSettled(
-      userIds.map(async (uid) => {
-        const user = await firebaseGet(`users/${uid}`, DB_URL);
-        if (user && user.fcmToken && user.status !== 'banned') return user.fcmToken;
-        return null;
-      })
-    );
-
-    const fcmTokens = tokenResults
-      .filter(r => r.status === 'fulfilled' && r.value)
-      .map(r => r.value);
-
-    if (fcmTokens.length === 0)
-      return { statusCode: 200, headers, body: JSON.stringify({ sent: 0, message: 'No FCM tokens found.' }) };
-
-    // ── Get FCM OAuth token ───────────────────────────────────────────────────
+    // ── Get OAuth access token ────────────────────────────────────────────────
     const auth = new GoogleAuth({
       credentials: SERVICE_ACCOUNT,
       scopes: ['https://www.googleapis.com/auth/firebase.messaging']
@@ -188,21 +110,98 @@ exports.handler = async (event) => {
     const accessToken = tokenData.token;
     const projectId   = SERVICE_ACCOUNT.project_id;
 
-    // ── Send to all tokens ────────────────────────────────────────────────────
+    // ── Channel id (test panel can override to find the right one) ────────────
+    const channelId = payload._testChannelId || 'high_importance_channel';
+
+    // ── result_pending: no push needed ────────────────────────────────────────
+    if (type === 'result_pending') {
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, statusUpdated: 'result_pending' }) };
+    }
+
+    // ── Build notification text ───────────────────────────────────────────────
+    const matchTitle    = payload.matchTitle    || '';
+    const roomId        = payload.roomId        || '';
+    const roomPassword  = payload.roomPassword  || '';
+
+    let title, body;
+    if (type === 'room_details') {
+      title = `Room Ready - Match #${matchId}`;
+      body  = `Room ID: ${roomId || '-'}  Password: ${roomPassword || '-'}`;
+    } else if (type === 'match_started') {
+      title = `Match #${matchId} is LIVE!`;
+      body  = `${matchTitle || 'Your match'} has started. Join the room now!`;
+    } else if (type === 'match_cancelled') {
+      title = `Match #${matchId} Cancelled`;
+      body  = reason ? `Reason: ${reason}` : 'The match has been cancelled.';
+    } else {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown type: ' + type }) };
+    }
+
+    // ── Collect FCM tokens ────────────────────────────────────────────────────
+    let fcmTokens = [];
+
+    // Test mode: use the injected token directly, skip all Firebase reads
+    if (payload._testToken) {
+      console.log(`[notify] TEST MODE — using injected token`);
+      fcmTokens = [payload._testToken];
+    } else {
+      // Production: get userIds from inline payload data (avoids race with match deletion)
+      // or fall back to fetching match from Firebase (hoster page path)
+      let match;
+      const hasInlineData = payload.players !== undefined || payload.teams !== undefined;
+
+      if (hasInlineData) {
+        match = { players: payload.players || null, teams: payload.teams || null };
+        console.log(`[notify] Using inline match data matchId=${matchId}`);
+      } else {
+        match = await firebaseGet(`matches/${matchId}`, DB_URL);
+        if (!match)
+          return { statusCode: 404, headers, body: JSON.stringify({ error: 'Match not found: ' + matchId }) };
+        console.log(`[notify] Fetched match from Firebase matchId=${matchId}`);
+      }
+
+      const userIds = collectUserIds(match);
+      console.log(`[notify] userIds found: ${userIds.length} → ${JSON.stringify(userIds)}`);
+
+      if (userIds.length === 0)
+        return { statusCode: 200, headers, body: JSON.stringify({ sent: 0, message: 'No players found in match data.' }) };
+
+      // Fetch FCM tokens from /users — safe even after match deletion
+      const tokenResults = await Promise.allSettled(
+        userIds.map(async (uid) => {
+          const user = await firebaseGet(`users/${uid}`, DB_URL);
+          console.log(`[notify] uid=${uid} fcmToken=${user?.fcmToken ? 'found' : 'MISSING'} status=${user?.status}`);
+          if (user && user.fcmToken && user.status !== 'banned') return user.fcmToken;
+          return null;
+        })
+      );
+
+      fcmTokens = tokenResults
+        .filter(r => r.status === 'fulfilled' && r.value)
+        .map(r => r.value);
+    }
+
+    console.log(`[notify] fcmTokens to send: ${fcmTokens.length}`);
+
+    if (fcmTokens.length === 0)
+      return { statusCode: 200, headers, body: JSON.stringify({ sent: 0, message: 'No FCM tokens found.' }) };
+
+    // ── Send to all ───────────────────────────────────────────────────────────
     const notifData = { matchId: String(matchId), type };
     const results = await Promise.allSettled(
-      fcmTokens.map(token => sendOne(accessToken, projectId, token, title, body, notifData))
+      fcmTokens.map(token => sendOne(accessToken, projectId, token, title, body, notifData, channelId))
     );
 
-    const sent   = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
-    const failed = results.length - sent;
+    const sent        = results.filter(r => r.status === 'fulfilled' && r.value?.ok === true).length;
+    const failed      = results.length - sent;
+    const fcmResponse = results[0]?.value?.response || null;
 
-    console.log(`[notify] matchId=${matchId} type=${type} users=${userIds.length} tokens=${fcmTokens.length} sent=${sent} failed=${failed}`);
+    console.log(`[notify] matchId=${matchId} type=${type} tokens=${fcmTokens.length} sent=${sent} failed=${failed}`);
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ success: true, sent, failed, total: fcmTokens.length, userIds: userIds.length })
+      body: JSON.stringify({ success: true, sent, failed, total: fcmTokens.length, fcmResponse })
     };
 
   } catch (err) {
