@@ -2,589 +2,335 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Battle - Maintenance Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maintenance — Aura Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --danger: #e63946;
-            --warning: #fca311;
-            --gray: #6c757d;
-            --white: #ffffff;
+            --red:#e63946; --red-dark:#b5202d;
+            --green:#22c55e; --green-dark:#16a34a;
+            --orange:#f97316;
+            --bg:#0d0d0f; --surface:#141418; --surface2:#1a1a1f; --surface3:#1f1f25;
+            --border:rgba(255,255,255,0.07); --border-red:rgba(230,57,70,0.2);
+            --text:#f0f0f2; --dim:#9898a8; --muted:#5a5a68;
         }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 15px;
-        }
-        
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-        
-        .header {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .logo img {
-            height: 35px;
-            margin-right: 12px;
-        }
-        
-        .logo h1 {
-            font-size: 18px;
-            color: var(--dark);
-            text-align: center;
-        }
-        
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .user-info span {
-            font-weight: 500;
-            color: var(--dark);
-            font-size: 14px;
-        }
-        
-        .logout-btn {
-            background: var(--danger);
-            color: var(--white);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .dashboard {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
-        .card-icon {
-            width: 35px;
-            height: 35px;
-            background: var(--primary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-            font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: var(--dark);
-            font-size: 14px;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            color: var(--dark);
-            background: var(--white);
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background: var(--secondary);
-        }
-        
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: var(--success);
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        
-        .alert {
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            display: none;
-            font-size: 14px;
-        }
-        
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-active {
-            background: var(--success);
-            color: var(--white);
-        }
-        
-        .status-inactive {
-            background: var(--gray);
-            color: var(--white);
-        }
-        
-        .current-config {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 15px;
-            font-size: 13px;
-        }
-        
-        .config-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .config-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .loader {
-            display: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-            margin: 0 auto;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .access-denied {
-            text-align: center;
-            padding: 30px 20px;
-            background: var(--white);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .access-denied i {
-            font-size: 40px;
-            color: var(--danger);
-            margin-bottom: 15px;
-        }
-        
-        .access-denied h2 {
-            font-size: 18px;
-            color: var(--dark);
-            margin-bottom: 10px;
-        }
-        
-        .access-denied p {
-            font-size: 14px;
-            color: var(--gray);
-            margin-bottom: 20px;
-        }
+        html,body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
+        body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(230,57,70,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(230,57,70,0.025) 1px,transparent 1px); background-size:44px 44px; pointer-events:none; z-index:0; }
+
+        /* ── Header ── */
+        .header { position:sticky; top:0; z-index:200; display:flex; align-items:center; gap:12px; padding:13px 18px; background:rgba(13,13,15,0.94); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+        .back-btn { width:34px; height:34px; border-radius:9px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; text-decoration:none; color:var(--dim); font-size:14px; flex-shrink:0; }
+        .h-logo { width:30px; height:30px; border-radius:8px; background:rgba(230,57,70,0.12); border:1px solid rgba(230,57,70,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .h-logo i { color:var(--red); font-size:13px; }
+        .h-title { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; flex:1; }
+        .h-title span { color:var(--red); }
+
+        /* ── Main ── */
+        .main { padding:20px 16px; max-width:560px; margin:0 auto; position:relative; z-index:1; padding-bottom:40px; display:flex; flex-direction:column; gap:16px; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── Status card ── */
+        .status-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; overflow:hidden; animation:fadeUp .3s ease both; }
+        .status-stripe { height:4px; transition:background .5s; }
+        .status-stripe.on  { background:linear-gradient(90deg,var(--red-dark),var(--red)); animation:pulse-stripe 2s ease-in-out infinite; }
+        .status-stripe.off { background:linear-gradient(90deg,var(--green-dark),var(--green)); }
+        @keyframes pulse-stripe { 0%,100%{opacity:.7} 50%{opacity:1} }
+
+        .status-body { padding:24px 20px 20px; display:flex; align-items:center; gap:18px; }
+        .status-icon { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; transition:background .4s,border .4s; }
+        .status-icon.on  { background:rgba(230,57,70,.12); border:1px solid rgba(230,57,70,.3); }
+        .status-icon.off { background:rgba(34,197,94,.12);  border:1px solid rgba(34,197,94,.3); }
+        .status-info { flex:1; }
+        .status-label { font-size:11px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+        .status-state { font-family:'Rajdhani',sans-serif; font-size:26px; font-weight:700; letter-spacing:1px; transition:color .4s; }
+        .status-state.on  { color:var(--red); }
+        .status-state.off { color:var(--green); }
+        .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; vertical-align:middle; transition:background .4s; }
+        .status-dot.on  { background:var(--red); animation:blink 1s ease-in-out infinite; }
+        .status-dot.off { background:var(--green); }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+        /* ── Toggle switch ── */
+        .toggle-wrap { padding:0 20px 20px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border); padding-top:16px; }
+        .toggle-label { font-size:13px; color:var(--dim); }
+        .toggle-label strong { display:block; font-size:14px; color:var(--text); font-weight:600; margin-bottom:2px; }
+        .toggle { position:relative; width:52px; height:28px; flex-shrink:0; }
+        .toggle input { opacity:0; width:0; height:0; position:absolute; }
+        .toggle-slider { position:absolute; inset:0; background:var(--surface3); border:1px solid var(--border); border-radius:34px; cursor:pointer; transition:background .3s,border .3s; }
+        .toggle-slider::before { content:''; position:absolute; width:20px; height:20px; left:3px; top:3px; border-radius:50%; background:var(--muted); transition:transform .3s,background .3s; }
+        .toggle input:checked + .toggle-slider { background:rgba(230,57,70,.2); border-color:rgba(230,57,70,.5); }
+        .toggle input:checked + .toggle-slider::before { transform:translateX(24px); background:var(--red); }
+        .toggle input:disabled + .toggle-slider { opacity:.5; cursor:not-allowed; }
+
+        /* ── Message card ── */
+        .msg-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:20px; animation:fadeUp .3s ease .1s both; }
+        .card-title { font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; color:var(--red); letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .msg-textarea { width:100%; min-height:90px; padding:13px 14px; background:var(--bg); border:1px solid var(--border); border-radius:12px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; line-height:1.6; resize:vertical; transition:border-color .2s; }
+        .msg-textarea:focus { outline:none; border-color:rgba(230,57,70,.5); box-shadow:0 0 0 3px rgba(230,57,70,.08); }
+        .msg-textarea::placeholder { color:var(--muted); font-size:13px; }
+        .msg-hint { font-size:11px; color:var(--muted); margin-top:7px; line-height:1.5; }
+
+        /* ── Admin key card ── */
+        .key-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:20px; animation:fadeUp .3s ease .15s both; }
+        .key-input-wrap { display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:0 14px; transition:border-color .2s; }
+        .key-input-wrap:focus-within { border-color:rgba(230,57,70,.5); box-shadow:0 0 0 3px rgba(230,57,70,.08); }
+        .key-input-wrap i { color:var(--muted); font-size:12px; flex-shrink:0; }
+        .key-input { flex:1; background:none; border:none; outline:none; color:var(--text); font-size:15px; font-family:'DM Sans',sans-serif; padding:13px 0; letter-spacing:3px; }
+        .key-input::placeholder { letter-spacing:0; font-size:13px; color:var(--muted); }
+        .key-toggle { background:none; border:none; color:var(--muted); cursor:pointer; padding:4px; font-size:13px; transition:color .2s; }
+        .key-toggle:hover { color:var(--text); }
+        .key-hint { font-size:11px; color:var(--muted); margin-top:7px; }
+
+        /* ── Save button ── */
+        .save-btn { width:100%; padding:15px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--red),var(--red-dark)); color:#fff; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; box-shadow:0 4px 20px rgba(230,57,70,.3); transition:opacity .2s,transform .1s; display:flex; align-items:center; justify-content:center; gap:8px; animation:fadeUp .3s ease .2s both; }
+        .save-btn:active { transform:scale(.98); }
+        .save-btn:disabled { opacity:.45; cursor:not-allowed; box-shadow:none; }
+
+        /* ── Preview card ── */
+        .preview-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:20px; animation:fadeUp .3s ease .25s both; }
+        .preview-banner { background:linear-gradient(135deg,#1a0a0a,#2d0d0d); border:1px solid rgba(230,57,70,.25); border-radius:14px; padding:24px 20px; text-align:center; position:relative; overflow:hidden; }
+        .preview-banner::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(230,57,70,.03) 10px,rgba(230,57,70,.03) 20px); }
+        .preview-icon { font-size:36px; margin-bottom:10px; }
+        .preview-title { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; color:var(--red); letter-spacing:1px; margin-bottom:8px; }
+        .preview-msg { font-size:13px; color:var(--dim); line-height:1.6; max-width:300px; margin:0 auto; word-break:break-word; }
+
+        /* ── Toast ── */
+        .toast { position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:11px 18px; font-size:13px; z-index:999; opacity:0; transition:all .28s; pointer-events:none; white-space:nowrap; max-width:88vw; text-align:center; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .toast.error   { border-color:rgba(230,57,70,.45); color:#ff8a91; }
+        .toast.success { border-color:rgba(34,197,94,.45); color:#4ade80; }
+        .toast.info    { border-color:rgba(230,57,70,.35); color:#ff8a91; }
+
+        /* ── Skeleton ── */
+        .sk-block { background:var(--surface2); border-radius:8px; animation:skpulse 1.5s ease infinite; }
+        @keyframes skpulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
     </style>
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Database -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">
-                <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo">
-                <h1>Aura Battle - Maintenance Mode</h1>
+
+<div class="header">
+    <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <div class="h-logo"><i class="fas fa-tools"></i></div>
+    <div class="h-title">Maintenance <span>Mode</span></div>
+</div>
+
+<div class="main">
+
+    <!-- ── Status Card ── -->
+    <div class="status-card" id="statusCard">
+        <div class="status-stripe off" id="statusStripe"></div>
+        <div class="status-body">
+            <div class="status-icon off" id="statusIcon">
+                <i class="fas fa-check-circle" id="statusIconI"></i>
             </div>
-            <div class="user-info">
-                <span id="adminUsername">Loading...</span>
-                <span id="adminRole"></span>
-                <button class="logout-btn" id="logoutBtn">Logout</button>
-            </div>
-        </div>
-        
-        <div id="accessDenied" class="access-denied" style="display: none;">
-            <i class="fas fa-exclamation-circle"></i>
-            <h2>Access Denied</h2>
-            <p>You don't have permission to access this page.</p>
-            <button class="btn btn-primary" id="goBackBtn">Go Back to Login</button>
-        </div>
-        
-        <div id="adminContent" style="display: none;">
-            <div class="alert alert-danger" id="errorMessage"></div>
-            <div class="alert alert-success" id="successMessage"></div>
-            
-            <div class="dashboard">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Maintenance Mode</div>
-                        <div class="card-icon">
-                            <i class="fas fa-tools"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="toggle-container">
-                        <label class="switch">
-                            <input type="checkbox" id="maintenanceToggle">
-                            <span class="slider"></span>
-                        </label>
-                        <span id="maintenanceStatus">Inactive</span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="maintenanceMessage">Maintenance Message</label>
-                        <textarea class="form-control" id="maintenanceMessage" rows="3" placeholder="Message shown during maintenance"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="adminKey">Admin Key</label>
-                        <input type="text" class="form-control" id="adminKey" placeholder="Secret key for admin access">
-                    </div>
-                    
-                    <button class="btn btn-primary" id="saveMaintenanceConfig">
-                        <span>Save Maintenance Configuration</span>
-                        <div class="loader" id="saveLoader"></div>
-                    </button>
-                    
-                    <div class="current-config" id="currentMaintenanceConfig">
-                        <h4>Current Configuration:</h4>
-                        <div class="config-item">
-                            <span>Status:</span>
-                            <span id="currentMaintenanceStatus" class="status-badge status-inactive">Inactive</span>
-                        </div>
-                        <div class="config-item">
-                            <span>Message:</span>
-                            <span id="currentMaintenanceMessage">Not set</span>
-                        </div>
-                        <div class="config-item">
-                            <span>Admin Key:</span>
-                            <span id="currentAdminKey">Not set</span>
-                        </div>
-                    </div>
+            <div class="status-info">
+                <div class="status-label">Current Status</div>
+                <div class="status-state off" id="statusState">
+                    <span class="status-dot off" id="statusDot"></span>App Online
                 </div>
             </div>
         </div>
+        <div class="toggle-wrap">
+            <div class="toggle-label">
+                <strong>Maintenance Mode</strong>
+                Toggle to take the app offline for all users
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="mainToggle" onchange="onToggleChange()">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
     </div>
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-            authDomain: "aura-battle-main.firebaseapp.com",
-            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-            projectId: "aura-battle-main",
-            storageBucket: "aura-battle-main.firebasestorage.app",
-            messagingSenderId: "763779990289",
-            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
-            measurementId: "G-ZZXZ00HK07"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // DOM Elements
-        const adminUsername = document.getElementById('adminUsername');
-        const adminRole = document.getElementById('adminRole');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const accessDenied = document.getElementById('accessDenied');
-        const adminContent = document.getElementById('adminContent');
-        const goBackBtn = document.getElementById('goBackBtn');
-        
-        // Maintenance Config Elements
-        const maintenanceToggle = document.getElementById('maintenanceToggle');
-        const maintenanceStatus = document.getElementById('maintenanceStatus');
-        const maintenanceMessage = document.getElementById('maintenanceMessage');
-        const adminKey = document.getElementById('adminKey');
-        const saveMaintenanceConfig = document.getElementById('saveMaintenanceConfig');
-        const saveLoader = document.getElementById('saveLoader');
-        const currentMaintenanceStatus = document.getElementById('currentMaintenanceStatus');
-        const currentMaintenanceMessage = document.getElementById('currentMaintenanceMessage');
-        const currentAdminKey = document.getElementById('currentAdminKey');
-        
-        // Check authentication and authorization
-        window.addEventListener('DOMContentLoaded', () => {
-            const adminUser = localStorage.getItem('adminUsername');
-            const adminEmail = localStorage.getItem('adminEmail');
-            const adminRoleValue = localStorage.getItem('adminRole');
-            const loginTime = localStorage.getItem('loginTime');
-            const currentTime = new Date().getTime();
-            
-            // Redirect to login if not authenticated or session expired
-            if (!adminUser || !adminRoleValue || !loginTime || (currentTime - parseInt(loginTime)) > 3600000) {
-                localStorage.clear();
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // Set username and role
-            adminUsername.textContent = adminUser;
-            adminRole.textContent = `(${adminRoleValue})`;
-            
-            // Verify user against database
-            verifyAdminAccess(adminEmail);
+    <!-- ── Message Card ── -->
+    <div class="msg-card">
+        <div class="card-title"><i class="fas fa-comment-alt"></i> Maintenance Message</div>
+        <textarea class="msg-textarea" id="mainMsg" placeholder="e.g. We're upgrading our servers. Back soon!" maxlength="300" oninput="updatePreview()"></textarea>
+        <div class="msg-hint">This message is shown to users when maintenance mode is ON.</div>
+    </div>
+
+    <!-- ── Admin Key Card ── -->
+    <div class="key-card">
+        <div class="card-title"><i class="fas fa-key"></i> Admin Key</div>
+        <div class="key-input-wrap">
+            <i class="fas fa-lock"></i>
+            <input class="key-input" type="password" id="adminKey" placeholder="Enter admin key" autocomplete="off" maxlength="32">
+            <button class="key-toggle" onclick="toggleKeyVis()" id="keyToggleBtn"><i class="fas fa-eye" id="keyEyeIcon"></i></button>
+        </div>
+        <div class="key-hint">Stored in Firebase as <code style="color:var(--red);font-size:10px">maintenanceConfig/adminKey</code></div>
+    </div>
+
+    <!-- ── Save Button ── -->
+    <button class="save-btn" id="saveBtn" onclick="saveConfig()">
+        <i class="fas fa-save"></i> Save Configuration
+    </button>
+
+    <!-- ── Live Preview ── -->
+    <div class="preview-card">
+        <div class="card-title"><i class="fas fa-eye"></i> User Preview</div>
+        <div class="preview-banner" id="previewBanner">
+            <div class="preview-icon">🔧</div>
+            <div class="preview-title">Under Maintenance</div>
+            <div class="preview-msg" id="previewMsg">Loading message...</div>
+        </div>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ── XOR decode ────────────────────────────────────────────────────────────────
+const _k = 'aB3xQ9mZ';
+const _e = (s,k) => s.split('').map((c,i) => String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+
+const _cfg = {
+    a: "\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+    b: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+    c: "\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+    d: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+    e: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+    f: "\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+    g: "\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
+};
+
+// ── Firebase init ─────────────────────────────────────────────────────────────
+if(!firebase.apps.length) firebase.initializeApp({
+    apiKey:            _e(_cfg.a,_k),
+    authDomain:        _e(_cfg.b,_k),
+    databaseURL:       _e(_cfg.c,_k),
+    projectId:         _e(_cfg.d,_k),
+    storageBucket:     _e(_cfg.e,_k),
+    messagingSenderId: _e(_cfg.f,_k),
+    appId:             _e(_cfg.g,_k)
+});
+const db = firebase.database();
+
+// ── Admin session check ───────────────────────────────────────────────────────
+const SESSION_MS = 30 * 60 * 1000;
+const _adminSess = (function(){
+    const key  = localStorage.getItem('adminUsername');
+    const time = parseInt(localStorage.getItem('loginTime') || '0');
+    if(!key || (Date.now()-time) >= SESSION_MS) return null;
+    return { id: key };
+})();
+if(!_adminSess){ window.location.href = 'index.html'; }
+
+// ── Load config from Firebase ─────────────────────────────────────────────────
+db.ref('maintenanceConfig').on('value', snap => {
+    const cfg = snap.val() || {};
+    const active  = cfg.maintenanceActive === true;
+    const message = cfg.maintenanceMessage || '';
+    const key     = cfg.adminKey || '';
+
+    // Update toggle
+    const toggle = document.getElementById('mainToggle');
+    toggle.checked = active;
+
+    // Update message textarea
+    document.getElementById('mainMsg').value = message;
+
+    // Update admin key field
+    document.getElementById('adminKey').value = key;
+
+    // Update status UI
+    updateStatusUI(active);
+
+    // Update preview
+    updatePreview();
+});
+
+// ── Status UI update ──────────────────────────────────────────────────────────
+function updateStatusUI(active){
+    const stripe  = document.getElementById('statusStripe');
+    const icon    = document.getElementById('statusIcon');
+    const iconI   = document.getElementById('statusIconI');
+    const state   = document.getElementById('statusState');
+    const dot     = document.getElementById('statusDot');
+
+    if(active){
+        stripe.className  = 'status-stripe on';
+        icon.className    = 'status-icon on';
+        iconI.className   = 'fas fa-tools';
+        state.className   = 'status-state on';
+        dot.className     = 'status-dot on';
+        state.innerHTML   = '<span class="status-dot on"></span>Maintenance ON';
+    } else {
+        stripe.className  = 'status-stripe off';
+        icon.className    = 'status-icon off';
+        iconI.className   = 'fas fa-check-circle';
+        state.className   = 'status-state off';
+        dot.className     = 'status-dot off';
+        state.innerHTML   = '<span class="status-dot off"></span>App Online';
+    }
+}
+
+// ── Toggle change (visual only — not saved until Save is clicked) ─────────────
+window.onToggleChange = function(){
+    const active = document.getElementById('mainToggle').checked;
+    updateStatusUI(active);
+};
+
+// ── Live preview update ───────────────────────────────────────────────────────
+window.updatePreview = function(){
+    const msg = document.getElementById('mainMsg').value.trim();
+    document.getElementById('previewMsg').textContent = msg || 'No message set yet.';
+};
+
+// ── Save config ───────────────────────────────────────────────────────────────
+window.saveConfig = async function(){
+    const active  = document.getElementById('mainToggle').checked;
+    const message = document.getElementById('mainMsg').value.trim();
+    const key     = document.getElementById('adminKey').value.trim();
+
+    if(!message){ toast('Please enter a maintenance message.','error'); return; }
+
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+    try {
+        await db.ref('maintenanceConfig').update({
+            maintenanceActive:  active,
+            maintenanceMessage: message,
+            adminKey:           key
         });
-        
-        // Verify admin access against database
-        function verifyAdminAccess(email) {
-            database.ref('admins').orderByChild('email').equalTo(email).once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        // User exists in database, grant access
-                        adminContent.style.display = 'block';
-                        accessDenied.style.display = 'none';
-                        loadMaintenanceConfig();
-                    } else {
-                        // User doesn't exist in database, deny access
-                        adminContent.style.display = 'none';
-                        accessDenied.style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    showError('Error verifying access: ' + error.message);
-                    adminContent.style.display = 'none';
-                    accessDenied.style.display = 'block';
-                });
-        }
-        
-        // Load Maintenance Configuration
-        function loadMaintenanceConfig() {
-            database.ref('maintenanceConfig').once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const config = snapshot.val();
-                        maintenanceToggle.checked = config.maintenanceActive || false;
-                        maintenanceStatus.textContent = config.maintenanceActive ? 'Active' : 'Inactive';
-                        maintenanceMessage.value = config.maintenanceMessage || '';
-                        adminKey.value = config.adminKey || '';
-                        
-                        // Update current config display
-                        currentMaintenanceStatus.textContent = config.maintenanceActive ? 'Active' : 'Inactive';
-                        currentMaintenanceStatus.className = config.maintenanceActive ? 'status-badge status-active' : 'status-badge status-inactive';
-                        currentMaintenanceMessage.textContent = config.maintenanceMessage || 'Not set';
-                        currentAdminKey.textContent = config.adminKey ? '••••••••' : 'Not set';
-                    }
-                })
-                .catch(error => {
-                    showError('Error loading maintenance configuration: ' + error.message);
-                });
-        }
-        
-        // Save Maintenance Configuration
-        saveMaintenanceConfig.addEventListener('click', () => {
-            const config = {
-                maintenanceActive: maintenanceToggle.checked,
-                maintenanceMessage: maintenanceMessage.value,
-                adminKey: adminKey.value
-            };
-            
-            // Show loading state
-            saveMaintenanceConfig.querySelector('span').textContent = 'Saving...';
-            saveLoader.style.display = 'block';
-            saveMaintenanceConfig.disabled = true;
-            
-            database.ref('maintenanceConfig').set(config)
-                .then(() => {
-                    showSuccess('Maintenance configuration saved successfully!');
-                    loadMaintenanceConfig(); // Reload to show current values
-                })
-                .catch(error => {
-                    showError('Error saving maintenance configuration: ' + error.message);
-                })
-                .finally(() => {
-                    // Reset button state
-                    saveMaintenanceConfig.querySelector('span').textContent = 'Save Maintenance Configuration';
-                    saveLoader.style.display = 'none';
-                    saveMaintenanceConfig.disabled = false;
-                });
-        });
-        
-        // Maintenance toggle change
-        maintenanceToggle.addEventListener('change', () => {
-            maintenanceStatus.textContent = maintenanceToggle.checked ? 'Active' : 'Inactive';
-        });
-        
-        // Logout
-        logoutBtn.addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        });
-        
-        // Go back to login
-        goBackBtn.addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        });
-        
-        // Helper functions for showing messages
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 5000);
-        }
-        
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 3000);
-        }
-    </script>
+        toast(active ? '🔧 Maintenance mode is now ON.' : '✅ App is back Online.', 'success');
+    } catch(e){
+        toast('Error: ' + e.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Save Configuration';
+    }
+};
+
+// ── Toggle admin key visibility ───────────────────────────────────────────────
+window.toggleKeyVis = function(){
+    const inp  = document.getElementById('adminKey');
+    const icon = document.getElementById('keyEyeIcon');
+    const show = inp.type === 'password';
+    inp.type   = show ? 'text' : 'password';
+    icon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let _tt;
+function toast(msg, type){
+    clearTimeout(_tt);
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.className = 'toast ' + type + ' show';
+    _tt = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+})();
+</script>
 </body>
 </html>
