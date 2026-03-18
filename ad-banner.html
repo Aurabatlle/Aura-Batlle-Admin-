@@ -21,22 +21,6 @@
         html,body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
         body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(139,92,246,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.02) 1px,transparent 1px); background-size:44px 44px; pointer-events:none; z-index:0; }
 
-        /* ── Gate screen ── */
-        #gateScreen { position:fixed; inset:0; background:var(--bg); z-index:999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:20px; }
-        .gate-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:36px 32px; width:100%; max-width:340px; text-align:center; }
-        .gate-icon { width:56px; height:56px; border-radius:14px; background:rgba(139,92,246,.12); border:1px solid rgba(139,92,246,.3); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
-        .gate-icon i { color:var(--purple); font-size:22px; }
-        .gate-title { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:700; letter-spacing:1px; margin-bottom:6px; }
-        .gate-sub { font-size:12px; color:var(--muted); margin-bottom:24px; }
-        .gate-input-wrap { display:flex; align-items:center; gap:10px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0 14px; margin-bottom:14px; transition:border-color .2s; }
-        .gate-input-wrap:focus-within { border-color:rgba(139,92,246,.5); box-shadow:0 0 0 3px rgba(139,92,246,.08); }
-        .gate-input-wrap i { color:var(--muted); font-size:13px; }
-        .gate-input { flex:1; background:none; border:none; outline:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:22px; font-weight:600; letter-spacing:8px; padding:14px 0; text-align:center; width:80px; }
-        .gate-input::placeholder { font-size:14px; letter-spacing:2px; color:var(--muted); }
-        .gate-btn { width:100%; padding:13px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--purple),#6d28d9); color:#fff; font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:opacity .2s; }
-        .gate-btn:hover { opacity:.88; }
-        .gate-err { font-size:12px; color:#ff8a91; margin-top:6px; display:none; }
-
         /* ── Header ── */
         .header { position:sticky; top:0; z-index:200; display:flex; align-items:center; gap:12px; padding:13px 18px; background:rgba(13,13,15,0.94); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
         .back-btn { width:34px; height:34px; border-radius:9px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; text-decoration:none; color:var(--dim); font-size:14px; flex-shrink:0; }
@@ -147,23 +131,7 @@
 </head>
 <body>
 
-<!-- ── Gate Screen ── -->
-<div id="gateScreen">
-    <div class="gate-card">
-        <div class="gate-icon"><i class="fas fa-shield-alt"></i></div>
-        <div class="gate-title">Access Required</div>
-        <div class="gate-sub">Enter your 2-digit admin key</div>
-        <div class="gate-input-wrap">
-            <i class="fas fa-key"></i>
-            <input class="gate-input" type="password" id="gateInput" maxlength="2" placeholder="••" inputmode="numeric" autocomplete="off">
-        </div>
-        <div class="gate-err" id="gateErr">Incorrect key. Try again.</div>
-        <button class="gate-btn" onclick="checkGate()"><i class="fas fa-unlock"></i> Unlock</button>
-    </div>
-</div>
-
-<!-- ── Main App (hidden until gate passes) ── -->
-<div id="appContent" style="display:none">
+<div id="appContent">
 
 <div class="header">
     <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
@@ -213,7 +181,7 @@
     </div>
 </div>
 
-</div><!-- /appContent -->
+</div>
 
 <!-- ── Edit Sheet ── -->
 <div class="sh-overlay" id="editSheet">
@@ -279,9 +247,6 @@
 const _k = 'aB3xQ9mZ';
 const _e = (s,k) => s.split('').map((c,i) => String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
 
-// ── Gate key (2-digit: "47") ──────────────────────────────────────────────────
-const _gk = "\x55\x75"; // XOR-encoded "47"
-
 // ── ImgBB API key (encoded) ───────────────────────────────────────────────────
 const _ik = "\x00\x75\x57\x1b\x37\x5b\x5c\x3e\x52\x73\x50\x1e\x60\x00\x5b\x6b\x51\x70\x07\x1b\x68\x5d\x0e\x39\x57\x72\x0b\x1b\x32\x09\x08\x6e";
 
@@ -296,56 +261,20 @@ const _cfg = {
     g: "\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
 };
 
-// ── Gate check ────────────────────────────────────────────────────────────────
 const SESSION_MS = 30 * 60 * 1000;
 
-function checkGate(){
-    const val = document.getElementById('gateInput').value.trim();
-    if(val === _e(_gk, _k)){
-        sessionStorage.setItem('ab_gate', Date.now().toString());
-        document.getElementById('gateScreen').style.display = 'none';
-        document.getElementById('appContent').style.display = 'block';
-        initApp();
-    } else {
-        const err = document.getElementById('gateErr');
-        err.style.display = 'block';
-        document.getElementById('gateInput').value = '';
-        setTimeout(() => err.style.display = 'none', 3000);
-    }
-}
-
-document.getElementById('gateInput').addEventListener('keypress', e => {
-    if(e.key === 'Enter') checkGate();
-});
-
-// Auto-unlock if gate was passed recently (same session)
-(function(){
-    const t = parseInt(sessionStorage.getItem('ab_gate') || '0');
-    if(Date.now() - t < SESSION_MS){
-        document.getElementById('gateScreen').style.display = 'none';
-        document.getElementById('appContent').style.display = 'block';
-        initApp();
-    }
-})();
-
 // ── Firebase init ─────────────────────────────────────────────────────────────
-let db;
-function initApp(){
-    if(!db){
-        const cfg = {
-            apiKey:            _e(_cfg.a,_k),
-            authDomain:        _e(_cfg.b,_k),
-            databaseURL:       _e(_cfg.c,_k),
-            projectId:         _e(_cfg.d,_k),
-            storageBucket:     _e(_cfg.e,_k),
-            messagingSenderId: _e(_cfg.f,_k),
-            appId:             _e(_cfg.g,_k)
-        };
-        if(!firebase.apps.length) firebase.initializeApp(cfg);
-        db = firebase.database();
-    }
-    loadBanners();
-}
+const _fcfg = {
+    apiKey:            _e(_cfg.a,_k),
+    authDomain:        _e(_cfg.b,_k),
+    databaseURL:       _e(_cfg.c,_k),
+    projectId:         _e(_cfg.d,_k),
+    storageBucket:     _e(_cfg.e,_k),
+    messagingSenderId: _e(_cfg.f,_k),
+    appId:             _e(_cfg.g,_k)
+};
+if(!firebase.apps.length) firebase.initializeApp(_fcfg);
+const db = firebase.database();
 
 // ── Admin session check ───────────────────────────────────────────────────────
 const adminSess = (function(){
@@ -355,6 +284,8 @@ const adminSess = (function(){
     return { id: key };
 })();
 if(!adminSess){ window.location.href = 'index.html'; }
+
+loadBanners();
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let _deleteKey = null;
