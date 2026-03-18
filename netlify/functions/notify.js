@@ -30,46 +30,78 @@ async function sendOne(accessToken, projectId, token, title, body, data = {}) {
       body: JSON.stringify({
         message: {
           token,
+
+          // FIX 1: Top-level notification block is required so Android shows
+          // the notification in ALL app states (foreground/background/killed).
           notification: { title, body },
-          data: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
+
+          // FIX 2: Also put title+body in data payload so Flutter's
+          // onBackgroundMessage / onMessageOpenedApp can read them when
+          // RemoteMessage.notification is null (app was killed).
+          data: {
+            ...Object.fromEntries(
+              Object.entries(data).map(([k, v]) => [k, String(v)])
+            ),
+            title,
+            body
+          },
+
           android: {
-            priority: 'high',
-            notification: { sound: 'default', click_action: 'FLUTTER_NOTIFICATION_CLICK' }
+            // FIX 3: FCM HTTP v1 expects uppercase "HIGH"
+            priority: 'HIGH',
+
+            notification: {
+              sound: 'default',
+
+              // FIX 4: channel_id must match the channel your Flutter app
+              // creates. Change 'match_alerts' to your actual channel id.
+              channel_id: 'match_alerts',
+
+              click_action: 'FLUTTER_NOTIFICATION_CLICK',
+
+              // FIX 5: Heads-up priority so notification pops up on screen
+              notification_priority: 'PRIORITY_HIGH',
+              visibility: 'PUBLIC'
+            }
           }
         }
       })
     }
   );
-  return res.ok;
+
+  // FIX 6: Log full FCM error body — res.ok only checks HTTP 200, not the
+  // FCM-level error (e.g. UNREGISTERED / INVALID_ARGUMENT inside a 200).
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '(unreadable)');
+    console.error(`[FCM] FAILED token=...${token.slice(-8)} status=${res.status} err=${errText}`);
+    return false;
+  }
+
+  const json = await res.json().catch(() => null);
+  if (json && json.error) {
+    console.warn(`[FCM] ERROR token=...${token.slice(-8)} code=${json.error.code} msg=${json.error.message}`);
+    return false;
+  }
+
+  return true;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Collect all real userIds from a match — works for BOTH Solo AND Team modes
-//
-// Solo:  match.players = { userId: { userId, inGameName } }
-//        → every userId value
-//
-// Multi: match.teams = { teamKey: { leaderId, teamName, members: { uid: IGN } } }
-//        → leaderId from every team
-//        → every uid KEY in members that is NOT a placeholder (p2, p3, p4…)
 // ─────────────────────────────────────────────────────────────────────────────
 function collectUserIds(match) {
   const ids = new Set();
 
-  // Solo players
   if (match.players && typeof match.players === 'object') {
     Object.values(match.players).forEach(p => {
       if (p && p.userId) ids.add(p.userId);
     });
   }
 
-  // Team players (Duo / Squad / 6v6)
   if (match.teams && typeof match.teams === 'object') {
     Object.values(match.teams).forEach(team => {
       if (!team) return;
-      // Always add the leader
       if (team.leaderId) ids.add(team.leaderId);
-      // Add real user uid keys from members (skip p2, p3, p4, p5, p6 placeholders)
       if (team.members && typeof team.members === 'object') {
         Object.keys(team.members).forEach(uid => {
           if (!/^p\d+$/.test(uid)) ids.add(uid);
@@ -109,54 +141,52 @@ exports.handler = async (event) => {
     const SERVICE_ACCOUNT = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
     const DB_URL          = process.env.FIREBASE_DB_URL;
 
-    // Fetch match
     const match = await firebaseGet(`matches/${matchId}`, DB_URL);
     if (!match)
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Match not found: ' + matchId }) };
 
-    // result_pending — just update status, no push needed
     if (type === 'result_pending') {
       await firebasePatch(`matches/${matchId}`, DB_URL, { status: 'result_pending' });
       return { statusCode: 200, headers, body: JSON.stringify({ success: true, statusUpdated: 'result_pending' }) };
     }
 
-    // Build notification text
+    // FIX 7: Removed emojis from title/body — some Android versions/OEMs
+    // silently drop notifications with emoji in the title string.
     let title, body;
     if (type === 'room_details') {
-      title = `🔑 Room Ready — Match #${matchId}`;
-      body  = `Room ID: ${match.roomId || '—'}   Password: ${match.roomPassword || '—'}`;
+      title = `Room Ready - Match #${matchId}`;
+      body  = `Room ID: ${match.roomId || '-'}   Password: ${match.roomPassword || '-'}`;
     } else if (type === 'match_started') {
-      title = `🔴 Match #${matchId} is LIVE!`;
+      title = `Match #${matchId} is LIVE!`;
       body  = `${match.title || 'Your match'} has started. Join the room now!`;
     } else if (type === 'match_cancelled') {
-      title = `❌ Match #${matchId} Cancelled`;
+      title = `Match #${matchId} Cancelled`;
       body  = reason ? `Reason: ${reason}` : 'The match has been cancelled.';
     } else {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown type: ' + type }) };
     }
 
-    // Collect all userIds from BOTH players (solo) and teams (multi)
     const userIds = collectUserIds(match);
     if (userIds.length === 0)
       return { statusCode: 200, headers, body: JSON.stringify({ sent: 0, message: 'No players joined yet.' }) };
 
-    // Fetch FCM tokens
-    const fcmTokens = [];
-    await Promise.all(
+    // FIX 8: Use Promise.allSettled for token fetch to avoid race conditions
+    // from concurrent async pushes into the shared fcmTokens array.
+    const tokenResults = await Promise.allSettled(
       userIds.map(async (uid) => {
-        try {
-          const user = await firebaseGet(`users/${uid}`, DB_URL);
-          if (user && user.fcmToken && user.status !== 'banned') {
-            fcmTokens.push(user.fcmToken);
-          }
-        } catch (_) {}
+        const user = await firebaseGet(`users/${uid}`, DB_URL);
+        if (user && user.fcmToken && user.status !== 'banned') return user.fcmToken;
+        return null;
       })
     );
+
+    const fcmTokens = tokenResults
+      .filter(r => r.status === 'fulfilled' && r.value)
+      .map(r => r.value);
 
     if (fcmTokens.length === 0)
       return { statusCode: 200, headers, body: JSON.stringify({ sent: 0, message: 'No FCM tokens found.' }) };
 
-    // Get FCM access token
     const auth = new GoogleAuth({
       credentials: SERVICE_ACCOUNT,
       scopes: ['https://www.googleapis.com/auth/firebase.messaging']
@@ -166,7 +196,6 @@ exports.handler = async (event) => {
     const accessToken = tokenData.token;
     const projectId   = SERVICE_ACCOUNT.project_id;
 
-    // Send to all
     const notifData = { matchId: String(matchId), type };
     const results = await Promise.allSettled(
       fcmTokens.map(token => sendOne(accessToken, projectId, token, title, body, notifData))
