@@ -202,9 +202,6 @@
 <div class="tab-bar">
     <div class="tab active" id="tab-upcoming" onclick="switchTab('upcoming')">⏳ Upcoming<span class="tab-badge" id="badge-upcoming">0</span></div>
     <div class="tab" id="tab-ongoing"   onclick="switchTab('ongoing')">🔴 Live<span class="tab-badge" id="badge-ongoing">0</span></div>
-    <div class="tab" id="tab-result_pending" onclick="switchTab('result_pending')">🏁 Pending<span class="tab-badge" id="badge-result_pending">0</span></div>
-    <div class="tab" id="tab-completed" onclick="switchTab('completed')">✅ Done<span class="tab-badge" id="badge-completed">0</span></div>
-    <div class="tab" id="tab-cancelled" onclick="switchTab('cancelled')">❌ Cancelled<span class="tab-badge" id="badge-cancelled">0</span></div>
 </div>
 
 <div class="main">
@@ -213,9 +210,6 @@
     </div>
     <div class="tab-content active" id="content-upcoming"><div id="list-upcoming"><div class="skeleton"></div><div class="skeleton"></div></div></div>
     <div class="tab-content" id="content-ongoing"><div id="list-ongoing"><div class="skeleton"></div></div></div>
-    <div class="tab-content" id="content-result_pending"><div id="list-result_pending"></div></div>
-    <div class="tab-content" id="content-completed"><div id="list-completed"></div></div>
-    <div class="tab-content" id="content-cancelled"><div id="list-cancelled"></div></div>
 </div>
 
 <!-- ══ Edit Match Sheet ══ -->
@@ -460,7 +454,7 @@ db.ref('matches').on('value', snap => {
 });
 
 function updateBadges(){
-    const counts = { upcoming:0, ongoing:0, result_pending:0, completed:0, cancelled:0 };
+    const counts = { upcoming:0, ongoing:0 };
     Object.values(allMatches).forEach(m => {
         if(counts[m.status] !== undefined) counts[m.status]++;
     });
@@ -477,7 +471,7 @@ function applySearch(){
 window.applySearch = applySearch;
 
 function renderAll(){
-    const tabs = ['upcoming','ongoing','result_pending','completed','cancelled'];
+    const tabs = ['upcoming','ongoing'];
     tabs.forEach(tab => {
         let matches = Object.values(allMatches).filter(m => m.status === tab);
 
@@ -505,7 +499,7 @@ function renderAll(){
         if(!el) return;
 
         if(!matches.length){
-            const labels = {upcoming:'No upcoming matches',ongoing:'No live matches',result_pending:'No pending results',completed:'No completed matches',cancelled:'No cancelled matches'};
+            const labels = {upcoming:'No upcoming matches',ongoing:'No live matches'};
             el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">${labels[tab]||'No matches'}</div></div>`;
             return;
         }
@@ -557,6 +551,8 @@ function buildCard(m){
         actionBtns += `<button class="mc-btn btn-end" onclick="openEndSheet('${m.matchId}')"><i class="fas fa-flag-checkered"></i> End</button>`;
         actionBtns += `<button class="mc-btn btn-cancel" onclick="openCancelSheet('${m.matchId}')"><i class="fas fa-times"></i> Cancel</button>`;
     }
+    // Admin-only delete button — always visible
+    actionBtns += `<button class="mc-btn" style="background:rgba(230,57,70,.15);color:var(--red);border:1px solid rgba(230,57,70,.3);" onclick="deleteMatch('${m.matchId}','${esc(m.title||'')}')"><i class="fas fa-trash-alt"></i> Delete</button>`;
 
     return `
     <div class="match-card" id="card-${m.matchId}">
@@ -846,16 +842,52 @@ window.confirmCancel = async function(){
         }
 
         await sendNotification(matchId, 'match_cancelled', reason);
+
+        // DELETE entire match node from database after notify + refund
+        await db.ref('matches/'+matchId).remove();
+
         closeSheet('cancelSheet');
-        toast(isFree ? 'Match cancelled. Players notified.' : 'Match cancelled. Entry fees refunded. ✅', 'info');
+        toast(isFree ? 'Match cancelled & deleted. Players notified.' : 'Match cancelled, fees refunded & data deleted. ✅', 'info');
     } catch(e){ toast('Error: '+e.message,'error'); }
     finally { btn.disabled = false; btn.textContent = 'Cancel Match'; }
 };
 
-// ── Notification sender (admin version — separate from hoster notify) ─────────
-// Sends FCM push via Netlify function, same endpoint as hostmatch.html
-// but tagged with sender: 'admin' so server logs can distinguish
+// ── Delete match (admin hard delete — no refund, no notify) ───────────────────
+window.deleteMatch = async function(matchId, title){
+    if(!confirm(`Permanently delete match "${title||matchId}"?
+
+This removes ALL match data from the database. No refunds will be issued.`)) return;
+    try {
+        await db.ref('matches/'+matchId).remove();
+        toast('🗑️ Match deleted permanently.', 'success');
+    } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+// ── Notification sender ───────────────────────────────────────────────────────
+// Writes a notification record to Firebase under /notifications/{matchId}
+// Your Android app listens to this node via FCM data messages or a Firestore
+// trigger. The Netlify notify function reads FCM tokens from /users/{uid}/fcmToken
+// and sends the push. Falls back to direct DB write if Netlify is unavailable.
 async function sendNotification(matchId, type, reason){
+    // 1. Write notification record to Firebase (picked up by Cloud Function / app)
+    try {
+        const now = new Date();
+        const pad = n => String(n).padStart(2,'0');
+        await db.ref('notifications/'+matchId).set({
+            matchId,
+            type,
+            sender:    'admin',
+            adminId:   adminSess ? adminSess.id : '',
+            reason:    reason || '',
+            timestamp: Date.now(),
+            date: `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`,
+            time: `${pad(now.getHours())}:${pad(now.getMinutes())}`
+        });
+    } catch(e){
+        console.warn('[Admin] DB notification write failed:', e.message);
+    }
+
+    // 2. Also call Netlify function if available (FCM push)
     try {
         const res = await fetch('/.netlify/functions/notify', {
             method: 'POST',
@@ -863,15 +895,15 @@ async function sendNotification(matchId, type, reason){
             body: JSON.stringify({
                 matchId,
                 type,
-                sender: 'admin',                          // ← NEW: admin tag
-                adminId: adminSess ? adminSess.id : '',   // ← NEW: which admin sent it
+                sender: 'admin',
+                adminId: adminSess ? adminSess.id : '',
                 ...(reason ? { reason } : {})
             })
         });
         const data = await res.json();
-        console.log(`[Admin] Notified ${data.sent||0} players`);
+        console.log(`[Admin] FCM notified ${data.sent||0} players`);
     } catch(e){
-        console.warn('[Admin] Push failed (non-critical):', e.message);
+        console.warn('[Admin] Netlify push failed (non-critical):', e.message);
     }
 }
 
