@@ -176,10 +176,7 @@
     <div class="section-head">
         Active Banners <span id="bannerCount">0</span>
     </div>
-    <div id="bannerList">
-        <div class="skeleton"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="height:12px;width:70%"></div><div class="sk-line" style="height:32px"></div></div></div>
-        <div class="skeleton"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="height:12px;width:55%"></div><div class="sk-line" style="height:32px"></div></div></div>
-    </div>
+    <div id="bannerList"></div>
 </div>
 
 </div>
@@ -286,8 +283,6 @@ const adminSess = (function(){
 })();
 if(!adminSess){ window.location.href = 'index.html'; }
 
-loadBanners();
-
 // ── State ─────────────────────────────────────────────────────────────────────
 let _deleteKey = null;
 let _uploadedUrl = '';   // URL from imgbb after upload (add form)
@@ -295,34 +290,63 @@ let _editUploadedUrl = ''; // URL from imgbb after upload (edit form)
 
 // ── Load banners ──────────────────────────────────────────────────────────────
 function loadBanners(){
+    const list    = document.getElementById('bannerList');
+    const countEl = document.getElementById('bannerCount');
+
+    // Show loading skeleton while fetching
+    list.innerHTML = [1,2,3].map(()=>`
+        <div class="skeleton">
+            <div class="sk-img"></div>
+            <div class="sk-body">
+                <div class="sk-line" style="height:12px;width:40%;margin-bottom:8px"></div>
+                <div class="sk-line" style="height:36px"></div>
+            </div>
+        </div>`).join('');
+
     db.ref('adBanners').on('value', snap => {
-        const list = document.getElementById('bannerList');
-        const countEl = document.getElementById('bannerCount');
         if(!snap.exists()){
-            list.innerHTML = `<div class="empty-state"><div class="empty-icon">🖼️</div><div class="empty-title">No Banners Yet</div><div class="empty-sub">Add your first ad banner above.</div></div>`;
+            list.innerHTML = `<div class="empty-state">
+                <div class="empty-icon">🖼️</div>
+                <div class="empty-title">No Banners Yet</div>
+                <div class="empty-sub">Add your first ad banner above.</div>
+            </div>`;
             countEl.textContent = '0';
             return;
         }
         const items = [];
-        snap.forEach(child => items.push({ key: child.key, ...child.val() }));
+        snap.forEach(child => {
+            const val = child.val();
+            if(val) items.push({ key: child.key, ...val });
+        });
         countEl.textContent = items.length;
         list.innerHTML = items.map((b, idx) => buildCard(b, idx + 1)).join('');
+    }, err => {
+        list.innerHTML = `<div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-title">Load Failed</div>
+            <div class="empty-sub">${err.message}</div>
+        </div>`;
     });
 }
 
 function buildCard(b, serial){
-    const imgHtml = b.imageUrl
-        ? `<img class="banner-img" src="${esc(b.imageUrl)}" alt="banner" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-        : '';
     return `
     <div class="banner-card">
-        ${imgHtml}
-        <div class="banner-img-placeholder" style="${b.imageUrl?'display:none':''}"><i class="fas fa-image"></i></div>
-        <div class="banner-body">
-            <div class="banner-meta">
-                <span class="banner-serial">#${serial}</span>
-                <a class="banner-url-link" href="${esc(b.redirectUrl||'')}" target="_blank" rel="noopener"><i class="fas fa-link"></i>${esc(b.redirectUrl||'No URL')}</a>
+        <div class="banner-img-wrap">
+            <div class="banner-serial-badge">#${serial}</div>
+            ${b.imageUrl
+                ? `<img class="banner-img" src="${esc(b.imageUrl)}" alt="Banner ${serial}" loading="lazy"
+                        onerror="this.style.display='none';this.parentElement.querySelector('.banner-img-placeholder').style.display='flex'">`
+                : ''}
+            <div class="banner-img-placeholder" style="${b.imageUrl?'display:none':'display:flex'}">
+                <i class="fas fa-image"></i><span>No Image</span>
             </div>
+        </div>
+        <div class="banner-body">
+            <a class="banner-url-link" href="${esc(b.redirectUrl||'#')}" target="_blank" rel="noopener">
+                <i class="fas fa-external-link-alt"></i>
+                <span>${esc(b.redirectUrl||'No redirect URL')}</span>
+            </a>
             <div class="banner-actions">
                 <button class="banner-btn btn-edit" onclick="openEdit('${b.key}','${esc(b.imageUrl||'')}','${esc(b.redirectUrl||'')}')"><i class="fas fa-pen"></i> Edit</button>
                 <button class="banner-btn btn-del"  onclick="openDelete('${b.key}')"><i class="fas fa-trash-alt"></i> Delete</button>
@@ -508,6 +532,9 @@ window.confirmDelete = async function(){
     } catch(e){ toast('Error: '+e.message,'error'); }
     finally { btn.disabled = false; btn.textContent = 'Delete'; closeConf(); }
 };
+
+// ── Start ────────────────────────────────────────────────────────────────────
+loadBanners();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
