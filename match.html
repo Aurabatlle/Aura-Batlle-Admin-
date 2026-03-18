@@ -582,7 +582,7 @@ function initDashboard(adminId, username){
 // ── Stats ────────────────────────────────────────────────────────────────────
 function loadStats(){
     // Total matches — realtime listener on maintenanceConfig/matchCounter
-    db.ref('maintenanceConfig').child('matchCounter').on('value', function(snap){
+    db.ref('matchCounter').on('value', function(snap){
         var val = snap.val();
         setText('statMatches', (val !== null && val !== undefined) ? val : '—');
     }, function(){ setText('statMatches','—'); });
