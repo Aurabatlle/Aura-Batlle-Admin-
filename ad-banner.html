@@ -2,1018 +2,599 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ad Banner Management - Aura Battle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ad Banners — Aura Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --danger: #e63946;
-            --warning: #fca311;
-            --gray: #6c757d;
-            --white: #ffffff;
+            --red:#e63946; --red-dark:#b5202d;
+            --gold:#f5c518; --gold-dark:#c9a000;
+            --green:#22c55e; --green-dark:#16a34a;
+            --purple:#8b5cf6;
+            --bg:#0d0d0f; --surface:#141418; --surface2:#1a1a1f; --surface3:#1f1f25;
+            --border:rgba(255,255,255,0.07); --border-red:rgba(230,57,70,0.2);
+            --text:#f0f0f2; --dim:#9898a8; --muted:#5a5a68;
         }
-        
-        body {
-            background-color: #f5f7fb;
-            color: #333;
-            line-height: 1.6;
-            padding-bottom: 20px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-        
-        /* Header Styles */
-        header {
-            background: var(--white);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            width: 100%;
-            justify-content: space-between;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo img {
-            height: 35px;
-            margin-right: 10px;
-        }
-        
-        .logo h1 {
-            font-size: 18px;
-            color: var(--primary);
-        }
-        
-        .back-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        
-        /* Content Area */
-        .content {
-            background: var(--white);
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 15px;
-            margin: 15px 0;
-        }
-        
-        .page-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: var(--dark);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 12px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-        
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background: var(--secondary);
-        }
-        
-        .btn-secondary {
-            background: var(--gray);
-            color: var(--white);
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-            color: var(--white);
-        }
-        
-        .btn-sm {
-            padding: 6px 10px;
-            font-size: 12px;
-        }
-        
-        /* File Upload */
-        .file-upload {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 12px 0;
-        }
-        
-        .file-upload-label {
-            display: inline-block;
-            padding: 10px 15px;
-            background: var(--light);
-            color: var(--dark);
-            border-radius: 6px;
-            cursor: pointer;
-            margin-bottom: 12px;
-            text-align: center;
-            font-size: 14px;
-        }
-        
-        .file-upload-label i {
-            margin-right: 6px;
-        }
-        
-        .upload-preview {
-            width: 100%;
-            max-width: 300px;
-            height: 150px;
-            border-radius: 6px;
-            object-fit: cover;
-            border: 2px dashed #ddd;
-            padding: 5px;
-            margin-bottom: 12px;
-        }
-        
-        /* Alert Styles */
-        .alert {
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-        
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        /* Table Styles */
-        .banners-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-        
-        .banners-table th, 
-        .banners-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .banners-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-        
-        .banners-table tr:hover {
-            background-color: #f5f7fb;
-        }
-        
-        .banner-image {
-            width: 120px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        
-        /* Login prompt */
-        .login-prompt {
-            text-align: center;
-            padding: 40px 15px;
-        }
-        
-        .login-prompt i {
-            font-size: 50px;
-            color: var(--gray);
-            margin-bottom: 15px;
-        }
-        
-        .login-prompt h2 {
-            margin-bottom: 12px;
-            color: var(--dark);
-            font-size: 20px;
-        }
-        
-        .login-prompt p {
-            color: var(--gray);
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        
-        /* Loader */
-        .loader {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-            margin-left: 8px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .banners-table {
-                display: block;
-                overflow-x: auto;
-                font-size: 12px;
-            }
-            
-            .banners-table th, 
-            .banners-table td {
-                padding: 8px 6px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .page-title {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .page-title h2 {
-                font-size: 18px;
-            }
-            
-            .banner-image {
-                width: 80px;
-                height: 40px;
-            }
-            
-            .header-left {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .logo {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .back-btn {
-                align-self: flex-end;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 0 10px;
-            }
-            
-            .content {
-                padding: 10px;
-            }
-            
-            .banners-table {
-                font-size: 11px;
-            }
-            
-            .btn {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-            
-            .logo h1 {
-                font-size: 16px;
-            }
-        }
-        
-        /* Card view for mobile */
-        .banners-grid {
-            display: none;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-top: 15px;
-        }
-        
-        .banner-card {
-            background: var(--white);
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .banner-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .banner-card-sno {
-            font-weight: bold;
-            color: var(--primary);
-            font-size: 14px;
-        }
-        
-        .banner-card-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .banner-card-image {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-        
-        .banner-card-url {
-            font-size: 12px;
-            color: var(--gray);
-            margin-bottom: 10px;
-            word-break: break-all;
-        }
-        
-        .banner-card-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: space-between;
-        }
-        
-        @media (max-width: 768px) {
-            .banners-table {
-                display: none;
-            }
-            
-            .banners-grid {
-                display: grid;
-            }
-        }
+        html,body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
+        body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(139,92,246,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.02) 1px,transparent 1px); background-size:44px 44px; pointer-events:none; z-index:0; }
+
+        /* ── Gate screen ── */
+        #gateScreen { position:fixed; inset:0; background:var(--bg); z-index:999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:20px; }
+        .gate-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:36px 32px; width:100%; max-width:340px; text-align:center; }
+        .gate-icon { width:56px; height:56px; border-radius:14px; background:rgba(139,92,246,.12); border:1px solid rgba(139,92,246,.3); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+        .gate-icon i { color:var(--purple); font-size:22px; }
+        .gate-title { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:700; letter-spacing:1px; margin-bottom:6px; }
+        .gate-sub { font-size:12px; color:var(--muted); margin-bottom:24px; }
+        .gate-input-wrap { display:flex; align-items:center; gap:10px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0 14px; margin-bottom:14px; transition:border-color .2s; }
+        .gate-input-wrap:focus-within { border-color:rgba(139,92,246,.5); box-shadow:0 0 0 3px rgba(139,92,246,.08); }
+        .gate-input-wrap i { color:var(--muted); font-size:13px; }
+        .gate-input { flex:1; background:none; border:none; outline:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:22px; font-weight:600; letter-spacing:8px; padding:14px 0; text-align:center; width:80px; }
+        .gate-input::placeholder { font-size:14px; letter-spacing:2px; color:var(--muted); }
+        .gate-btn { width:100%; padding:13px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--purple),#6d28d9); color:#fff; font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:opacity .2s; }
+        .gate-btn:hover { opacity:.88; }
+        .gate-err { font-size:12px; color:#ff8a91; margin-top:6px; display:none; }
+
+        /* ── Header ── */
+        .header { position:sticky; top:0; z-index:200; display:flex; align-items:center; gap:12px; padding:13px 18px; background:rgba(13,13,15,0.94); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+        .back-btn { width:34px; height:34px; border-radius:9px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; text-decoration:none; color:var(--dim); font-size:14px; flex-shrink:0; }
+        .h-logo { width:30px; height:30px; border-radius:8px; background:rgba(139,92,246,0.12); border:1px solid rgba(139,92,246,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .h-logo i { color:var(--purple); font-size:13px; }
+        .h-title { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; flex:1; }
+        .h-title span { color:var(--purple); }
+        .h-pill { padding:3px 10px; background:rgba(139,92,246,0.15); border:1px solid rgba(139,92,246,0.3); border-radius:20px; font-size:10px; color:var(--purple); letter-spacing:1px; font-weight:600; text-transform:uppercase; }
+
+        /* ── Main ── */
+        .main { padding:16px; max-width:640px; margin:0 auto; position:relative; z-index:1; padding-bottom:40px; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+        /* ── Add banner card ── */
+        .add-card { background:var(--surface); border:1px dashed rgba(139,92,246,.35); border-radius:18px; padding:20px; margin-bottom:20px; animation:fadeUp .3s ease both; }
+        .add-card-title { font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; color:var(--purple); letter-spacing:2px; text-transform:uppercase; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+        .field { margin-bottom:14px; }
+        .field label { display:block; font-size:10px; font-weight:600; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:7px; }
+        .field input { width:100%; padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; transition:border-color .2s; }
+        .field input:focus { outline:none; border-color:rgba(139,92,246,.5); box-shadow:0 0 0 3px rgba(139,92,246,.08); }
+        .field input::placeholder { color:var(--muted); font-size:13px; }
+
+        /* Image upload zone */
+        .upload-zone { width:100%; border:1.5px dashed rgba(139,92,246,.3); border-radius:12px; background:rgba(139,92,246,.04); cursor:pointer; transition:border-color .2s,background .2s; overflow:hidden; position:relative; }
+        .upload-zone:hover { border-color:rgba(139,92,246,.6); background:rgba(139,92,246,.08); }
+        .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+        .upload-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px 16px; gap:8px; pointer-events:none; }
+        .upload-placeholder i { font-size:28px; color:rgba(139,92,246,.5); }
+        .upload-placeholder span { font-size:12px; color:var(--muted); text-align:center; }
+        .upload-preview { width:100%; max-height:180px; object-fit:cover; display:none; border-radius:10px; }
+        .upload-progress { height:3px; background:var(--surface2); border-radius:2px; margin-top:10px; overflow:hidden; display:none; }
+        .upload-progress-bar { height:100%; background:linear-gradient(90deg,var(--purple),#a78bfa); border-radius:2px; width:0%; transition:width .3s; }
+        .upload-status { font-size:11px; color:var(--purple); margin-top:6px; display:none; text-align:center; }
+
+        .add-btn { width:100%; padding:13px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--purple),#6d28d9); color:#fff; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; margin-top:4px; transition:opacity .2s,transform .1s; display:flex; align-items:center; justify-content:center; gap:7px; box-shadow:0 4px 16px rgba(139,92,246,.25); }
+        .add-btn:active { transform:scale(.98); }
+        .add-btn:disabled { opacity:.45; cursor:not-allowed; box-shadow:none; }
+
+        /* ── Banner list ── */
+        .section-head { font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:600; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; }
+        .section-head span { color:var(--purple); }
+
+        .banner-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:14px; animation:fadeUp .3s ease both; transition:border-color .2s; }
+        .banner-card:hover { border-color:rgba(139,92,246,.25); }
+        .banner-img { width:100%; height:140px; object-fit:cover; display:block; background:var(--surface2); }
+        .banner-img-placeholder { width:100%; height:140px; background:var(--surface2); display:flex; align-items:center; justify-content:center; }
+        .banner-img-placeholder i { font-size:32px; color:var(--muted); opacity:.4; }
+        .banner-body { padding:12px 14px 14px; }
+        .banner-url { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px; margin-bottom:10px; overflow:hidden; }
+        .banner-url i { font-size:10px; flex-shrink:0; }
+        .banner-url a { color:var(--purple); text-decoration:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px; }
+        .banner-url a:hover { text-decoration:underline; }
+        .banner-actions { display:flex; gap:8px; }
+        .banner-btn { flex:1; padding:9px 8px; border-radius:9px; border:none; font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; transition:opacity .2s,transform .1s; }
+        .banner-btn:active { transform:scale(.97); }
+        .banner-btn.btn-edit { background:rgba(139,92,246,.12); color:var(--purple); border:1px solid rgba(139,92,246,.25); }
+        .banner-btn.btn-del  { background:rgba(230,57,70,.1); color:var(--red); border:1px solid rgba(230,57,70,.2); }
+
+        /* ── Edit sheet ── */
+        .sh-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(4px); z-index:400; align-items:flex-end; justify-content:center; }
+        .sh-overlay.show { display:flex; }
+        .sheet { background:var(--surface); border-radius:20px 20px 0 0; border-top:1px solid var(--border); width:100%; max-width:640px; max-height:90vh; overflow-y:auto; animation:slideUp .3s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        .sh-stripe { height:3px; background:linear-gradient(90deg,var(--purple),#a78bfa); border-radius:20px 20px 0 0; }
+        .sh-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:12px auto 0; }
+        .sh-head { padding:16px 22px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+        .sh-title { font-family:'Rajdhani',sans-serif; font-size:19px; font-weight:700; letter-spacing:1px; }
+        .sh-x { width:30px; height:30px; border-radius:8px; background:var(--surface2); border:none; color:var(--dim); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; }
+        .sh-body { padding:22px; }
+        .sh-btn { width:100%; padding:14px; border:none; border-radius:10px; font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; margin-top:8px; background:linear-gradient(135deg,var(--purple),#6d28d9); color:#fff; box-shadow:0 4px 16px rgba(139,92,246,.25); transition:opacity .2s; display:flex; align-items:center; justify-content:center; gap:7px; }
+        .sh-btn:disabled { opacity:.45; cursor:not-allowed; box-shadow:none; }
+        .sh-msg { margin-top:12px; padding:11px 14px; border-radius:8px; font-size:13px; display:none; }
+        .sh-msg.error   { background:rgba(230,57,70,.1); color:#ff8a91; border:1px solid rgba(230,57,70,.2); }
+        .sh-msg.success { background:rgba(34,197,94,.1); color:#4ade80; border:1px solid rgba(34,197,94,.2); }
+
+        /* ── Confirm delete overlay ── */
+        .conf-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.8); backdrop-filter:blur(4px); z-index:500; align-items:center; justify-content:center; padding:20px; }
+        .conf-overlay.show { display:flex; }
+        .conf-box { background:var(--surface); border:1px solid rgba(230,57,70,.25); border-radius:18px; padding:28px 24px; max-width:340px; width:100%; text-align:center; animation:fadeUp .25s ease both; }
+        .conf-icon { font-size:38px; margin-bottom:12px; }
+        .conf-title { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; margin-bottom:8px; }
+        .conf-sub { font-size:13px; color:var(--muted); margin-bottom:22px; line-height:1.5; }
+        .conf-btns { display:flex; gap:10px; }
+        .conf-btns button { flex:1; padding:12px; border-radius:10px; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; border:none; }
+        .conf-cancel { background:var(--surface2); color:var(--dim); }
+        .conf-del { background:var(--red); color:#fff; }
+
+        /* ── Empty / skeleton ── */
+        .skeleton { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:14px; }
+        .sk-img { height:140px; background:var(--surface2); animation:skpulse 1.5s ease infinite; }
+        .sk-body { padding:12px 14px 14px; display:flex; flex-direction:column; gap:8px; }
+        .sk-line { background:var(--surface2); border-radius:4px; animation:skpulse 1.5s ease infinite; }
+        @keyframes skpulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+        .empty-state { text-align:center; padding:50px 20px; }
+        .empty-icon { font-size:44px; margin-bottom:12px; opacity:.3; }
+        .empty-title { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; color:var(--dim); margin-bottom:6px; }
+        .empty-sub { font-size:13px; color:var(--muted); }
+
+        /* ── Toast ── */
+        .toast { position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:11px 18px; font-size:13px; z-index:999; opacity:0; transition:all .28s; pointer-events:none; white-space:nowrap; max-width:88vw; text-align:center; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .toast.error   { border-color:rgba(230,57,70,.45); color:#ff8a91; }
+        .toast.success { border-color:rgba(34,197,94,.45); color:#4ade80; }
+        .toast.info    { border-color:rgba(139,92,246,.45); color:#c4b5fd; }
+
+        .edit-img-preview { width:100%; height:120px; object-fit:cover; border-radius:10px; margin-bottom:12px; display:none; background:var(--surface2); }
     </style>
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Database -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="header-left">
-                    <div class="logo">
-                        <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Company Logo">
-                        <h1>Aura Battle Admin</h1>
-                    </div>
-                    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div id="adminContent" style="display: none;">
-            <div class="content">
-                <div class="page-title">
-                    <h2>Ad Banner Management</h2>
-                    <button class="btn btn-primary" onclick="showAddForm()"><i class="fas fa-plus"></i> Add Banner</button>
+<!-- ── Gate Screen ── -->
+<div id="gateScreen">
+    <div class="gate-card">
+        <div class="gate-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="gate-title">Access Required</div>
+        <div class="gate-sub">Enter your 2-digit admin key</div>
+        <div class="gate-input-wrap">
+            <i class="fas fa-key"></i>
+            <input class="gate-input" type="password" id="gateInput" maxlength="2" placeholder="••" inputmode="numeric" autocomplete="off">
+        </div>
+        <div class="gate-err" id="gateErr">Incorrect key. Try again.</div>
+        <button class="gate-btn" onclick="checkGate()"><i class="fas fa-unlock"></i> Unlock</button>
+    </div>
+</div>
+
+<!-- ── Main App (hidden until gate passes) ── -->
+<div id="appContent" style="display:none">
+
+<div class="header">
+    <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <div class="h-logo"><i class="fas fa-image"></i></div>
+    <div class="h-title">Ad <span>Banners</span></div>
+    <div class="h-pill">Admin</div>
+</div>
+
+<div class="main">
+
+    <!-- Add Banner -->
+    <div class="add-card">
+        <div class="add-card-title"><i class="fas fa-plus-circle"></i> Add New Banner</div>
+
+        <div class="field">
+            <label>Banner Image</label>
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="imageFile" accept="image/*" onchange="previewImage(this)">
+                <div class="upload-placeholder" id="uploadPlaceholder">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Tap to upload image<br><span style="font-size:10px;opacity:.6">JPG, PNG, WebP · Max 10MB</span></span>
                 </div>
-                
-                <!-- Add/Edit Form -->
-                <div id="bannerForm" style="display: none;">
-                    <div class="alert alert-danger" id="formError"></div>
-                    <div class="alert alert-success" id="formSuccess"></div>
-                    
-                    <div class="file-upload">
-                        <label for="bannerImageUpload" class="file-upload-label">
-                            <i class="fas fa-upload"></i> Upload Banner Image
-                        </label>
-                        <input type="file" id="bannerImageUpload" accept="image/*" style="display: none;">
-                        <img src="https://via.placeholder.com/300x150?text=Banner+Image" alt="Preview" class="upload-preview" id="bannerImagePreview">
-                    </div>
-                    
-                    <form id="adBannerForm">
-                        <div class="form-group">
-                            <label for="bannerName">Banner Name</label>
-                            <input type="text" class="form-control" id="bannerName" placeholder="Enter banner name">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="redirectUrl">Redirect URL</label>
-                            <input type="url" class="form-control" id="redirectUrl" placeholder="https://example.com">
-                        </div>
-                        
-                        <div class="form-group">
-                            <button type="button" class="btn btn-primary" id="saveBannerBtn">Save Banner</button>
-                            <button type="button" class="btn btn-secondary" onclick="hideForm()">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Banners Table (Desktop) -->
-                <div id="bannersList">
-                    <h3>Ad Banners</h3>
-                    <table class="banners-table">
-                        <thead>
-                            <tr>
-                                <th>S.No</th>
-                                <th>Image</th>
-                                <th>Name</th>
-                                <th>Redirect URL</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bannersTableBody">
-                            <!-- Banners will be loaded here -->
-                        </tbody>
-                    </table>
-                    
-                    <!-- Banners Grid (Mobile) -->
-                    <div class="banners-grid" id="bannersGrid">
-                        <!-- Banners will be loaded here in card format -->
-                    </div>
-                </div>
+                <img class="upload-preview" id="uploadPreview" alt="preview">
             </div>
+            <div class="upload-progress" id="uploadProgress"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
+            <div class="upload-status" id="uploadStatus"></div>
         </div>
-        
-        <div id="loginPrompt" class="login-prompt">
-            <i class="fas fa-lock"></i>
-            <h2>Authentication Required</h2>
-            <p>Please login to access the admin dashboard</p>
-            <button class="btn btn-primary" onclick="window.location.href='index.html'">Go to Login</button>
+
+        <div class="field">
+            <label>Redirect URL</label>
+            <input type="url" id="addRedirectUrl" placeholder="https://example.com" autocomplete="off">
         </div>
+
+        <button class="add-btn" id="addBtn" onclick="addBanner()">
+            <i class="fas fa-plus"></i> Add Banner
+        </button>
+        <div class="sh-msg" id="addMsg"></div>
     </div>
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-            authDomain: "aura-battle-main.firebaseapp.com",
-            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-            projectId: "aura-battle-main",
-            storageBucket: "aura-battle-main.firebasestorage.app",
-            messagingSenderId: "763779990289",
-            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
-            measurementId: "G-ZZXZ00HK07"
+    <!-- Banner List -->
+    <div class="section-head">
+        Active Banners <span id="bannerCount">0</span>
+    </div>
+    <div id="bannerList">
+        <div class="skeleton"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="height:12px;width:70%"></div><div class="sk-line" style="height:32px"></div></div></div>
+        <div class="skeleton"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="height:12px;width:55%"></div><div class="sk-line" style="height:32px"></div></div></div>
+    </div>
+</div>
+
+</div><!-- /appContent -->
+
+<!-- ── Edit Sheet ── -->
+<div class="sh-overlay" id="editSheet">
+    <div class="sheet">
+        <div class="sh-stripe"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div class="sh-title">✏️ Edit Banner</div>
+            <button class="sh-x" onclick="closeEdit()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <input type="hidden" id="editKey">
+            <img class="edit-img-preview" id="editImgPreview" alt="current">
+
+            <div class="field">
+                <label>Replace Image <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+                <div class="upload-zone" id="editUploadZone" style="margin-bottom:0">
+                    <input type="file" id="editImageFile" accept="image/*" onchange="previewEditImage(this)">
+                    <div class="upload-placeholder" id="editUploadPlaceholder">
+                        <i class="fas fa-camera"></i>
+                        <span>Tap to choose new image</span>
+                    </div>
+                    <img class="upload-preview" id="editUploadPreview" alt="new preview">
+                </div>
+                <div class="upload-progress" id="editUploadProgress"><div class="upload-progress-bar" id="editUploadProgressBar"></div></div>
+                <div class="upload-status" id="editUploadStatus"></div>
+            </div>
+
+            <div class="field">
+                <label>Redirect URL</label>
+                <input type="url" id="editRedirectUrl" placeholder="https://example.com" autocomplete="off">
+            </div>
+
+            <button class="sh-btn" id="editSaveBtn" onclick="saveEdit()">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <div class="sh-msg" id="editMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete Confirm ── -->
+<div class="conf-overlay" id="confOverlay">
+    <div class="conf-box">
+        <div class="conf-icon">🗑️</div>
+        <div class="conf-title">Delete Banner?</div>
+        <div class="conf-sub">This will permanently remove the banner. It will no longer appear in the app.</div>
+        <div class="conf-btns">
+            <button class="conf-cancel" onclick="closeConf()">Cancel</button>
+            <button class="conf-del" id="confDelBtn" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ── XOR decode (same scheme as index.html, key = 'aB3xQ9mZ') ─────────────────
+const _k = 'aB3xQ9mZ';
+const _e = (s,k) => s.split('').map((c,i) => String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+
+// ── Gate key (2-digit: "47") ──────────────────────────────────────────────────
+const _gk = "\x55\x75"; // XOR-encoded "47"
+
+// ── ImgBB API key (encoded) ───────────────────────────────────────────────────
+const _ik = "\x00\x75\x57\x1b\x37\x5b\x5c\x3e\x52\x73\x50\x1e\x60\x00\x5b\x6b\x51\x70\x07\x1b\x68\x5d\x0e\x39\x57\x72\x0b\x1b\x32\x09\x08\x6e";
+
+// ── Firebase config (same XOR encoding as index.html) ────────────────────────
+const _cfg = {
+    a: "\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+    b: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+    c: "\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+    d: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+    e: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+    f: "\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+    g: "\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
+};
+
+// ── Gate check ────────────────────────────────────────────────────────────────
+const SESSION_MS = 30 * 60 * 1000;
+
+function checkGate(){
+    const val = document.getElementById('gateInput').value.trim();
+    if(val === _e(_gk, _k)){
+        sessionStorage.setItem('ab_gate', Date.now().toString());
+        document.getElementById('gateScreen').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+        initApp();
+    } else {
+        const err = document.getElementById('gateErr');
+        err.style.display = 'block';
+        document.getElementById('gateInput').value = '';
+        setTimeout(() => err.style.display = 'none', 3000);
+    }
+}
+
+document.getElementById('gateInput').addEventListener('keypress', e => {
+    if(e.key === 'Enter') checkGate();
+});
+
+// Auto-unlock if gate was passed recently (same session)
+(function(){
+    const t = parseInt(sessionStorage.getItem('ab_gate') || '0');
+    if(Date.now() - t < SESSION_MS){
+        document.getElementById('gateScreen').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+        initApp();
+    }
+})();
+
+// ── Firebase init ─────────────────────────────────────────────────────────────
+let db;
+function initApp(){
+    if(!db){
+        const cfg = {
+            apiKey:            _e(_cfg.a,_k),
+            authDomain:        _e(_cfg.b,_k),
+            databaseURL:       _e(_cfg.c,_k),
+            projectId:         _e(_cfg.d,_k),
+            storageBucket:     _e(_cfg.e,_k),
+            messagingSenderId: _e(_cfg.f,_k),
+            appId:             _e(_cfg.g,_k)
         };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // ImgBB API Key
-        const IMGBB_API_KEY = 'a7dcfb1d31cf1961024c9dcc608cc0e4';
-        
-        // DOM Elements
-        const adminContent = document.getElementById('adminContent');
-        const loginPrompt = document.getElementById('loginPrompt');
-        const bannerForm = document.getElementById('bannerForm');
-        const bannersTableBody = document.getElementById('bannersTableBody');
-        const bannersGrid = document.getElementById('bannersGrid');
-        
-        // State variables
-        let isEditMode = false;
-        let currentBannerId = null;
-        let uploadedImageUrl = null;
-        let bannerCount = 0;
-        
-        // Check if user is logged in
-        window.addEventListener('DOMContentLoaded', () => {
-            const adminRole = localStorage.getItem('adminRole');
-            const adminUsername = localStorage.getItem('adminUsername');
-            const adminEmail = localStorage.getItem('adminEmail');
-            const loginTime = localStorage.getItem('loginTime');
-            const currentTime = new Date().getTime();
-            
-            // If user was logged in less than 10 minutes ago
-            if (adminRole && adminUsername && loginTime && (currentTime - parseInt(loginTime)) < 600000) {
-                // Verify admin still exists in database
-                verifyAdminInDatabase(adminUsername, adminEmail);
-            } else {
-                showLoginPrompt();
-            }
+        if(!firebase.apps.length) firebase.initializeApp(cfg);
+        db = firebase.database();
+    }
+    loadBanners();
+}
+
+// ── Admin session check ───────────────────────────────────────────────────────
+const adminSess = (function(){
+    const key  = localStorage.getItem('adminUsername');
+    const time = parseInt(localStorage.getItem('loginTime') || '0');
+    if(!key || (Date.now()-time) >= SESSION_MS) return null;
+    return { id: key };
+})();
+if(!adminSess){ window.location.href = 'index.html'; }
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let _deleteKey = null;
+let _uploadedUrl = '';   // URL from imgbb after upload (add form)
+let _editUploadedUrl = ''; // URL from imgbb after upload (edit form)
+
+// ── Load banners ──────────────────────────────────────────────────────────────
+function loadBanners(){
+    db.ref('adBanners').on('value', snap => {
+        const list = document.getElementById('bannerList');
+        const countEl = document.getElementById('bannerCount');
+        if(!snap.exists()){
+            list.innerHTML = `<div class="empty-state"><div class="empty-icon">🖼️</div><div class="empty-title">No Banners Yet</div><div class="empty-sub">Add your first ad banner above.</div></div>`;
+            countEl.textContent = '0';
+            return;
+        }
+        const items = [];
+        snap.forEach(child => items.push({ key: child.key, ...child.val() }));
+        countEl.textContent = items.length;
+        list.innerHTML = items.map(b => buildCard(b)).join('');
+    });
+}
+
+function buildCard(b){
+    const imgHtml = b.imageUrl
+        ? `<img class="banner-img" src="${esc(b.imageUrl)}" alt="banner" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : '';
+    return `
+    <div class="banner-card">
+        ${imgHtml}
+        <div class="banner-img-placeholder" style="${b.imageUrl?'display:none':''}"><i class="fas fa-image"></i></div>
+        <div class="banner-body">
+            <div class="banner-url"><i class="fas fa-link"></i><a href="${esc(b.redirectUrl||'')}" target="_blank" rel="noopener">${esc(b.redirectUrl||'No URL')}</a></div>
+            <div class="banner-actions">
+                <button class="banner-btn btn-edit" onclick="openEdit('${b.key}','${esc(b.imageUrl||'')}','${esc(b.redirectUrl||'')}')"><i class="fas fa-pen"></i> Edit</button>
+                <button class="banner-btn btn-del"  onclick="openDelete('${b.key}')"><i class="fas fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>`;
+}
+
+// ── Image preview (add form) ──────────────────────────────────────────────────
+window.previewImage = function(input){
+    const file = input.files[0];
+    if(!file) return;
+    const prev = document.getElementById('uploadPreview');
+    const ph   = document.getElementById('uploadPlaceholder');
+    const reader = new FileReader();
+    reader.onload = e => {
+        prev.src = e.target.result;
+        prev.style.display = 'block';
+        ph.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+    _uploadedUrl = ''; // reset — needs re-upload
+};
+
+// ── Image preview (edit form) ─────────────────────────────────────────────────
+window.previewEditImage = function(input){
+    const file = input.files[0];
+    if(!file) return;
+    const prev = document.getElementById('editUploadPreview');
+    const ph   = document.getElementById('editUploadPlaceholder');
+    const reader = new FileReader();
+    reader.onload = e => {
+        prev.src = e.target.result;
+        prev.style.display = 'block';
+        ph.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+    _editUploadedUrl = '';
+};
+
+// ── Upload image to ImgBB ─────────────────────────────────────────────────────
+async function uploadToImgBB(file, progressBarId, progressWrapId, statusId){
+    const apiKey = _e(_ik, _k);
+    const progressWrap = document.getElementById(progressWrapId);
+    const progressBar  = document.getElementById(progressBarId);
+    const statusEl     = document.getElementById(statusId);
+
+    progressWrap.style.display = 'block';
+    progressBar.style.width = '10%';
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Uploading image…';
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        progressBar.style.width = '40%';
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+            method: 'POST',
+            body: formData
         });
-        
-        // Verify admin exists in database
-        function verifyAdminInDatabase(username, email) {
-            const adminsRef = database.ref('admins');
-            
-            adminsRef.once('value')
-                .then(snapshot => {
-                    let adminFound = false;
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const admin = childSnapshot.val();
-                        
-                        // Check if username/email matches
-                        if (admin.username === username || admin.email === email) {
-                            adminFound = true;
-                            return true;
-                        }
-                    });
-                    
-                    if (adminFound) {
-                        showAdminContent();
-                        loadBanners();
-                    } else {
-                        showLoginPrompt();
-                    }
-                })
-                .catch(error => {
-                    console.error('Database error:', error);
-                    showLoginPrompt();
-                });
+        progressBar.style.width = '80%';
+        const data = await res.json();
+        if(!data.success) throw new Error(data.error?.message || 'Upload failed');
+        progressBar.style.width = '100%';
+        statusEl.textContent = '✅ Image uploaded!';
+        setTimeout(() => { progressWrap.style.display = 'none'; statusEl.style.display = 'none'; }, 2000);
+        return data.data.url;
+    } catch(err){
+        progressBar.style.width = '0';
+        statusEl.textContent = '❌ Upload failed: ' + err.message;
+        statusEl.style.color = '#ff8a91';
+        throw err;
+    }
+}
+
+// ── Add banner ────────────────────────────────────────────────────────────────
+window.addBanner = async function(){
+    const file        = document.getElementById('imageFile').files[0];
+    const redirectUrl = document.getElementById('addRedirectUrl').value.trim();
+
+    if(!file)        { shMsg('addMsg','Please select an image.','error'); return; }
+    if(!redirectUrl) { shMsg('addMsg','Please enter a redirect URL.','error'); return; }
+
+    const btn = document.getElementById('addBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+
+    try {
+        const imageUrl = await uploadToImgBB(file, 'uploadProgressBar', 'uploadProgress', 'uploadStatus');
+
+        await db.ref('adBanners').push({ imageUrl, redirectUrl });
+
+        // Reset form
+        document.getElementById('imageFile').value = '';
+        document.getElementById('addRedirectUrl').value = '';
+        document.getElementById('uploadPreview').style.display = 'none';
+        document.getElementById('uploadPlaceholder').style.display = 'flex';
+        _uploadedUrl = '';
+
+        shMsg('addMsg','✅ Banner added!','success');
+        toast('Banner added successfully.','success');
+    } catch(e){
+        shMsg('addMsg','Error: '+e.message,'error');
+    } finally {
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Add Banner';
+    }
+};
+
+// ── Open edit sheet ───────────────────────────────────────────────────────────
+window.openEdit = function(key, imageUrl, redirectUrl){
+    document.getElementById('editKey').value        = key;
+    document.getElementById('editRedirectUrl').value = decodeURIComponent(redirectUrl);
+
+    // Show current image
+    const prev = document.getElementById('editImgPreview');
+    if(imageUrl){
+        prev.src = decodeURIComponent(imageUrl);
+        prev.style.display = 'block';
+    } else {
+        prev.style.display = 'none';
+    }
+
+    // Reset new image upload area
+    document.getElementById('editImageFile').value = '';
+    document.getElementById('editUploadPreview').style.display = 'none';
+    document.getElementById('editUploadPlaceholder').style.display = 'flex';
+    document.getElementById('editUploadProgress').style.display = 'none';
+    document.getElementById('editUploadStatus').style.display = 'none';
+    _editUploadedUrl = '';
+    shMsg('editMsg','','');
+    document.getElementById('editSheet').classList.add('show');
+};
+window.closeEdit = function(){
+    document.getElementById('editSheet').classList.remove('show');
+};
+
+// ── Save edit ─────────────────────────────────────────────────────────────────
+window.saveEdit = async function(){
+    const key         = document.getElementById('editKey').value;
+    const redirectUrl = document.getElementById('editRedirectUrl').value.trim();
+    const newFile     = document.getElementById('editImageFile').files[0];
+
+    if(!redirectUrl){ shMsg('editMsg','Please enter a redirect URL.','error'); return; }
+
+    const btn = document.getElementById('editSaveBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+
+    try {
+        const updates = { redirectUrl };
+
+        if(newFile){
+            const imageUrl = await uploadToImgBB(newFile, 'editUploadProgressBar', 'editUploadProgress', 'editUploadStatus');
+            updates.imageUrl = imageUrl;
         }
-        
-        // Show admin content
-        function showAdminContent() {
-            adminContent.style.display = 'block';
-            loginPrompt.style.display = 'none';
-        }
-        
-        // Show login prompt
-        function showLoginPrompt() {
-            adminContent.style.display = 'none';
-            loginPrompt.style.display = 'block';
-        }
-        
-        // Go back to dashboard
-        function goBack() {
-            window.location.href = 'Dashboard (1).html';
-        }
-        
-        // Show add form
-        function showAddForm() {
-            isEditMode = false;
-            currentBannerId = null;
-            uploadedImageUrl = null;
-            
-            // Reset form
-            document.getElementById('adBannerForm').reset();
-            document.getElementById('bannerImagePreview').src = 'https://via.placeholder.com/300x150?text=Banner+Image';
-            document.getElementById('formError').style.display = 'none';
-            document.getElementById('formSuccess').style.display = 'none';
-            
-            // Show form
-            bannerForm.style.display = 'block';
-            
-            // Scroll to form
-            bannerForm.scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // Hide form
-        function hideForm() {
-            bannerForm.style.display = 'none';
-        }
-        
-        // Show edit form
-        function showEditForm(bannerId) {
-            isEditMode = true;
-            currentBannerId = bannerId;
-            
-            // Get banner data
-            const bannersRef = database.ref('adBanners/' + bannerId);
-            bannersRef.once('value')
-                .then(snapshot => {
-                    const banner = snapshot.val();
-                    
-                    if (banner) {
-                        // Fill form with banner data
-                        document.getElementById('bannerName').value = banner.name || '';
-                        document.getElementById('redirectUrl').value = banner.redirectUrl || '';
-                        
-                        // Set image preview
-                        if (banner.imageUrl) {
-                            document.getElementById('bannerImagePreview').src = banner.imageUrl;
-                            uploadedImageUrl = banner.imageUrl;
-                        } else {
-                            document.getElementById('bannerImagePreview').src = 'https://via.placeholder.com/300x150?text=Banner+Image';
-                        }
-                        
-                        // Hide alerts
-                        document.getElementById('formError').style.display = 'none';
-                        document.getElementById('formSuccess').style.display = 'none';
-                        
-                        // Show form
-                        bannerForm.style.display = 'block';
-                        
-                        // Scroll to form
-                        bannerForm.scrollIntoView({ behavior: 'smooth' });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error getting banner:', error);
-                    alert('Error loading banner data');
-                });
-        }
-        
-        // Image upload preview
-        document.getElementById('bannerImageUpload').addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                // Check file size (max 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    showAlert('formError', 'File size must be less than 5MB');
-                    this.value = '';
-                    return;
-                }
-                
-                // Check file type
-                if (!file.type.match('image.*')) {
-                    showAlert('formError', 'Please select an image file');
-                    this.value = '';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('bannerImagePreview').src = e.target.result;
-                }
-                reader.readAsDataURL(file);
-                
-                // Upload image to ImgBB
-                uploadImageToImgBB(file);
-            }
-        });
-        
-        // Upload image to ImgBB
-        function uploadImageToImgBB(file) {
-            // Show loading state
-            const saveBtn = document.getElementById('saveBannerBtn');
-            const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = 'Uploading Image <div class="loader"></div>';
-            saveBtn.disabled = true;
-            
-            // Convert image to base64 for ImgBB API
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function() {
-                const base64Image = reader.result.split(',')[1];
-                
-                // Create form data
-                const formData = new FormData();
-                formData.append('key', IMGBB_API_KEY);
-                formData.append('image', base64Image);
-                
-                // Make the API request to ImgBB
-                fetch('https://api.imgbb.com/1/upload', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        uploadedImageUrl = data.data.url;
-                        showAlert('formSuccess', 'Image uploaded successfully!');
-                    } else {
-                        showAlert('formError', 'Failed to upload image: ' + (data.error.message || 'Unknown error'));
-                    }
-                    
-                    // Reset button
-                    saveBtn.innerHTML = originalText;
-                    saveBtn.disabled = false;
-                })
-                .catch(error => {
-                    console.error('Upload error:', error);
-                    showAlert('formError', 'Error uploading image: ' + error.message);
-                    
-                    // Reset button
-                    saveBtn.innerHTML = originalText;
-                    saveBtn.disabled = false;
-                });
-            };
-            
-            reader.onerror = function(error) {
-                console.error('File reading error:', error);
-                showAlert('formError', 'Error reading image file');
-                
-                // Reset button
-                saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
-            };
-        }
-        
-        // Save banner
-        document.getElementById('saveBannerBtn').addEventListener('click', function() {
-            const bannerName = document.getElementById('bannerName').value.trim();
-            const redirectUrl = document.getElementById('redirectUrl').value.trim();
-            
-            // Validation
-            if (!bannerName) {
-                showAlert('formError', 'Please enter a banner name');
-                return;
-            }
-            
-            if (!redirectUrl) {
-                showAlert('formError', 'Please enter a redirect URL');
-                return;
-            }
-            
-            if (!uploadedImageUrl && !isEditMode) {
-                showAlert('formError', 'Please upload a banner image');
-                return;
-            }
-            
-            // Show loading state
-            const originalText = this.innerHTML;
-            this.innerHTML = 'Saving <div class="loader"></div>';
-            this.disabled = true;
-            
-            // Prepare banner data
-            const bannerData = {
-                name: bannerName,
-                redirectUrl: redirectUrl,
-                imageUrl: uploadedImageUrl,
-                updatedAt: new Date().toISOString()
-            };
-            
-            // Save to Firebase
-            const bannersRef = database.ref('adBanners');
-            
-            if (isEditMode) {
-                // Update existing banner
-                bannersRef.child(currentBannerId).update(bannerData)
-                    .then(() => {
-                        showAlert('formSuccess', 'Banner updated successfully!');
-                        loadBanners();
-                        
-                        // Reset button
-                        this.innerHTML = originalText;
-                        this.disabled = false;
-                        
-                        // Hide form after 2 seconds
-                        setTimeout(() => {
-                            hideForm();
-                        }, 2000);
-                    })
-                    .catch(error => {
-                        console.error('Error updating banner:', error);
-                        showAlert('formError', 'Error updating banner: ' + error.message);
-                        
-                        // Reset button
-                        this.innerHTML = originalText;
-                        this.disabled = false;
-                    });
-            } else {
-                // Add new banner
-                bannerData.createdAt = new Date().toISOString();
-                
-                bannersRef.push(bannerData)
-                    .then(() => {
-                        showAlert('formSuccess', 'Banner added successfully!');
-                        loadBanners();
-                        
-                        // Reset form
-                        document.getElementById('adBannerForm').reset();
-                        document.getElementById('bannerImagePreview').src = 'https://via.placeholder.com/300x150?text=Banner+Image';
-                        uploadedImageUrl = null;
-                        
-                        // Reset button
-                        this.innerHTML = originalText;
-                        this.disabled = false;
-                    })
-                    .catch(error => {
-                        console.error('Error adding banner:', error);
-                        showAlert('formError', 'Error adding banner: ' + error.message);
-                        
-                        // Reset button
-                        this.innerHTML = originalText;
-                        this.disabled = false;
-                    });
-            }
-        });
-        
-        // Load banners from Firebase
-        function loadBanners() {
-            const bannersRef = database.ref('adBanners');
-            
-            bannersRef.once('value')
-                .then(snapshot => {
-                    bannersTableBody.innerHTML = '';
-                    bannersGrid.innerHTML = '';
-                    bannerCount = 0;
-                    
-                    if (!snapshot.exists()) {
-                        bannersTableBody.innerHTML = `
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 20px;">
-                                    No banners found. Click "Add Banner" to create one.
-                                </td>
-                            </tr>
-                        `;
-                        
-                        bannersGrid.innerHTML = `
-                            <div style="text-align: center; padding: 20px; grid-column: 1 / -1;">
-                                No banners found. Click "Add Banner" to create one.
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    snapshot.forEach(childSnapshot => {
-                        bannerCount++;
-                        const banner = childSnapshot.val();
-                        const bannerId = childSnapshot.key;
-                        
-                        // Add to table (desktop view)
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${bannerCount}</td>
-                            <td><img src="${banner.imageUrl || 'https://via.placeholder.com/150x75?text=No+Image'}" alt="Banner" class="banner-image"></td>
-                            <td>${banner.name || 'Unnamed'}</td>
-                            <td><a href="${banner.redirectUrl}" target="_blank" style="word-break: break-all; font-size: 12px;">${banner.redirectUrl}</a></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-primary btn-sm" onclick="showEditForm('${bannerId}')"><i class="fas fa-edit"></i> Edit</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteBanner('${bannerId}')"><i class="fas fa-trash"></i> Delete</button>
-                                </div>
-                            </td>
-                        `;
-                        
-                        bannersTableBody.appendChild(row);
-                        
-                        // Add to grid (mobile view)
-                        const card = document.createElement('div');
-                        card.className = 'banner-card';
-                        card.innerHTML = `
-                            <div class="banner-card-header">
-                                <span class="banner-card-sno">#${bannerCount}</span>
-                                <span class="banner-card-name">${banner.name || 'Unnamed'}</span>
-                            </div>
-                            <img src="${banner.imageUrl || 'https://via.placeholder.com/300x150?text=No+Image'}" alt="Banner" class="banner-card-image">
-                            <div class="banner-card-url">
-                                <a href="${banner.redirectUrl}" target="_blank">${banner.redirectUrl}</a>
-                            </div>
-                            <div class="banner-card-actions">
-                                <button class="btn btn-primary btn-sm" onclick="showEditForm('${bannerId}')"><i class="fas fa-edit"></i> Edit</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteBanner('${bannerId}')"><i class="fas fa-trash"></i> Delete</button>
-                            </div>
-                        `;
-                        
-                        bannersGrid.appendChild(card);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading banners:', error);
-                    bannersTableBody.innerHTML = `
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 20px; color: var(--danger);">
-                                Error loading banners: ${error.message}
-                            </td>
-                        </tr>
-                    `;
-                    
-                    bannersGrid.innerHTML = `
-                        <div style="text-align: center; padding: 20px; color: var(--danger); grid-column: 1 / -1;">
-                            Error loading banners: ${error.message}
-                        </div>
-                    `;
-                });
-        }
-        
-        // Delete banner
-        function deleteBanner(bannerId) {
-            if (!confirm('Are you sure you want to delete this banner?')) {
-                return;
-            }
-            
-            const bannersRef = database.ref('adBanners/' + bannerId);
-            bannersRef.remove()
-                .then(() => {
-                    alert('Banner deleted successfully!');
-                    loadBanners();
-                })
-                .catch(error => {
-                    console.error('Error deleting banner:', error);
-                    alert('Error deleting banner: ' + error.message);
-                });
-        }
-        
-        // Helper function to show alerts
-        function showAlert(elementId, message) {
-            const alertElement = document.getElementById(elementId);
-            alertElement.textContent = message;
-            alertElement.style.display = 'block';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                alertElement.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Auto logout after 10 minutes
-        setInterval(() => {
-            const loginTime = localStorage.getItem('loginTime');
-            const currentTime = new Date().getTime();
-            
-            if (loginTime && (currentTime - parseInt(loginTime)) >= 600000) {
-                alert('Your session has expired. You will be logged out.');
-                logout();
-            }
-        }, 60000); // Check every minute
-        
-        // Logout function
-        function logout() {
-            localStorage.removeItem('adminRole');
-            localStorage.removeItem('adminUsername');
-            localStorage.removeItem('adminEmail');
-            localStorage.removeItem('loginTime');
-            window.location.href = 'index.html';
-        }
-    </script>
+
+        await db.ref('adBanners/'+key).update(updates);
+        shMsg('editMsg','✅ Saved!','success');
+        toast('Banner updated.','success');
+        setTimeout(() => closeEdit(), 1500);
+    } catch(e){
+        shMsg('editMsg','Error: '+e.message,'error');
+    } finally {
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    }
+};
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+window.openDelete = function(key){
+    _deleteKey = key;
+    document.getElementById('confOverlay').classList.add('show');
+};
+window.closeConf = function(){
+    document.getElementById('confOverlay').classList.remove('show');
+    _deleteKey = null;
+};
+window.confirmDelete = async function(){
+    if(!_deleteKey) return;
+    const btn = document.getElementById('confDelBtn');
+    btn.disabled = true; btn.textContent = 'Deleting…';
+    try {
+        await db.ref('adBanners/'+_deleteKey).remove();
+        toast('Banner deleted.','info');
+    } catch(e){ toast('Error: '+e.message,'error'); }
+    finally { btn.disabled = false; btn.textContent = 'Delete'; closeConf(); }
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+let _tt;
+function toast(msg,type){
+    clearTimeout(_tt);
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.className = 'toast '+type+' show';
+    _tt = setTimeout(()=>el.classList.remove('show'), 3200);
+}
+
+let _sm = {};
+function shMsg(id, text, type){
+    clearTimeout(_sm[id]);
+    const el = document.getElementById(id);
+    if(!text){ el.style.display='none'; return; }
+    el.textContent = text; el.className = 'sh-msg '+type; el.style.display = 'block';
+    _sm[id] = setTimeout(()=>el.style.display='none', 5000);
+}
+
+})();
+</script>
 </body>
 </html>
