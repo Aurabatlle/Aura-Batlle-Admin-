@@ -208,6 +208,20 @@
     <div class="filter-bar">
         <input type="text" id="searchInput" placeholder="🔍  Search by title, ID or hoster…" oninput="applySearch()">
     </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:130px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 12px;">
+            <i class="fas fa-calendar-alt" style="color:var(--muted);font-size:12px;flex-shrink:0;"></i>
+            <input type="date" id="filterDate" style="flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 0;min-width:0;" oninput="applySearch()" title="Filter by date">
+        </div>
+        <div style="flex:1;min-width:110px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 12px;">
+            <i class="fas fa-clock" style="color:var(--muted);font-size:12px;flex-shrink:0;"></i>
+            <input type="time" id="filterTime" style="flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 0;min-width:0;" oninput="applySearch()" title="Filter by time">
+        </div>
+        <button onclick="clearDateFilter()" style="padding:0 14px;height:40px;background:var(--surface);border:1px solid var(--border-red);border-radius:10px;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;">
+            <i class="fas fa-times"></i> Clear
+        </button>
+    </div>
+    <div id="filterInfo" style="font-size:11px;color:var(--muted);margin-bottom:10px;display:none;"></div>
     <div class="tab-content active" id="content-upcoming"><div id="list-upcoming"><div class="skeleton"></div><div class="skeleton"></div></div></div>
     <div class="tab-content" id="content-ongoing"><div id="list-ongoing"><div class="skeleton"></div></div></div>
 </div>
@@ -280,7 +294,18 @@
                     </select>
                 </div>
             </div>
-            <div class="field"><label>Per Kill Gold</label><input type="number" id="editPerKillGold" placeholder="0" min="0"></div>
+            <!-- Prize section — switches between Kill and Rank based on prizeType -->
+            <div id="prizeKillSection" class="field">
+                <label>Per Kill Gold</label>
+                <input type="number" id="editPerKillGold" placeholder="0" min="0">
+            </div>
+            <div id="prizeRankSection" style="display:none;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <label style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;">Rank Prizes</label>
+                    <button type="button" onclick="addRankPrizeRow()" style="background:rgba(139,92,246,.12);color:var(--purple);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Rank</button>
+                </div>
+                <div id="rankPrizeRows"></div>
+            </div>
             <div class="field"><label>Hoster Username</label><input type="text" id="editHosterUsername" placeholder="hoster username" autocomplete="off"></div>
             <div class="field"><label>Description</label><textarea id="editDescription" placeholder="Match description…"></textarea></div>
             <button class="sh-btn purple" id="saveEditBtn" onclick="saveEdit()"><i class="fas fa-save"></i> Save All Changes</button>
@@ -470,6 +495,13 @@ function applySearch(){
 }
 window.applySearch = applySearch;
 
+window.clearDateFilter = function(){
+    document.getElementById('filterDate').value = '';
+    document.getElementById('filterTime').value = '';
+    document.getElementById('filterInfo').style.display = 'none';
+    renderAll();
+};
+
 function renderAll(){
     const tabs = ['upcoming','ongoing'];
     tabs.forEach(tab => {
@@ -482,6 +514,33 @@ function renderAll(){
                 (m.matchId||'').toLowerCase().includes(searchQuery) ||
                 (m.hosterUsername||'').toLowerCase().includes(searchQuery)
             );
+        }
+
+        // Date filter
+        const filterDate = document.getElementById('filterDate').value;
+        const filterTime = document.getElementById('filterTime').value;
+        if(filterDate){
+            matches = matches.filter(m => (m.date||'') === filterDate);
+        }
+        if(filterTime){
+            // Match times within ±30 minutes of selected time
+            matches = matches.filter(m => {
+                if(!m.time) return false;
+                const [fh,fm] = filterTime.split(':').map(Number);
+                const [mh,mm] = (m.time||'00:00').split(':').map(Number);
+                const diff = Math.abs((fh*60+fm) - (mh*60+mm));
+                return diff <= 30;
+            });
+        }
+
+        // Update filter info label
+        if(filterDate || filterTime){
+            const infoEl = document.getElementById('filterInfo');
+            const parts = [];
+            if(filterDate) parts.push(`Date: ${filterDate}`);
+            if(filterTime) parts.push(`Time: ~${filterTime} (±30 min)`);
+            infoEl.textContent = `Filtering by — ${parts.join('  ·  ')}`;
+            infoEl.style.display = 'block';
         }
 
         // Sort
@@ -614,7 +673,59 @@ window.openEditSheet = function(matchId){
     document.getElementById('editPerKillGold').value   = m.perKillGold  || 0;
     document.getElementById('editHosterUsername').value= m.hosterUsername|| '';
     document.getElementById('editDescription').value   = m.description  || '';
+
+    // Toggle prize section based on prizeType
+    togglePrizeSection(m.prizeType || 'kill');
+
+    // Load rank prizes into rows
+    const rows = document.getElementById('rankPrizeRows');
+    rows.innerHTML = '';
+    const prizes = m.rankPrizes || [];
+    if(prizes.length > 0){
+        prizes.forEach(p => addRankPrizeRow(p.rank, p.gold));
+    } else {
+        // Default 3 rank rows when switching to rank mode
+        addRankPrizeRow(1, 0);
+        addRankPrizeRow(2, 0);
+        addRankPrizeRow(3, 0);
+    }
+
     document.getElementById('editSheet').classList.add('show');
+};
+
+window.togglePrizeSection = function(type){
+    document.getElementById('prizeKillSection').style.display  = type === 'kill' ? '' : 'none';
+    document.getElementById('prizeRankSection').style.display  = type === 'rank' ? '' : 'none';
+};
+
+// Auto-toggle when prizeType dropdown changes
+document.getElementById('editPrizeType').addEventListener('change', function(){
+    togglePrizeSection(this.value);
+    if(this.value === 'rank' && document.getElementById('rankPrizeRows').children.length === 0){
+        addRankPrizeRow(1,0); addRankPrizeRow(2,0); addRankPrizeRow(3,0);
+    }
+});
+
+window.addRankPrizeRow = function(rank, gold){
+    const rows    = document.getElementById('rankPrizeRows');
+    const idx     = rows.children.length + 1;
+    const r       = rank !== undefined ? rank : idx;
+    const g       = gold !== undefined ? gold : 0;
+    const row     = document.createElement('div');
+    row.className = 'rank-prize-row';
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    row.innerHTML = `
+        <div style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;width:70px;flex-shrink:0;">
+            <i class="fas fa-trophy" style="color:var(--gold);font-size:10px;"></i>
+            <input type="number" class="rank-input" value="${r}" min="1" placeholder="#" style="width:32px;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-family:'Rajdhani',sans-serif;font-weight:700;">
+        </div>
+        <div style="flex:1;display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;">
+            <i class="fas fa-coins" style="color:var(--gold);font-size:10px;"></i>
+            <input type="number" class="gold-input" value="${g}" min="0" placeholder="Gold" style="flex:1;background:none;border:none;outline:none;color:var(--gold);font-size:14px;font-family:'Rajdhani',sans-serif;font-weight:700;">
+            <span style="font-size:10px;color:var(--muted);">G</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" style="width:30px;height:30px;background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.2);border-radius:8px;color:var(--red);cursor:pointer;font-size:12px;flex-shrink:0;">✕</button>`;
+    rows.appendChild(row);
 };
 
 window.saveEdit = async function(){
@@ -622,6 +733,25 @@ window.saveEdit = async function(){
     const btn     = document.getElementById('saveEditBtn');
     btn.disabled  = true; btn.textContent = 'Saving…';
     try {
+        const prizeType = document.getElementById('editPrizeType').value;
+
+        // Build rankPrizes array from rows if prizeType === 'rank'
+        let rankPrizes = null;
+        if(prizeType === 'rank'){
+            const rows = document.querySelectorAll('#rankPrizeRows .rank-prize-row');
+            rankPrizes = [];
+            rows.forEach(row => {
+                const rank = parseInt(row.querySelector('.rank-input').value) || 0;
+                const gold = parseInt(row.querySelector('.gold-input').value) || 0;
+                if(rank > 0) rankPrizes.push({ rank, gold });
+            });
+            rankPrizes.sort((a,b) => a.rank - b.rank);
+            if(rankPrizes.length === 0){
+                sheetMsg('editMsg','Add at least one rank prize.','error');
+                return;
+            }
+        }
+
         const updates = {
             title:          document.getElementById('editTitle').value.trim(),
             date:           document.getElementById('editDate').value,
@@ -633,8 +763,9 @@ window.saveEdit = async function(){
             entryFee:       parseInt(document.getElementById('editEntryFee').value) || 0,
             spots:          parseInt(document.getElementById('editSpots').value)    || 0,
             map:            document.getElementById('editMap').value.trim(),
-            prizeType:      document.getElementById('editPrizeType').value,
-            perKillGold:    parseInt(document.getElementById('editPerKillGold').value) || 0,
+            prizeType,
+            perKillGold:    prizeType === 'kill' ? (parseInt(document.getElementById('editPerKillGold').value) || 0) : 0,
+            rankPrizes:     rankPrizes,
             hosterUsername: document.getElementById('editHosterUsername').value.trim(),
             description:    document.getElementById('editDescription').value.trim(),
         };
