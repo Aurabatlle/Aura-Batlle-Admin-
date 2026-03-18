@@ -453,14 +453,12 @@
 </head>
 <body>
 
-<!-- Loading -->
 <div id="loadingScreen">
     <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Logo" onerror="this.style.display='none'">
     <div class="ld-spin"></div>
     <p class="ld-txt">Loading dashboard…</p>
 </div>
 
-<!-- Header -->
 <header>
     <div class="header-inner">
         <a class="logo" href="#">
@@ -486,7 +484,6 @@
     </div>
 </header>
 
-<!-- Dashboard -->
 <div class="main" id="mainArea" style="display:none;">
 
     <div class="welcome-bar">
@@ -525,6 +522,12 @@
             <div class="card-icon"><i class="fas fa-tools"></i></div>
             <h3>Maintenance</h3>
             <p>Enable / disable maintenance mode</p>
+        </div>
+
+        <div class="card" onclick="navigateTo('match.html')">
+            <div class="card-icon"><i class="fas fa-gamepad"></i></div>
+            <h3>Manage Matches</h3>
+            <p>Create and edit game match details</p>
         </div>
 
         <div class="card" onclick="navigateTo('ad-banner.html')">
@@ -566,7 +569,6 @@
     </div>
 </div>
 
-<!-- Login Prompt -->
 <div class="login-prompt" id="loginPrompt">
     <div class="lp-icon"><i class="fas fa-ban"></i></div>
     <h2>Access Denied</h2>
@@ -576,9 +578,6 @@
     </button>
 </div>
 
-<!-- ── Modals ── -->
-
-<!-- Settings -->
 <div class="modal" id="settingsModal">
     <div class="modal-box">
         <div class="modal-header">
@@ -616,7 +615,6 @@
     </div>
 </div>
 
-<!-- Password -->
 <div class="modal" id="passwordModal">
     <div class="modal-box">
         <div class="modal-header">
@@ -828,9 +826,10 @@ function clearSession() {
 
 // ── Search ───────────────────────────────────────────────────────────
 const cardData = [
-{ title:"Manage Hosters",       icon:"fas fa-server",        link:"hoster.html" },
+    { title:"Manage Hosters",       icon:"fas fa-server",        link:"hoster.html" },
     { title:"Update Version",       icon:"fas fa-sync-alt",      link:"ubdate.html" },
     { title:"Maintenance Control",  icon:"fas fa-tools",         link:"maintanace.html" },
+    { title:"Manage Matches",       icon:"fas fa-gamepad",       link:"match.html" },
     { title:"Ad Banner Management", icon:"fas fa-rectangle-ad",  link:"ad-banner.html" },
     { title:"Manage Users",         icon:"fas fa-user-friends",  link:"manageuser.html" },
     { title:"Payment Source",       icon:"fas fa-wallet",        link:"upi.html" },
