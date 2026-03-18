@@ -1,561 +1,579 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura Battle - Version Update Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Aura Battle · update manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --danger: #e63946;
-            --warning: #fca311;
-            --gray: #6c757d;
-            --white: #ffffff;
+            --bg: #0a0c14;           /* deep black background */
+            --surface: #1a1d2b;       /* dark red‑black card */
+            --surface-hover: #222837;
+            --border: #3a1e2c;        /* subtle red border */
+            --accent-red: #e11b3a;     /* main aggressive red */
+            --accent-red-dark: #a80f2b;
+            --accent-glow: rgba(225, 27, 58, 0.45);
+            --text-light: #f0eef7;
+            --text-muted: #b8b6c2;
+            --danger-bg: #2f1420;
+            --success-bg: #0e3322;
+            --success: #45e68b;
+            --warning: #ffb347;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 15px;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-light);
+            min-height: 100dvh;
+            padding: 18px 16px 24px;
+            position: relative;
         }
-        
-        .container {
-            max-width: 100%;
+
+        /* red ambient blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -100px; right: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(225,27,58,0.25) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -2;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -80px; left: -50px;
+            width: 380px; height: 380px;
+            background: radial-gradient(circle, rgba(190,30,45,0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .dashboard {
+            max-width: 560px;
             margin: 0 auto;
         }
-        
-        .header {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .logo {
+
+        /* header bar */
+        .top-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            background: rgba(10, 12, 20, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 10px 16px;
+            border-radius: 60px;
+            border: 1px solid var(--border);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
         }
-        
-        .logo img {
-            height: 35px;
-            margin-right: 12px;
-        }
-        
-        .logo h1 {
-            font-size: 18px;
-            color: var(--dark);
-            text-align: center;
-        }
-        
-        .user-info {
+        .logo-area {
             display: flex;
-            flex-direction: column;
             align-items: center;
             gap: 10px;
         }
-        
-        .user-info span {
-            font-weight: 500;
-            color: var(--dark);
-            font-size: 14px;
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: var(--accent-red);
+            border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            color: black;
+            font-weight: 800;
+            box-shadow: 0 0 16px var(--accent-glow);
         }
-        
-        .logout-btn {
-            background: var(--danger);
-            color: var(--white);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 14px;
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: -0.5px;
         }
-        
-        .dashboard {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 15px;
+        .logo-text span { color: var(--accent-red); }
+
+        .admin-badge {
+            background: var(--surface);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            display: flex; align-items: center; gap: 6px;
         }
-        
+        .admin-badge i { color: var(--accent-red); }
+
+        /* main cards */
         .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 24px 20px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 18px 28px -12px rgba(0,0,0,0.8);
+            transition: border-color 0.2s;
         }
-        
+        .card:hover { border-color: #b0304a; }
+
         .card-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #eee;
+            gap: 10px;
+            margin-bottom: 24px;
         }
-        
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
+        .card-header i {
+            font-size: 24px;
+            color: var(--accent-red);
+            background: rgba(225,27,58,0.15);
+            padding: 10px;
+            border-radius: 18px;
         }
-        
-        .card-icon {
-            width: 35px;
-            height: 35px;
-            background: var(--primary);
-            border-radius: 8px;
+        .card-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        /* current version pill */
+        .version-grid {
+            background: #0f111c;
+            border-radius: 24px;
+            padding: 20px 16px;
+            margin-bottom: 24px;
+            border: 1px solid #2d1f2a;
+        }
+        .version-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--white);
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .version-row:last-child { margin-bottom: 0; }
+        .version-label {
+            color: var(--text-muted);
             font-size: 14px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
             font-weight: 500;
-            color: var(--dark);
-            font-size: 14px;
+            display: flex; align-items: center; gap: 6px;
         }
-        
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            color: var(--dark);
-            background: var(--white);
+        .version-value {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            background: linear-gradient(135deg, #fff, #d9c9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
+        .version-sub {
+            font-size: 16px;
+            color: var(--accent-red);
+            background: rgba(225,27,58,0.1);
+            padding: 4px 12px;
+            border-radius: 60px;
+            border: 1px solid #571a2a;
         }
-        
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background: var(--secondary);
-        }
-        
-        .alert {
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            display: none;
-            font-size: 14px;
-        }
-        
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .current-config {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 15px;
-            font-size: 13px;
-        }
-        
-        .config-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .config-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .version-info {
-            background: #e9ecef;
-            padding: 8px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            font-size: 13px;
-        }
-        
-        .version-info p {
-            margin: 4px 0;
-        }
-        
-        .loader {
-            display: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-            margin: 0 auto;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .access-denied {
-            text-align: center;
-            padding: 30px 20px;
-            background: var(--white);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .access-denied i {
-            font-size: 40px;
-            color: var(--danger);
-            margin-bottom: 15px;
-        }
-        
-        .access-denied h2 {
-            font-size: 18px;
-            color: var(--dark);
-            margin-bottom: 10px;
-        }
-        
-        .access-denied p {
-            font-size: 14px;
-            color: var(--gray);
+
+        /* form area */
+        .input-group {
             margin-bottom: 20px;
         }
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .input-field {
+            width: 100%;
+            background: #0d0f1a;
+            border: 1px solid #3b1e2b;
+            border-radius: 18px;
+            padding: 16px 18px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(225, 27, 58, 0.2);
+        }
+        textarea.input-field {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .flex-row .input-group { flex: 1; min-width: 110px; }
+
+        /* update message specific */
+        .message-preview {
+            background: #130e1e;
+            border-left: 4px solid var(--accent-red);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 12px 0 20px;
+            font-style: italic;
+            color: #cbc3e0;
+        }
+
+        /* action buttons */
+        .btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 14px 24px;
+            border-radius: 60px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+            cursor: pointer;
+            transition: .2s;
+            width: 100%;
+            color: var(--text-light);
+        }
+
+        .btn-primary {
+            background: var(--accent-red);
+            border: none;
+            box-shadow: 0 4px 24px var(--accent-glow);
+            color: black;
+        }
+        .btn-primary:hover { background: #c61734; transform: scale(1.02); }
+        .btn-outline-red {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+        .btn-outline-red:hover { background: rgba(225,27,58,0.1); }
+
+        .loader {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(0,0,0,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 18px 0 6px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-danger {
+            background: var(--danger-bg);
+            border: 1px solid #b42e4b;
+            color: #ffb0b0;
+        }
+        .alert-success {
+            background: #0c281e;
+            border: 1px solid #208a54;
+            color: var(--success);
+        }
+
+        .last-updated {
+            color: var(--text-muted);
+            font-size: 12px;
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 16px;
+        }
+
+        /* logout */
+        .logout-btn {
+            margin-top: 32px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+        }
+        .logout-btn button {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 12px 30px;
+            border-radius: 60px;
+            font-weight: 600;
+            width: auto;
+            display: inline-flex;
+            transition: .2s;
+        }
+        .logout-btn button:hover { border-color: var(--accent-red); color: #fff; }
+
+        /* misc */
+        .small-note {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 8px 0 0;
+        }
     </style>
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Database -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">
-                <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Aura Battle Logo">
-                <h1>Aura Battle - Version Update Management</h1>
-            </div>
-            <div class="user-info">
-                <span id="adminUsername">Loading...</span>
-                <span id="adminRole"></span>
-                <button class="logout-btn" id="logoutBtn">Logout</button>
-            </div>
+<div class="dashboard" id="dashboardMain">
+    <!-- top bar -->
+    <div class="top-bar">
+        <div class="logo-area">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">AURA<span>BATTLE</span></div>
         </div>
-        
-        <div id="accessDenied" class="access-denied" style="display: none;">
-            <i class="fas fa-exclamation-circle"></i>
-            <h2>Access Denied</h2>
-            <p>You don't have permission to access this page.</p>
-            <button class="btn btn-primary" id="goBackBtn">Go Back to Login</button>
-        </div>
-        
-        <div id="adminContent" style="display: none;">
-            <div class="alert alert-danger" id="errorMessage"></div>
-            <div class="alert alert-success" id="successMessage"></div>
-            
-            <div class="dashboard">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Version Configuration</div>
-                        <div class="card-icon">
-                            <i class="fas fa-code-branch"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="version-info">
-                        <p><strong>Update Logic:</strong> Update will be required if BOTH version code AND version name are smaller than the minimum values</p>
-                        <p><strong>Version Name Format:</strong> Major.Minor.Patch (e.g., 1.6.2)</p>
-                        <p><strong>Version Code:</strong> Numeric value (e.g., 10)</p>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="minVersionName">Minimum Version Name</label>
-                        <input type="text" class="form-control" id="minVersionName" placeholder="e.g., 1.6.2">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="minVersionCode">Minimum Version Code</label>
-                        <input type="number" class="form-control" id="minVersionCode" placeholder="e.g., 10">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="updateMessage">Update Message</label>
-                        <textarea class="form-control" id="updateMessage" rows="3" placeholder="Message shown to users">A new version is available with exciting new features and improvements!</textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="updateLink">Update Link</label>
-                        <input type="url" class="form-control" id="updateLink" placeholder="https://play.google.com/store/apps/details?id=com.aura.battle" value="https://play.google.com/store/apps/details?id=com.aura.battle">
-                    </div>
-                    
-                    <button class="btn btn-primary" id="saveVersionConfig">
-                        <span>Save Version Configuration</span>
-                        <div class="loader" id="saveLoader"></div>
-                    </button>
-                    
-                    <div class="current-config" id="currentVersionConfig">
-                        <h4>Current Configuration:</h4>
-                        <div class="config-item">
-                            <span>Minimum Version Name:</span>
-                            <span id="currentMinVersionName">Not set</span>
-                        </div>
-                        <div class="config-item">
-                            <span>Minimum Version Code:</span>
-                            <span id="currentMinVersionCode">Not set</span>
-                        </div>
-                        <div class="config-item">
-                            <span>Update Message:</span>
-                            <span id="currentUpdateMessage">Not set</span>
-                        </div>
-                        <div class="config-item">
-                            <span>Update Link:</span>
-                            <span id="currentUpdateLink">Not set</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="admin-badge">
+            <i class="fas fa-crown"></i> <span id="adminNameDisplay">admin</span>
         </div>
     </div>
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-            authDomain: "aura-battle-main.firebaseapp.com",
-            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-            projectId: "aura-battle-main",
-            storageBucket: "aura-battle-main.firebasestorage.app",
-            messagingSenderId: "763779990289",
-            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
-            measurementId: "G-ZZXZ00HK07"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // DOM Elements
-        const adminUsername = document.getElementById('adminUsername');
-        const adminRole = document.getElementById('adminRole');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const accessDenied = document.getElementById('accessDenied');
-        const adminContent = document.getElementById('adminContent');
-        const goBackBtn = document.getElementById('goBackBtn');
-        
-        // Version Config Elements
-        const minVersionName = document.getElementById('minVersionName');
-        const minVersionCode = document.getElementById('minVersionCode');
-        const updateMessage = document.getElementById('updateMessage');
-        const updateLink = document.getElementById('updateLink');
-        const saveVersionConfig = document.getElementById('saveVersionConfig');
-        const saveLoader = document.getElementById('saveLoader');
-        
-        // Current Config Display Elements
-        const currentMinVersionName = document.getElementById('currentMinVersionName');
-        const currentMinVersionCode = document.getElementById('currentMinVersionCode');
-        const currentUpdateMessage = document.getElementById('currentUpdateMessage');
-        const currentUpdateLink = document.getElementById('currentUpdateLink');
-        
-        // Check authentication and authorization
-        window.addEventListener('DOMContentLoaded', () => {
-            const adminUser = localStorage.getItem('adminUsername');
-            const adminEmail = localStorage.getItem('adminEmail');
-            const adminRoleValue = localStorage.getItem('adminRole');
-            const loginTime = localStorage.getItem('loginTime');
-            const currentTime = new Date().getTime();
-            
-            // Redirect to login if not authenticated or session expired
-            if (!adminUser || !adminRoleValue || !loginTime || (currentTime - parseInt(loginTime)) > 3600000) {
-                localStorage.clear();
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // Set username and role
-            adminUsername.textContent = adminUser;
-            adminRole.textContent = `(${adminRoleValue})`;
-            
-            // Verify user against database
-            verifyAdminAccess(adminEmail);
-        });
-        
-        // Verify admin access against database
-        function verifyAdminAccess(email) {
-            database.ref('admins').orderByChild('email').equalTo(email).once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        // User exists in database, grant access
-                        adminContent.style.display = 'block';
-                        accessDenied.style.display = 'none';
-                        loadVersionConfig();
-                    } else {
-                        // User doesn't exist in database, deny access
-                        adminContent.style.display = 'none';
-                        accessDenied.style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    showError('Error verifying access: ' + error.message);
-                    adminContent.style.display = 'none';
-                    accessDenied.style.display = 'block';
-                });
+    <!-- main update card -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-cloud-arrow-up"></i>
+            <h2>update controller</h2>
+        </div>
+
+        <!-- current values from firebase will fill this -->
+        <div class="version-grid" id="currentVersionGrid">
+            <div class="version-row">
+                <span class="version-label"><i class="fas fa-code-branch"></i> min version</span>
+                <span class="version-value" id="displayMinVer">—</span>
+            </div>
+            <div class="version-row">
+                <span class="version-label"><i class="fas fa-tag"></i> version name</span>
+                <span class="version-sub" id="displayMinName">—</span>
+            </div>
+            <div class="version-row">
+                <span class="version-label"><i class="fas fa-link"></i> update link</span>
+                <span class="version-sub" style="font-size:13px;" id="displayLink">—</span>
+            </div>
+        </div>
+
+        <!-- dynamic alerts -->
+        <div class="alert alert-danger" id="errorMsg"><i class="fas fa-exclamation-triangle"></i> <span></span></div>
+        <div class="alert alert-success" id="successMsg"><i class="fas fa-circle-check"></i> <span></span></div>
+
+        <!-- form to edit update config -->
+        <div class="input-group">
+            <label><i class="fas fa-hashtag" style="margin-right:4px;"></i> MINIMUM VERSION CODE (integer)</label>
+            <input type="number" class="input-field" id="minVersionCode" placeholder="e.g. 6" value="6">
+        </div>
+
+        <div class="flex-row">
+            <div class="input-group">
+                <label>VERSION NAME</label>
+                <input type="text" class="input-field" id="minVersionName" placeholder="2.6" value="2.6">
+            </div>
+            <div class="input-group">
+                <label>UPDATE LINK</label>
+                <input type="url" class="input-field" id="updateLink" placeholder="https://..." value="https://aurabatlle.github.io/Aura-Batlle-/app-debug.apk">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label><i class="fas fa-message"></i> UPDATE MESSAGE</label>
+            <textarea class="input-field" id="updateMessage" rows="2">🚨 hyper os supported</textarea>
+        </div>
+
+        <!-- live preview -->
+        <div class="message-preview" id="livePreview">
+            <i class="fas fa-bolt" style="color:var(--accent-red); margin-right:6px;"></i> <span>🚨 hyper os supported</span>
+        </div>
+
+        <button class="btn btn-primary" id="saveUpdateBtn" onclick="handleSave()">
+            <i class="fas fa-save"></i> publish update
+            <div class="loader" id="saveLoader"></div>
+        </button>
+
+        <div class="last-updated">
+            <i class="fas fa-clock"></i> current config – last sync <span id="syncTime">just now</span>
+        </div>
+    </div>
+
+    <!-- danger zone card (reset) -->
+    <div class="card" style="border-color: #631e2e;">
+        <div class="card-header">
+            <i class="fas fa-shield-halved" style="color:#d14b62;"></i>
+            <h2>config zone</h2>
+        </div>
+        <button class="btn btn-outline-red" onclick="loadCurrentConfig(true)">
+            <i class="fas fa-rotate-right"></i> refresh from firebase
+        </button>
+        <div class="small-note"><i class="fas fa-database"></i> changes take effect immediately</div>
+    </div>
+
+    <!-- logout -->
+    <div class="logout-btn">
+        <button onclick="logout()"><i class="fas fa-sign-out"></i> logout / exit</button>
+    </div>
+</div>
+
+<!-- firebase sdk -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<!-- same xor config from login page (key=73? but we keep key as given) 
+     actually we reuse exactly the same logic to keep firebase config consistent -->
+<script>
+// copy‑paste the exact XOR logic from index (key: aB3xQ9mZ)
+const _e = (s,k)=>s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+const _k = 'aB3xQ9mZ';
+
+const _cfg = {
+    a: "\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+    b: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+    c: "\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+    d: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+    e: "\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+    f: "\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+    g: "\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
+};
+
+function _d(s){ return _e(s,_k); }
+function _getConfig(){
+    return {
+        apiKey:            _d(_cfg.a),
+        authDomain:        _d(_cfg.b),
+        databaseURL:       _d(_cfg.c),
+        projectId:         _d(_cfg.d),
+        storageBucket:     _d(_cfg.e),
+        messagingSenderId: _d(_cfg.f),
+        appId:             _d(_cfg.g)
+    };
+}
+
+// init firebase
+firebase.initializeApp(_getConfig());
+const db = firebase.database();
+
+// reference to updateConfig node (structure you gave)
+const updateRef = db.ref('updateConfig');
+
+// load current values into form & display
+function loadCurrentConfig(showToast = false) {
+    updateRef.once('value').then(snap => {
+        const data = snap.val() || {};
+        // safe assign
+        const minVer = data.minimumVersionCode ?? 6;
+        const minName = data.minimumVersionName ?? '2.6';
+        const link = data.updateLink ?? 'https://aurabatlle.github.io/Aura-Batlle-/app-debug.apk';
+        const msg = data.updateMessage ?? '🚨 hyper os supported';
+
+        // update display fields
+        document.getElementById('displayMinVer').innerText = minVer;
+        document.getElementById('displayMinName').innerText = minName;
+        document.getElementById('displayLink').innerHTML = `<small>${link.substring(0,40)}…</small>`;
+        document.getElementById('minVersionCode').value = minVer;
+        document.getElementById('minVersionName').value = minName;
+        document.getElementById('updateLink').value = link;
+        document.getElementById('updateMessage').value = msg;
+        document.getElementById('livePreview').innerHTML = `<i class="fas fa-bolt" style="color:var(--accent-red); margin-right:6px;"></i> <span>${msg}</span>`;
+        document.getElementById('syncTime').innerText = new Date().toLocaleTimeString();
+
+        if (showToast) {
+            showSuccess('config reloaded');
         }
-        
-        // Load Version Configuration
-        function loadVersionConfig() {
-            database.ref('updateConfig').once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const config = snapshot.val();
-                        minVersionName.value = config.minimumVersionName || '';
-                        minVersionCode.value = config.minimumVersionCode || '';
-                        updateMessage.value = config.updateMessage || '';
-                        updateLink.value = config.updateLink || '';
-                        
-                        // Update current config display
-                        currentMinVersionName.textContent = config.minimumVersionName || 'Not set';
-                        currentMinVersionCode.textContent = config.minimumVersionCode || 'Not set';
-                        currentUpdateMessage.textContent = config.updateMessage || 'Not set';
-                        currentUpdateLink.textContent = config.updateLink || 'Not set';
-                    }
-                })
-                .catch(error => {
-                    showError('Error loading version configuration: ' + error.message);
-                });
-        }
-        
-        // Save Version Configuration
-        saveVersionConfig.addEventListener('click', () => {
-            const config = {
-                minimumVersionName: minVersionName.value,
-                minimumVersionCode: parseInt(minVersionCode.value) || 0,
-                updateMessage: updateMessage.value,
-                updateLink: updateLink.value
-            };
-            
-            // Validate inputs
-            if (!config.minimumVersionName || !config.minimumVersionCode) {
-                showError('Please fill in all version fields');
-                return;
-            }
-            
-            // Validate version name format (should be x.y.z)
-            const versionRegex = /^\d+(\.\d+)*$/;
-            if (!versionRegex.test(config.minimumVersionName)) {
-                showError('Version name should be in format like 1.6.2 (numbers separated by dots)');
-                return;
-            }
-            
-            // Show loading state
-            saveVersionConfig.querySelector('span').textContent = 'Saving...';
-            saveLoader.style.display = 'block';
-            saveVersionConfig.disabled = true;
-            
-            database.ref('updateConfig').set(config)
-                .then(() => {
-                    showSuccess('Version configuration saved successfully!');
-                    loadVersionConfig(); // Reload to show current values
-                })
-                .catch(error => {
-                    showError('Error saving version configuration: ' + error.message);
-                })
-                .finally(() => {
-                    // Reset button state
-                    saveVersionConfig.querySelector('span').textContent = 'Save Version Configuration';
-                    saveLoader.style.display = 'none';
-                    saveVersionConfig.disabled = false;
-                });
+    }).catch(e => showError('load error: ' + e.message));
+}
+
+// live preview on message change
+document.getElementById('updateMessage').addEventListener('input', function(e){
+    document.getElementById('livePreview').innerHTML = `<i class="fas fa-bolt" style="color:var(--accent-red); margin-right:6px;"></i> <span>${e.target.value || '—'}</span>`;
+});
+
+// Save handler
+function handleSave() {
+    const code = parseInt(document.getElementById('minVersionCode').value, 10);
+    const nameVer = document.getElementById('minVersionName').value.trim();
+    const link = document.getElementById('updateLink').value.trim();
+    const msg = document.getElementById('updateMessage').value.trim();
+
+    if (!code || isNaN(code)) { showError('valid version code required'); return; }
+    if (!nameVer) { showError('version name missing'); return; }
+    if (!link.startsWith('http')) { showError('link must start with http'); return; }
+
+    const loader = document.getElementById('saveLoader');
+    const btn = document.getElementById('saveUpdateBtn');
+    btn.disabled = true; loader.style.display = 'inline-block';
+
+    const updateData = {
+        minimumVersionCode: code,
+        minimumVersionName: nameVer,
+        updateLink: link,
+        updateMessage: msg || '🚀 new update'
+    };
+
+    updateRef.set(updateData)
+        .then(() => {
+            showSuccess('update config published!');
+            loadCurrentConfig(false);
+        })
+        .catch(err => showError('save failed: ' + err.message))
+        .finally(() => {
+            btn.disabled = false;
+            loader.style.display = 'none';
         });
-        
-        // Logout
-        logoutBtn.addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        });
-        
-        // Go back to login
-        goBackBtn.addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        });
-        
-        // Helper functions for showing messages
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 5000);
-        }
-        
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 3000);
-        }
-    </script>
+}
+
+// helpers
+function showError(m) {
+    const box = document.getElementById('errorMsg');
+    box.querySelector('span').innerText = m;
+    box.style.display = 'flex';
+    document.getElementById('successMsg').style.display = 'none';
+    setTimeout(() => box.style.display = 'none', 4000);
+}
+function showSuccess(m) {
+    const box = document.getElementById('successMsg');
+    box.querySelector('span').innerText = m;
+    box.style.display = 'flex';
+    document.getElementById('errorMsg').style.display = 'none';
+    setTimeout(() => box.style.display = 'none', 3000);
+}
+
+// session check (must be logged in from index)
+function checkSession() {
+    const admin = localStorage.getItem('adminUsername');
+    const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+    const displayName = localStorage.getItem('adminDisplayName') || 'admin';
+    document.getElementById('adminNameDisplay').innerText = displayName;
+
+    if (!admin || (Date.now() - loginTime) > 30*60*1000) {
+        // redirect to login
+        window.location.replace('index.html');  // assume login page named index.html
+    }
+}
+
+function logout() {
+    ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime'].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'index.html';
+}
+
+// initial load
+window.addEventListener('DOMContentLoaded', () => {
+    checkSession();
+    loadCurrentConfig(false);
+});
+</script>
 </body>
 </html>
-
-
-
-
