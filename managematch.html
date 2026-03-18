@@ -995,30 +995,8 @@ This removes ALL match data from the database. No refunds will be issued.`)) ret
 };
 
 // ── Notification sender ───────────────────────────────────────────────────────
-// Writes a notification record to Firebase under /notifications/{matchId}
-// Your Android app listens to this node via FCM data messages or a Firestore
-// trigger. The Netlify notify function reads FCM tokens from /users/{uid}/fcmToken
-// and sends the push. Falls back to direct DB write if Netlify is unavailable.
+// Calls the Netlify notify function directly (FCM push only — no Firebase write).
 async function sendNotification(matchId, type, reason){
-    // 1. Write notification record to Firebase (picked up by Cloud Function / app)
-    try {
-        const now = new Date();
-        const pad = n => String(n).padStart(2,'0');
-        await db.ref('notifications/'+matchId).set({
-            matchId,
-            type,
-            sender:    'admin',
-            adminId:   adminSess ? adminSess.id : '',
-            reason:    reason || '',
-            timestamp: Date.now(),
-            date: `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`,
-            time: `${pad(now.getHours())}:${pad(now.getMinutes())}`
-        });
-    } catch(e){
-        console.warn('[Admin] DB notification write failed:', e.message);
-    }
-
-    // 2. Also call Netlify function if available (FCM push)
     try {
         const res = await fetch('/.netlify/functions/notify', {
             method: 'POST',
@@ -1026,7 +1004,7 @@ async function sendNotification(matchId, type, reason){
             body: JSON.stringify({
                 matchId,
                 type,
-                sender: 'admin',
+                sender:  'admin',
                 adminId: adminSess ? adminSess.id : '',
                 ...(reason ? { reason } : {})
             })
@@ -1034,7 +1012,7 @@ async function sendNotification(matchId, type, reason){
         const data = await res.json();
         console.log(`[Admin] FCM notified ${data.sent||0} players`);
     } catch(e){
-        console.warn('[Admin] Netlify push failed (non-critical):', e.message);
+        console.warn('[Admin] Netlify notify failed (non-critical):', e.message);
     }
 }
 
