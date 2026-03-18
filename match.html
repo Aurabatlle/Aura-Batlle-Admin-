@@ -233,7 +233,7 @@
         <div class="d-menu">
             <button class="d-item" onclick="openSheet('settingsSheet')"><i class="fas fa-cog"></i> Profile Settings</button>
             <button class="d-item" onclick="openSheet('passwordSheet')"><i class="fas fa-key"></i> Change Password</button>
-            <button class="d-item" onclick="openSheet('noticeSheet')"><i class="fas fa-bullhorn"></i> Post Announcement</button>
+
             <div class="d-sep"></div>
             <button class="d-item danger" onclick="openSheet('logoutSheet')"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
@@ -248,29 +248,12 @@
             <div class="g-name">Hello, <span id="greetName">Admin</span> 👋</div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
-            <div class="stat-card purple">
-                <div class="s-icon purple"><i class="fas fa-users"></i></div>
-                <div class="s-label">Total Users</div>
-                <div class="s-val loading" id="statUsers">000</div>
-            </div>
-            <div class="stat-card red">
-                <div class="s-icon red"><i class="fas fa-ban"></i></div>
-                <div class="s-label">Banned</div>
-                <div class="s-val loading" id="statBanned">00</div>
-            </div>
+        <!-- Stats — Total Matches from maintenanceConfig/matchCounter + Hosters -->
+        <div class="stats-row">
             <div class="stat-card green">
                 <div class="s-icon green"><i class="fas fa-gamepad"></i></div>
-                <div class="s-label">Matches</div>
+                <div class="s-label">Total Matches</div>
                 <div class="s-val loading" id="statMatches">00</div>
-            </div>
-        </div>
-        <div class="stats-row">
-            <div class="stat-card gold">
-                <div class="s-icon gold"><i class="fas fa-coins"></i></div>
-                <div class="s-label">Total Coins</div>
-                <div class="s-val loading" id="statCoins">000</div>
             </div>
             <div class="stat-card blue">
                 <div class="s-icon blue"><i class="fas fa-user-tie"></i></div>
@@ -279,34 +262,7 @@
             </div>
         </div>
 
-        <!-- User Management -->
-        <div class="sec-head" style="margin-top:8px;animation:fadeUp .45s .12s ease both;">User Management</div>
-        <div class="grid" style="margin-bottom:10px;animation:fadeUp .45s .15s ease both;">
-            <div class="acard accent-purple" onclick="openSheet('userSearchSheet')">
-                <i class="fas fa-chevron-right a-arr"></i>
-                <div class="a-ico purple"><i class="fas fa-search"></i></div>
-                <div class="a-title">Search User</div>
-                <div class="a-desc">Find by UID, name or phone</div>
-            </div>
-            <div class="acard accent-red" onclick="openSheet('banSheet')">
-                <i class="fas fa-chevron-right a-arr"></i>
-                <div class="a-ico red"><i class="fas fa-ban"></i></div>
-                <div class="a-title">Ban User</div>
-                <div class="a-desc">Ban with reason + duration</div>
-            </div>
-            <div class="acard accent-gold" onclick="openSheet('coinsSheet')">
-                <i class="fas fa-chevron-right a-arr"></i>
-                <div class="a-ico gold"><i class="fas fa-coins"></i></div>
-                <div class="a-title">Adjust Coins</div>
-                <div class="a-desc">Add or deduct coins</div>
-            </div>
-            <div class="acard accent-green" onclick="openSheet('unbanSheet')">
-                <i class="fas fa-chevron-right a-arr"></i>
-                <div class="a-ico green"><i class="fas fa-user-check"></i></div>
-                <div class="a-title">Unban User</div>
-                <div class="a-desc">Remove ban by UID</div>
-            </div>
-        </div>
+
 
         <!-- Match Management -->
         <div class="sec-head" style="animation:fadeUp .45s .18s ease both;">Match Management</div>
@@ -337,41 +293,14 @@
             </a>
         </div>
 
-        <!-- Hosters & Platform -->
-        <div class="sec-head" style="animation:fadeUp .45s .22s ease both;">Platform</div>
-        <div style="animation:fadeUp .45s .24s ease both;">
-            <div class="acard-wide accent-red" onclick="openSheet('hosterSheet')">
-                <div class="a-ico red"><i class="fas fa-user-tie"></i></div>
-                <div class="aw-info">
-                    <div class="aw-title">Manage Hosters</div>
-                    <div class="aw-desc">Add, view or remove hoster accounts</div>
-                </div>
-                <i class="fas fa-chevron-right aw-arr"></i>
-            </div>
-            <div class="acard-wide accent-gold" onclick="openSheet('noticeSheet')">
-                <div class="a-ico gold"><i class="fas fa-bullhorn"></i></div>
-                <div class="aw-info">
-                    <div class="aw-title">Announcements</div>
-                    <div class="aw-desc">Post notices visible to all users</div>
-                </div>
-                <i class="fas fa-chevron-right aw-arr"></i>
-            </div>
-            <div class="acard-wide accent-purple" onclick="openSheet('adBannerSheet')">
-                <div class="a-ico purple"><i class="fas fa-image"></i></div>
-                <div class="aw-info">
-                    <div class="aw-title">Ad Banners</div>
-                    <div class="aw-desc">Add or remove home page banners</div>
-                </div>
-                <i class="fas fa-chevron-right aw-arr"></i>
-            </div>
-        </div>
+
 
     </div><!-- /main -->
 
     <!-- Bottom nav -->
     <nav class="bnav">
         <button class="nb active"><i class="fas fa-home"></i><span>Home</span></button>
-        <button class="nb" onclick="openSheet('userSearchSheet')"><i class="fas fa-users"></i><span>Users</span></button>
+
         <a href="creatematch.html" class="nb"><i class="fas fa-plus"></i><span>Create</span></button></a>
         <a href="hostmatch.html" class="nb"><i class="fas fa-play"></i><span>Host</span></a>
         <button class="nb" onclick="openSheet('settingsSheet')"><i class="fas fa-cog"></i><span>Settings</span></button>
@@ -655,26 +584,12 @@ function initDashboard(adminId, username){
 
 // ── Stats ────────────────────────────────────────────────────────────────────
 function loadStats(){
-    // Users
-    db.ref('users').once('value').then(snap=>{
-        let total=0, banned=0, coins=0;
-        snap.forEach(c=>{
-            total++;
-            const u=c.val();
-            if(u.status==='banned') banned++;
-            coins += (u.wallet?.depositGold||0) + (u.wallet?.winningGold||0);
-        });
-        setText('statUsers', total);
-        setText('statBanned', banned);
-        setText('statCoins', coins.toLocaleString());
-    }).catch(()=>{ setText('statUsers','—'); setText('statBanned','—'); setText('statCoins','—'); });
-
-    // Matches
-    db.ref('matches').once('value').then(snap=>{
-        setText('statMatches', snap.numChildren());
+    // Total matches from maintenanceConfig/matchCounter
+    db.ref('maintenanceConfig/matchCounter').once('value').then(snap=>{
+        setText('statMatches', snap.val() ?? '—');
     }).catch(()=>setText('statMatches','—'));
 
-    // Hosters
+    // Hosters count
     db.ref('hosters').once('value').then(snap=>{
         setText('statHosters', snap.numChildren());
     }).catch(()=>setText('statHosters','—'));
