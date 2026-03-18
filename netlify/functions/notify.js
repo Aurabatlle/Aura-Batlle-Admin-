@@ -1,333 +1,190 @@
-/**
- * notify.js — Netlify Serverless Function
- * ─────────────────────────────────────────────────────────────────────────────
- * File location in your project:
- *   netlify/functions/notify.js
- *
- * Called by:
- *   hostmatch.html  →  sendNotification(matchId, type, reason)
- *   admin-matches.html → sendNotification(matchId, type, reason)
- *
- * What it does:
- *   1. Reads the match from Firebase to get all joined player UIDs
- *   2. Reads each player's FCM token from /users/{uid}/fcmToken
- *   3. Sends an FCM push notification to all tokens via Firebase Cloud Messaging
- *   4. Returns { sent: N } — number of tokens successfully pushed
- *
- * Notification types handled:
- *   match_started   — "Match is now LIVE! Room details ready."
- *   room_details    — "Room ID & Password are now available."
- *   match_cancelled — "Match has been cancelled. Reason: {reason}"
- *   result_pending  — "Match ended. Results will be announced soon."
- *
- * Environment variables required in Netlify dashboard:
- *   FIREBASE_DATABASE_URL  — e.g. https://aura-battle-main-default-rtdb.firebaseio.com
- *   FIREBASE_SERVER_KEY    — FCM Server Key from Firebase Console →
- *                            Project Settings → Cloud Messaging → Server Key
- *                            (Legacy API — v1 requires service account, see note below)
- *
- * ─────────────────────────────────────────────────────────────────────────────
- * HOW TO GET YOUR FCM SERVER KEY:
- *   Firebase Console → Project Settings → Cloud Messaging tab
- *   Copy "Server key" under "Cloud Messaging API (Legacy)"
- *   If legacy is disabled, enable it or see FCM v1 note at bottom of file.
- * ─────────────────────────────────────────────────────────────────────────────
- */
+const { GoogleAuth } = require('google-auth-library');
 
-const https = require('https');
-
-// ── Firebase REST helper ──────────────────────────────────────────────────────
-// Reads a path from Firebase Realtime DB using the REST API (no SDK needed)
-async function firebaseGet(path) {
-    const dbUrl   = process.env.FIREBASE_DATABASE_URL.replace(/\/$/, '');
-    const url     = `${dbUrl}/${path}.json`;
-    return new Promise((resolve, reject) => {
-        https.get(url, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try { resolve(JSON.parse(data)); }
-                catch(e) { reject(new Error('Firebase parse error: ' + e.message)); }
-            });
-        }).on('error', reject);
-    });
+// ── Firebase REST helpers ─────────────────────────────────────────────────────
+async function firebaseGet(path, dbUrl) {
+  const res = await fetch(`${dbUrl}/${path}.json`);
+  if (!res.ok) throw new Error(`Firebase GET failed: ${res.status}`);
+  return res.json();
 }
 
-// ── Send one FCM push via Legacy HTTP API ─────────────────────────────────────
-async function sendFcmPush(tokens, title, body, data) {
-    if (!tokens || tokens.length === 0) return 0;
+async function firebasePatch(path, dbUrl, data) {
+  const res = await fetch(`${dbUrl}/${path}.json`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error(`Firebase PATCH failed: ${res.status}`);
+  return res.json();
+}
 
-    const serverKey = process.env.FIREBASE_SERVER_KEY;
-    if (!serverKey) {
-        console.warn('[notify] FIREBASE_SERVER_KEY not set — skipping FCM push');
-        return 0;
-    }
-
-    // FCM allows max 1000 tokens per request — chunk if needed
-    const chunks = [];
-    for (let i = 0; i < tokens.length; i += 1000) {
-        chunks.push(tokens.slice(i, i + 1000));
-    }
-
-    let totalSent = 0;
-
-    for (const chunk of chunks) {
-        const payload = JSON.stringify({
-            registration_ids: chunk,
-            notification: {
-                title,
-                body,
-                sound: 'default',
-                click_action: 'FLUTTER_NOTIFICATION_CLICK'
-            },
-            data: {
-                ...data,
-                click_action: 'FLUTTER_NOTIFICATION_CLICK'
-            },
-            android: {
-                priority: 'high',
-                notification: {
-                    sound:        'default',
-                    priority:     'high',
-                    channelId:    'aura_battle_channel'
-                }
-            },
-            apns: {
-                payload: {
-                    aps: {
-                        sound: 'default',
-                        badge: 1
-                    }
-                }
-            }
-        });
-
-        const result = await new Promise((resolve, reject) => {
-            const req = https.request({
-                hostname: 'fcm.googleapis.com',
-                path:     '/fcm/send',
-                method:   'POST',
-                headers: {
-                    'Content-Type':  'application/json',
-                    'Authorization': `key=${serverKey}`,
-                    'Content-Length': Buffer.byteLength(payload)
-                }
-            }, (res) => {
-                let body = '';
-                res.on('data', chunk => body += chunk);
-                res.on('end', () => {
-                    try { resolve(JSON.parse(body)); }
-                    catch(e) { resolve({ failure: chunk.length }); }
-                });
-            });
-            req.on('error', reject);
-            req.write(payload);
-            req.end();
-        });
-
-        totalSent += result.success || 0;
-        if (result.failure > 0) {
-            console.warn(`[notify] ${result.failure} tokens failed in this chunk`);
+// ── FCM send (single token) ───────────────────────────────────────────────────
+async function sendOne(accessToken, projectId, token, title, body, data = {}) {
+  const res = await fetch(
+    `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: {
+          token,
+          notification: { title, body },
+          data: Object.fromEntries(Object.entries(data).map(([k, v]) => [k, String(v)])),
+          android: {
+            priority: 'high',
+            notification: { sound: 'default', click_action: 'FLUTTER_NOTIFICATION_CLICK' }
+          }
         }
+      })
     }
-
-    return totalSent;
+  );
+  return res.ok;
 }
 
-// ── Collect all FCM tokens for a match ───────────────────────────────────────
-async function getTokensForMatch(matchId, matchData) {
-    const uids   = new Set();
-    const isSolo = (matchData.entryType || '').toLowerCase() === 'solo';
+// ─────────────────────────────────────────────────────────────────────────────
+// Collect all real userIds from a match — works for BOTH Solo AND Team modes
+//
+// Solo:  match.players = { userId: { userId, inGameName } }
+//        → every userId value
+//
+// Multi: match.teams = { teamKey: { leaderId, teamName, members: { uid: IGN } } }
+//        → leaderId from every team
+//        → every uid KEY in members that is NOT a placeholder (p2, p3, p4…)
+// ─────────────────────────────────────────────────────────────────────────────
+function collectUserIds(match) {
+  const ids = new Set();
 
-    if (isSolo) {
-        // Solo: players/{userId} = { userId, inGameName }
-        const players = matchData.players || {};
-        Object.values(players).forEach(p => {
-            const uid = p.userId || p.uid;
-            if (uid) uids.add(uid);
-        });
-    } else {
-        // Team: teams/{teamId} = { leaderId, members: { uid: ign } }
-        const teams = matchData.teams || {};
-        Object.values(teams).forEach(team => {
-            if (team.leaderId) uids.add(team.leaderId);
-            // Also notify all team members
-            Object.keys(team.members || {}).forEach(uid => uids.add(uid));
-        });
-    }
-
-    if (uids.size === 0) return [];
-
-    // Fetch FCM tokens for all UIDs in parallel
-    const tokenPromises = [...uids].map(async uid => {
-        try {
-            const token = await firebaseGet(`users/${uid}/fcmToken`);
-            return typeof token === 'string' && token.length > 10 ? token : null;
-        } catch (e) {
-            console.warn(`[notify] Could not get token for uid ${uid}:`, e.message);
-            return null;
-        }
+  // Solo players
+  if (match.players && typeof match.players === 'object') {
+    Object.values(match.players).forEach(p => {
+      if (p && p.userId) ids.add(p.userId);
     });
+  }
 
-    const results = await Promise.all(tokenPromises);
-    return results.filter(Boolean); // remove nulls
-}
+  // Team players (Duo / Squad / 6v6)
+  if (match.teams && typeof match.teams === 'object') {
+    Object.values(match.teams).forEach(team => {
+      if (!team) return;
+      // Always add the leader
+      if (team.leaderId) ids.add(team.leaderId);
+      // Add real user uid keys from members (skip p2, p3, p4, p5, p6 placeholders)
+      if (team.members && typeof team.members === 'object') {
+        Object.keys(team.members).forEach(uid => {
+          if (!/^p\d+$/.test(uid)) ids.add(uid);
+        });
+      }
+    });
+  }
 
-// ── Notification message builder ──────────────────────────────────────────────
-function buildMessage(type, matchTitle, reason) {
-    const title = matchTitle || 'Aura Battle';
-
-    switch (type) {
-        case 'match_started':
-            return {
-                title: '🔴 Match is LIVE!',
-                body:  `${title} has started. Check room details now!`
-            };
-        case 'room_details':
-            return {
-                title: '🔑 Room Details Available',
-                body:  `Room ID & Password are now set for ${title}. Tap to view.`
-            };
-        case 'match_cancelled':
-            return {
-                title: '❌ Match Cancelled',
-                body:  reason
-                    ? `${title} was cancelled. Reason: ${reason}`
-                    : `${title} has been cancelled. Entry fee refunded.`
-            };
-        case 'result_pending':
-            return {
-                title: '🏁 Match Ended',
-                body:  `${title} has ended. Results will be announced soon.`
-            };
-        default:
-            return {
-                title: 'Aura Battle Update',
-                body:  `Update for match: ${title}`
-            };
-    }
+  return [...ids];
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
-exports.handler = async function(event, context) {
-    // Only allow POST
-    if (event.httpMethod !== 'POST') {
-        return {
-            statusCode: 405,
-            body: JSON.stringify({ error: 'Method not allowed' })
-        };
+exports.handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
+  if (event.httpMethod !== 'POST')
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+
+  try {
+    if (!process.env.FIREBASE_SERVICE_ACCOUNT)
+      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Missing env: FIREBASE_SERVICE_ACCOUNT' }) };
+    if (!process.env.FIREBASE_DB_URL)
+      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Missing env: FIREBASE_DB_URL' }) };
+
+    if (!event.body)
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Request body is empty.' }) };
+
+    const { matchId, type, reason } = JSON.parse(event.body);
+    if (!matchId || !type)
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'matchId and type are required.' }) };
+
+    const SERVICE_ACCOUNT = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    const DB_URL          = process.env.FIREBASE_DB_URL;
+
+    // Fetch match
+    const match = await firebaseGet(`matches/${matchId}`, DB_URL);
+    if (!match)
+      return { statusCode: 404, headers, body: JSON.stringify({ error: 'Match not found: ' + matchId }) };
+
+    // result_pending — just update status, no push needed
+    if (type === 'result_pending') {
+      await firebasePatch(`matches/${matchId}`, DB_URL, { status: 'result_pending' });
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, statusUpdated: 'result_pending' }) };
     }
 
-    let body;
-    try {
-        body = JSON.parse(event.body || '{}');
-    } catch (e) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'Invalid JSON body' })
-        };
+    // Build notification text
+    let title, body;
+    if (type === 'room_details') {
+      title = `🔑 Room Ready — Match #${matchId}`;
+      body  = `Room ID: ${match.roomId || '—'}   Password: ${match.roomPassword || '—'}`;
+    } else if (type === 'match_started') {
+      title = `🔴 Match #${matchId} is LIVE!`;
+      body  = `${match.title || 'Your match'} has started. Join the room now!`;
+    } else if (type === 'match_cancelled') {
+      title = `❌ Match #${matchId} Cancelled`;
+      body  = reason ? `Reason: ${reason}` : 'The match has been cancelled.';
+    } else {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown type: ' + type }) };
     }
 
-    const { matchId, type, reason, sender, adminId } = body;
+    // Collect all userIds from BOTH players (solo) and teams (multi)
+    const userIds = collectUserIds(match);
+    if (userIds.length === 0)
+      return { statusCode: 200, headers, body: JSON.stringify({ sent: 0, message: 'No players joined yet.' }) };
 
-    if (!matchId || !type) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: 'matchId and type are required' })
-        };
-    }
+    // Fetch FCM tokens
+    const fcmTokens = [];
+    await Promise.all(
+      userIds.map(async (uid) => {
+        try {
+          const user = await firebaseGet(`users/${uid}`, DB_URL);
+          if (user && user.fcmToken && user.status !== 'banned') {
+            fcmTokens.push(user.fcmToken);
+          }
+        } catch (_) {}
+      })
+    );
 
-    console.log(`[notify] matchId=${matchId} type=${type} sender=${sender||'hoster'} adminId=${adminId||'—'}`);
+    if (fcmTokens.length === 0)
+      return { statusCode: 200, headers, body: JSON.stringify({ sent: 0, message: 'No FCM tokens found.' }) };
 
-    try {
-        // 1. Fetch match data from Firebase
-        const matchData = await firebaseGet(`matches/${matchId}`);
-        if (!matchData) {
-            console.warn(`[notify] Match ${matchId} not found in DB`);
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ sent: 0, warning: 'Match not found' })
-            };
-        }
+    // Get FCM access token
+    const auth = new GoogleAuth({
+      credentials: SERVICE_ACCOUNT,
+      scopes: ['https://www.googleapis.com/auth/firebase.messaging']
+    });
+    const client      = await auth.getClient();
+    const tokenData   = await client.getAccessToken();
+    const accessToken = tokenData.token;
+    const projectId   = SERVICE_ACCOUNT.project_id;
 
-        // 2. Collect FCM tokens
-        const tokens = await getTokensForMatch(matchId, matchData);
-        console.log(`[notify] Found ${tokens.length} tokens for match ${matchId}`);
+    // Send to all
+    const notifData = { matchId: String(matchId), type };
+    const results = await Promise.allSettled(
+      fcmTokens.map(token => sendOne(accessToken, projectId, token, title, body, notifData))
+    );
 
-        if (tokens.length === 0) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ sent: 0, warning: 'No FCM tokens found' })
-            };
-        }
+    const sent   = results.filter(r => r.status === 'fulfilled' && r.value === true).length;
+    const failed = results.length - sent;
 
-        // 3. Build message
-        const { title: msgTitle, body: msgBody } = buildMessage(
-            type,
-            matchData.title,
-            reason
-        );
+    console.log(`[notify] matchId=${matchId} type=${type} users=${userIds.length} tokens=${fcmTokens.length} sent=${sent} failed=${failed}`);
 
-        // 4. Send FCM push
-        const sent = await sendFcmPush(tokens, msgTitle, msgBody, {
-            matchId,
-            type,
-            sender: sender || 'hoster'
-        });
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ success: true, sent, failed, total: fcmTokens.length, userIds: userIds.length })
+    };
 
-        console.log(`[notify] Sent ${sent} / ${tokens.length} pushes`);
-
-        return {
-            statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sent, total: tokens.length })
-        };
-
-    } catch (err) {
-        console.error('[notify] Error:', err.message);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: err.message })
-        };
-    }
+  } catch (err) {
+    console.error('notify error:', err);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
+  }
 };
-
-/*
- * ─────────────────────────────────────────────────────────────────────────────
- * SETUP CHECKLIST
- * ─────────────────────────────────────────────────────────────────────────────
- *
- * 1. Place this file at:
- *      netlify/functions/notify.js
- *
- * 2. In Netlify dashboard → Site → Environment Variables, add:
- *      FIREBASE_DATABASE_URL  = https://aura-battle-main-default-rtdb.firebaseio.com
- *      FIREBASE_SERVER_KEY    = your FCM server key (see below)
- *
- * 3. Get FCM Server Key:
- *      Firebase Console → Project Settings → Cloud Messaging
- *      Copy "Server key" under "Cloud Messaging API (Legacy)"
- *      If not visible, click the 3-dot menu → "Manage API in Google Cloud Console"
- *      Enable it there, then come back — the key will appear.
- *
- * 4. In your Android app, make sure each user's FCM token is saved to:
- *      /users/{userId}/fcmToken
- *    Your HomeActivity already does this via fetchAndSaveFcmToken().
- *
- * 5. In your Android app's notification channel, use:
- *      channelId = "aura_battle_channel"
- *    to match the android.notification.channelId sent above.
- *
- * ─────────────────────────────────────────────────────────────────────────────
- * FCM v1 NOTE (if Legacy API is disabled):
- * ─────────────────────────────────────────────────────────────────────────────
- * If Google has disabled the Legacy FCM API for your project, you need to use
- * FCM HTTP v1 which requires a Service Account. Steps:
- *   1. Firebase Console → Project Settings → Service Accounts
- *   2. Click "Generate new private key" → download JSON
- *   3. Add the JSON contents as FIREBASE_SERVICE_ACCOUNT env variable
- *   4. Use googleapis npm package to get an OAuth2 access token, then call:
- *      POST https://fcm.googleapis.com/v1/projects/{projectId}/messages:send
- *      with Authorization: Bearer {access_token}
- * ─────────────────────────────────────────────────────────────────────────────
- */
