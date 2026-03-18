@@ -2,1257 +2,551 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Hoster Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Manage Hosters — Aura Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --danger: #e63946;
-            --warning: #fca311;
-            --gray: #6c757d;
-            --white: #ffffff;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 100%;
-        }
-        
-        .dashboard {
-            background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            min-height: 90vh;
-        }
-        
-        .dashboard-header {
-            background: var(--primary);
-            padding: 20px;
-            color: var(--white);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .dashboard-header h1 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .user-info span {
-            margin-right: 15px;
-        }
-        
-        .logout-btn {
-            background: var(--danger);
-            color: var(--white);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .dashboard-body {
-            padding: 20px;
-        }
-        
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .tab.active {
-            border-bottom: 3px solid var(--primary);
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .search-box {
-            margin-bottom: 20px;
-            display: flex;
-        }
-        
-        .search-box input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px 0 0 5px;
-        }
-        
-        .search-box button {
-            padding: 10px 15px;
-            background: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: 0 5px 5px 0;
-            cursor: pointer;
-        }
-        
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .filter-btn {
-            padding: 8px 15px;
-            background: var(--light);
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-        
-        .filter-btn.active {
-            background: var(--primary);
-            color: var(--white);
-            border-color: var(--primary);
-        }
-        
-        .hoster-list {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .hoster-card {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 15px;
-            background: var(--light);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .hoster-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .hoster-name {
-            font-weight: 600;
-            font-size: 18px;
-        }
-        
-        .hoster-status {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-active {
-            background: var(--success);
-            color: var(--dark);
-        }
-        
-        .status-banned {
-            background: var(--danger);
-            color: var(--white);
-        }
-        
-        .hoster-content {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .hoster-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid var(--primary);
-        }
-        
-        .hoster-details {
-            flex: 1;
-        }
-        
-        .hoster-detail {
-            display: flex;
-            margin-bottom: 5px;
-            flex-wrap: wrap;
-        }
-        
-        .hoster-detail label {
-            font-weight: 600;
-            min-width: 100px;
-        }
-        
-        .hoster-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .action-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .ban-btn {
-            background: var(--danger);
-            color: var(--white);
-        }
-        
-        .unban-btn {
-            background: var(--success);
-            color: var(--white);
-        }
-        
-        .edit-btn {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        .delete-btn {
-            background: var(--danger);
-            color: var(--white);
-        }
-        
-        .add-hoster-form, .edit-hoster-form {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            color: var(--dark);
-            background: var(--white);
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .image-upload {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .image-preview {
-            width: 120px;
-            height: 120px;
-            border-radius: 10px;
-            border: 2px dashed var(--primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-        
-        .image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-        
-        .upload-btn {
-            background: var(--primary);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-        }
-        
-        .upload-btn input {
-            display: none;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background: var(--secondary);
-        }
-        
-        .btn-secondary {
-            background: var(--gray);
-            color: var(--white);
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        
-        .modal-content {
-            background: var(--white);
-            border-radius: 10px;
-            padding: 20px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        
-        .alert {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1100;
-            max-width: 350px;
-        }
-        
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .loader {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
-            margin: 0 auto;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @media (min-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .tabs {
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-            
-            .hoster-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .hoster-content {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .hoster-actions {
-                width: 100%;
-                justify-content: flex-start;
-            }
-            
-            .hoster-detail label {
-                min-width: 80px;
-            }
-        }
+            --red: #e63946; --red-dark: #b5202d;
+            --gold: #f5c518; --gold-dark: #c9a000;
+            --green: #22c55e; --green-dark: #16a34a;
+            --purple: #8b5cf6; --purple-dark: #6d28d9;
+            --blue: #3b82f6;
+            --bg: #0d0d0f; --surface: #141418; --surface2: #1a1a1f; --surface3: #1f1f25;
+            --border: rgba(255,255,255,0.07); --border-red: rgba(230,57,70,0.2);
+            --text: #f0f0f2; --dim: #9898a8; --muted: #5a5a68;
+        }
+        html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(139,92,246,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.02) 1px, transparent 1px); background-size: 44px 44px; pointer-events: none; z-index: 0; }
+
+        /* ── Header ── */
+        .header { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; gap: 12px; padding: 13px 18px; background: rgba(13,13,15,0.94); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+        .back-btn { width: 34px; height: 34px; border-radius: 9px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--dim); font-size: 14px; flex-shrink: 0; }
+        .h-logo { width: 30px; height: 30px; border-radius: 8px; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .h-logo i { color: var(--purple); font-size: 13px; }
+        .h-title { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; flex: 1; }
+        .h-title span { color: var(--purple); }
+        .h-add-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: linear-gradient(135deg, var(--purple), var(--purple-dark)); color: #fff; border: none; border-radius: 10px; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer; flex-shrink: 0; transition: opacity .2s; }
+        .h-add-btn:hover { opacity: .85; }
+
+        /* ── Toolbar ── */
+        .toolbar { padding: 14px 16px 8px; max-width: 640px; margin: 0 auto; display: flex; gap: 8px; flex-wrap: wrap; position: relative; z-index: 1; }
+        .search-box { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0 14px; transition: border-color .2s; }
+        .search-box:focus-within { border-color: rgba(139,92,246,.45); box-shadow: 0 0 0 3px rgba(139,92,246,.08); }
+        .search-box i { color: var(--muted); font-size: 13px; flex-shrink: 0; }
+        .search-box input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 0; }
+        .search-box input::placeholder { color: var(--muted); font-size: 13px; }
+        .sort-btn { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--dim); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; white-space: nowrap; transition: border-color .2s, color .2s; }
+        .sort-btn.active { border-color: rgba(139,92,246,.4); color: var(--purple); }
+        .sort-btn i { font-size: 12px; }
+        .info-bar { padding: 4px 16px 10px; max-width: 640px; margin: 0 auto; font-size: 11px; color: var(--muted); position: relative; z-index: 1; }
+
+        /* ── Main ── */
+        .main { padding: 0 16px 30px; max-width: 640px; margin: 0 auto; position: relative; z-index: 1; }
+
+        /* ── Hoster card ── */
+        .hoster-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 0; margin-bottom: 12px; overflow: hidden; transition: border-color .2s; animation: fadeUp .3s ease both; }
+        .hoster-card:hover { border-color: rgba(139,92,246,.25); }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .hc-top { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+        .hc-avatar { width: 44px; height: 44px; border-radius: 50%; background: rgba(139,92,246,.1); border: 2px solid rgba(139,92,246,.3); display: flex; align-items: center; justify-content: center; font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: var(--purple); flex-shrink: 0; }
+        .hc-info { flex: 1; min-width: 0; }
+        .hc-name { font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: .5px; }
+        .hc-meta { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 8px; }
+        .hc-match-count { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+        .hc-match-count.loading { color: var(--muted); }
+        .hc-match-count.loaded { color: var(--purple); font-weight: 600; }
+        .hc-divider { height: 1px; background: var(--border); margin: 0 16px; }
+        .hc-actions { display: flex; }
+        .hc-btn { flex: 1; padding: 11px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; background: none; border: none; color: var(--dim); transition: background .15s, color .15s; }
+        .hc-btn:not(:last-child) { border-right: 1px solid var(--border); }
+        .hc-btn.edit:hover  { background: rgba(139,92,246,.07); color: var(--purple); }
+        .hc-btn.pw:hover    { background: rgba(245,197,24,.07);  color: var(--gold); }
+        .hc-btn.del:hover   { background: rgba(230,57,70,.07);   color: var(--red); }
+        .hc-btn i { font-size: 13px; }
+
+        /* skeleton */
+        .skeleton { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; height: 86px; margin-bottom: 12px; animation: skpulse 1.5s ease infinite; }
+        @keyframes skpulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-icon { font-size: 46px; margin-bottom: 14px; opacity: .35; }
+        .empty-title { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: var(--dim); margin-bottom: 6px; }
+        .empty-sub { font-size: 13px; color: var(--muted); }
+
+        /* ── Sheets ── */
+        .sh-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(4px); z-index: 400; align-items: flex-end; justify-content: center; }
+        .sh-overlay.show { display: flex; }
+        .sheet { background: var(--surface); border-radius: 20px 20px 0 0; border-top: 1px solid var(--border); width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; animation: slideUp .3s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        .sh-stripe         { height: 3px; border-radius: 20px 20px 0 0; }
+        .sh-stripe.purple  { background: linear-gradient(90deg, var(--purple-dark), var(--purple)); }
+        .sh-stripe.gold    { background: linear-gradient(90deg, var(--gold-dark), var(--gold)); }
+        .sh-stripe.red     { background: linear-gradient(90deg, var(--red-dark), var(--red)); }
+        .sh-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
+        .sh-head { padding: 16px 22px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .sh-title { font-family: 'Rajdhani', sans-serif; font-size: 19px; font-weight: 700; letter-spacing: 1px; }
+        .sh-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+        .sh-x { width: 30px; height: 30px; border-radius: 8px; background: var(--surface2); border: none; color: var(--dim); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .sh-body { padding: 22px; }
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+        .field input { width: 100%; padding: 13px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 15px; font-family: 'DM Sans', sans-serif; transition: border-color .2s; }
+        .field input:focus { outline: none; border-color: rgba(139,92,246,.5); box-shadow: 0 0 0 3px rgba(139,92,246,.08); }
+        .field input::placeholder { color: var(--muted); font-size: 14px; }
+        .sh-btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; margin-top: 8px; transition: opacity .2s; }
+        .sh-btn:disabled { opacity: .5; cursor: not-allowed; }
+        .sh-btn.purple { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,.25); }
+        .sh-btn.gold   { background: linear-gradient(135deg, var(--gold), var(--gold-dark));   color: #1a1200; }
+        .sh-btn.red    { background: linear-gradient(135deg, var(--red),  var(--red-dark));    color: #fff; }
+        .sh-msg { margin-top: 12px; padding: 11px 14px; border-radius: 8px; font-size: 13px; display: none; line-height: 1.5; }
+        .sh-msg.error   { background: rgba(230,57,70,.1);  color: #ff8a91; border: 1px solid rgba(230,57,70,.2); }
+        .sh-msg.success { background: rgba(34,197,94,.1);  color: #4ade80; border: 1px solid rgba(34,197,94,.2); }
+
+        /* ── Confirm delete sheet ── */
+        .conf-body { padding: 28px 22px 32px; text-align: center; }
+        .conf-icon { font-size: 38px; margin-bottom: 12px; }
+        .conf-title { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .conf-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+        .conf-btns { display: flex; gap: 12px; }
+        .conf-btns button { flex: 1; padding: 13px; border-radius: 10px; font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: none; }
+        .btn-cancel-conf { background: var(--surface2); color: var(--dim); }
+        .btn-del-conf    { background: var(--red); color: #fff; }
+
+        /* ── Toast ── */
+        .toast { position: fixed; top: 68px; left: 50%; transform: translateX(-50%) translateY(-16px); background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 18px; font-size: 13px; z-index: 999; opacity: 0; transition: all .28s; pointer-events: none; white-space: nowrap; max-width: 88vw; text-align: center; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.error   { border-color: rgba(230,57,70,.45);  color: #ff8a91; }
+        .toast.success { border-color: rgba(34,197,94,.45);  color: #4ade80; }
+        .toast.info    { border-color: rgba(139,92,246,.45); color: #c4b5fd; }
     </style>
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Database -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Dashboard Page -->
-        <div class="dashboard" id="dashboardPage">
-            <div class="dashboard-header">
-                <h1>Hoster Management Dashboard</h1>
-                <div class="user-info">
-                    <span id="adminUsername">Admin User</span>
-                    <button class="logout-btn" id="logoutBtn">Logout</button>
-                </div>
-            </div>
-            
-            <div class="dashboard-body">
-                <div class="tabs">
-                    <div class="tab active" data-tab="viewHosters">View Hosters</div>
-                    <div class="tab" data-tab="addHoster">Add Hoster</div>
-                </div>
-                
-                <div class="tab-content active" id="viewHostersTab">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Search by name, email, username or phone">
-                        <button id="searchBtn"><i class="fas fa-search"></i></button>
-                    </div>
-                    
-                    <div class="filters">
-                        <div class="filter-btn active" data-filter="all">All Hosters</div>
-                        <div class="filter-btn" data-filter="mostMatches">Most Matches</div>
-                        <div class="filter-btn" data-filter="leastMatches">Least Matches</div>
-                        <div class="filter-btn" data-filter="active">Active</div>
-                        <div class="filter-btn" data-filter="banned">Banned</div>
-                    </div>
-                    
-                    <div class="hoster-list" id="hosterList">
-                        <!-- Hoster cards will be added here dynamically -->
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="addHosterTab">
-                    <h2>Add New Hoster</h2>
-                    <form class="add-hoster-form" id="addHosterForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="hosterUsername">Username *</label>
-                                <input type="text" class="form-control" id="hosterUsername" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="hosterName">Full Name *</label>
-                                <input type="text" class="form-control" id="hosterName" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="hosterEmail">Email *</label>
-                                <input type="email" class="form-control" id="hosterEmail" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="hosterPhone">Phone Number *</label>
-                                <input type="tel" class="form-control" id="hosterPhone" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="hosterPassword">Password *</label>
-                            <input type="password" class="form-control" id="hosterPassword" required>
-                        </div>
-                        
-                        <div class="image-upload">
-                            <div class="image-preview" id="addImagePreview">
-                                <i class="fas fa-user fa-3x" style="color: #ccc;"></i>
-                                <img id="addPreviewImg" src="" alt="Preview">
-                            </div>
-                            <label class="upload-btn">
-                                <i class="fas fa-upload"></i> Upload Image
-                                <input type="file" id="addHosterImage" accept="image/*">
-                            </label>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">
-                            <span>Add Hoster</span>
-                            <div class="loader" id="addHosterLoader"></div>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
 
-        <!-- Hoster Edit Modal -->
-        <div class="modal" id="editHosterModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Edit Hoster Details</h2>
-                    <button class="close-modal" id="closeEditModal">&times;</button>
-                </div>
-                <form class="edit-hoster-form" id="editHosterForm">
-                    <input type="hidden" id="editHosterId">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="editUsername">Username *</label>
-                            <input type="text" class="form-control" id="editUsername" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="editName">Full Name *</label>
-                            <input type="text" class="form-control" id="editName" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="editEmail">Email *</label>
-                            <input type="email" class="form-control" id="editEmail" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="editPhone">Phone Number *</label>
-                            <input type="tel" class="form-control" id="editPhone" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editPassword">Password (leave blank to keep current)</label>
-                        <input type="password" class="form-control" id="editPassword">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editStatus">Status</label>
-                        <select class="form-control" id="editStatus">
-                            <option value="active">Active</option>
-                            <option value="banned">Banned</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editMatches">Total Matches Hosted</label>
-                        <input type="number" class="form-control" id="editMatches" min="0">
-                    </div>
-                    
-                    <div class="image-upload">
-                        <div class="image-preview" id="editImagePreview">
-                            <i class="fas fa-user fa-3x" style="color: #ccc;"></i>
-                            <img id="editPreviewImg" src="" alt="Preview">
-                        </div>
-                        <label class="upload-btn">
-                            <i class="fas fa-upload"></i> Change Image
-                            <input type="file" id="editHosterImage" accept="image/*">
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <span>Update Hoster</span>
-                        <div class="loader" id="editHosterLoader"></div>
-                    </button>
-                </form>
-            </div>
-        </div>
+<div class="header">
+    <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <div class="h-logo"><i class="fas fa-user-tie"></i></div>
+    <div class="h-title">Manage <span>Hosters</span></div>
+    <button class="h-add-btn" onclick="openAddSheet()"><i class="fas fa-plus"></i> Add Hoster</button>
+</div>
 
-        <!-- Alert Messages -->
-        <div class="alert alert-danger" id="errorMessage"></div>
-        <div class="alert alert-success" id="successMessage"></div>
+<!-- Toolbar: search + sort -->
+<div class="toolbar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search hoster…" oninput="renderList()">
     </div>
+    <button class="sort-btn" id="sortBtn" onclick="toggleSort()">
+        <i class="fas fa-fire"></i> Most Hosted
+    </button>
+</div>
+<div class="info-bar" id="infoBar"></div>
 
-    <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD7pAsdYqkJzDbSsi8xbLsy2X5s0bgP040",
-            authDomain: "aura-battle-main.firebaseapp.com",
-            databaseURL: "https://aura-battle-main-default-rtdb.firebaseio.com",
-            projectId: "aura-battle-main",
-            storageBucket: "aura-battle-main.firebasestorage.app",
-            messagingSenderId: "763779990289",
-            appId: "1:763779990289:web:5caa7bc861e80b6f0b02b0",
-            measurementId: "G-ZZXZ00HK07"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // ImgBB API Key
-        const IMGBB_API_KEY = 'a7dcfb1d31cf1961024c9dcc608cc0e4';
-        
-        // DOM Elements
-        const dashboardPage = document.getElementById('dashboardPage');
-        const adminUsernameSpan = document.getElementById('adminUsername');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const hosterList = document.getElementById('hosterList');
-        const addHosterForm = document.getElementById('addHosterForm');
-        const editHosterForm = document.getElementById('editHosterForm');
-        const searchInput = document.getElementById('searchInput');
-        const searchBtn = document.getElementById('searchBtn');
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        const editHosterModal = document.getElementById('editHosterModal');
-        const closeEditModal = document.getElementById('closeEditModal');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const addHosterImage = document.getElementById('addHosterImage');
-        const addPreviewImg = document.getElementById('addPreviewImg');
-        const editHosterImage = document.getElementById('editHosterImage');
-        const editPreviewImg = document.getElementById('editPreviewImg');
-        const addHosterLoader = document.getElementById('addHosterLoader');
-        const editHosterLoader = document.getElementById('editHosterLoader');
-        
-        // Current admin data
-        let currentAdmin = null;
-        let currentHosterImage = null;
-        
-        // Logout function
-        logoutBtn.addEventListener('click', function() {
-            localStorage.removeItem('adminRole');
-            localStorage.removeItem('adminUsername');
-            localStorage.removeItem('adminEmail');
-            localStorage.removeItem('loginTime');
-            
-            // Redirect to login page (would be in a real scenario)
-            alert('Logged out successfully. Redirecting to login...');
-            // In a real app: window.location.href = 'login.html';
+<div class="main" id="hosterList">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+</div>
+
+<!-- ══ Add Hoster Sheet ══ -->
+<div class="sh-overlay" id="addSheet">
+    <div class="sheet">
+        <div class="sh-stripe purple"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div>
+                <div class="sh-title">➕ Add Hoster</div>
+                <div class="sh-subtitle">Username becomes the Firebase key</div>
+            </div>
+            <button class="sh-x" onclick="closeSheet('addSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field">
+                <label>Username</label>
+                <input type="text" id="addUsername" placeholder="e.g. AkgHost" autocomplete="off" autocapitalize="none" spellcheck="false">
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" id="addPassword" placeholder="Min. 6 characters">
+            </div>
+            <button class="sh-btn purple" id="addBtn" onclick="addHoster()"><i class="fas fa-plus"></i> Add Hoster</button>
+            <div class="sh-msg" id="addMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Edit Username Sheet ══ -->
+<div class="sh-overlay" id="editSheet">
+    <div class="sheet">
+        <div class="sh-stripe purple"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div>
+                <div class="sh-title">✏️ Edit Username</div>
+                <div class="sh-subtitle" id="editSheetSub"></div>
+            </div>
+            <button class="sh-x" onclick="closeSheet('editSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <input type="hidden" id="editOldUsername">
+            <div class="field">
+                <label>New Username</label>
+                <input type="text" id="editUsername" placeholder="New username" autocomplete="off" autocapitalize="none" spellcheck="false">
+            </div>
+            <button class="sh-btn purple" id="editBtn" onclick="saveEdit()"><i class="fas fa-save"></i> Save Username</button>
+            <div class="sh-msg" id="editMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Change Password Sheet ══ -->
+<div class="sh-overlay" id="pwSheet">
+    <div class="sheet">
+        <div class="sh-stripe gold"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div>
+                <div class="sh-title">🔑 Change Password</div>
+                <div class="sh-subtitle" id="pwSheetSub"></div>
+            </div>
+            <button class="sh-x" onclick="closeSheet('pwSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <input type="hidden" id="pwUsername">
+            <div class="field">
+                <label>New Password</label>
+                <input type="password" id="newPw" placeholder="Min. 6 characters">
+            </div>
+            <div class="field">
+                <label>Confirm Password</label>
+                <input type="password" id="confPw" placeholder="Repeat new password">
+            </div>
+            <button class="sh-btn gold" id="pwBtn" onclick="savePassword()"><i class="fas fa-key"></i> Update Password</button>
+            <div class="sh-msg" id="pwMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ Delete Confirm Sheet ══ -->
+<div class="sh-overlay" id="delSheet">
+    <div class="sheet">
+        <div class="sh-stripe red"></div><div class="sh-handle"></div>
+        <div class="conf-body">
+            <input type="hidden" id="delUsername">
+            <div class="conf-icon">🗑️</div>
+            <div class="conf-title">Delete Hoster?</div>
+            <div class="conf-sub" id="delConfSub">This will permanently remove this hoster account.</div>
+            <div class="conf-btns">
+                <button class="btn-cancel-conf" onclick="closeSheet('delSheet')">Cancel</button>
+                <button class="btn-del-conf"    id="delConfBtn" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ── Firebase ──────────────────────────────────────────────────────────────────
+const _cfg = JSON.parse(atob('eyJhcGlLZXkiOiJBSXphU3lEN3BBc2RZcWtKekRiU3NpOHhiTHN5Mlg1czBiZ1AwNDAiLCJhdXRoRG9tYWluIjoiYXVyYS1iYXR0bGUtbWFpbi5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vYXVyYS1iYXR0bGUtbWFpbi1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20iLCJwcm9qZWN0SWQiOiJhdXJhLWJhdHRsZS1tYWluIiwic3RvcmFnZUJ1Y2tldCI6ImF1cmEtYmF0dGxlLW1haW4uZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiNzYzNzc5OTkwMjg5IiwiYXBwSWQiOiIxOjc2Mzc3OTk5MDI4OTp3ZWI6NWNhYTdiYzg2MWU4MGI2ZjBiMDJiMCIsIm1lYXN1cmVtZW50SWQiOiJHLVpaWFowMEhLMDcifQ=='));
+firebase.initializeApp(_cfg);
+const db = firebase.database();
+
+// ── Admin session ─────────────────────────────────────────────────────────────
+const SESSION_MS = 30 * 60 * 1000;
+function getAdminSession(){
+    const key  = localStorage.getItem('adminUsername');
+    const time = parseInt(localStorage.getItem('loginTime') || '0');
+    if(!key || (Date.now()-time) >= SESSION_MS){ clearAdminSession(); return null; }
+    return { id: key, username: localStorage.getItem('adminDisplayName') || key };
+}
+function clearAdminSession(){
+    ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime'].forEach(k => localStorage.removeItem(k));
+}
+if(!getAdminSession()){ window.location.href = 'index.html'; }
+
+// ── State ─────────────────────────────────────────────────────────────────────
+// hosters[username] = { username, password }
+// matchCounts[username] = number  (loaded from matches node)
+let _hosters     = {};   // username → hoster data
+let _matchCounts = {};   // username → total match count
+let _sortByMost  = false;
+
+// ── Load hosters (realtime) ───────────────────────────────────────────────────
+db.ref('hosters').on('value', snap => {
+    _hosters = {};
+    if(snap.exists()){
+        snap.forEach(child => {
+            const key = child.key;          // this IS the username (new structure)
+            const val = child.val();
+            // support both old (random key, username field) and new (key = username)
+            const username = val.username || key;
+            _hosters[username] = { ...val, _key: key, username };
         });
-        
-        // Tab switching
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                const tabId = this.getAttribute('data-tab');
-                
-                // Update active tab
-                tabs.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Show corresponding content
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                    if (content.id === tabId + 'Tab') {
-                        content.classList.add('active');
-                    }
-                });
-            });
-        });
-        
-        // Load hosters from Firebase
-        function loadHosters(searchTerm = '', filter = 'all') {
-            const hostersRef = database.ref('hosters');
-            
-            hostersRef.once('value')
-                .then(snapshot => {
-                    hosterList.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        hosterList.innerHTML = '<p>No hosters found.</p>';
-                        return;
-                    }
-                    
-                    let hosters = [];
-                    snapshot.forEach(childSnapshot => {
-                        const hoster = childSnapshot.val();
-                        hoster.id = childSnapshot.key;
-                        hosters.push(hoster);
-                    });
-                    
-                    // Apply search filter
-                    if (searchTerm) {
-                        const term = searchTerm.toLowerCase();
-                        hosters = hosters.filter(hoster => 
-                            (hoster.username && hoster.username.toLowerCase().includes(term)) ||
-                            (hoster.firstName && hoster.firstName.toLowerCase().includes(term)) ||
-                            (hoster.email && hoster.email.toLowerCase().includes(term)) ||
-                            (hoster.phone && hoster.phone.includes(term))
-                        );
-                    }
-                    
-                    // Apply additional filters
-                    switch(filter) {
-                        case 'mostMatches':
-                            hosters.sort((a, b) => (b.totalMatches || 0) - (a.totalMatches || 0));
-                            break;
-                        case 'leastMatches':
-                            hosters.sort((a, b) => (a.totalMatches || 0) - (b.totalMatches || 0));
-                            break;
-                        case 'active':
-                            hosters = hosters.filter(hoster => hoster.status !== 'banned');
-                            break;
-                        case 'banned':
-                            hosters = hosters.filter(hoster => hoster.status === 'banned');
-                            break;
-                    }
-                    
-                    // Display hosters
-                    hosters.forEach(hoster => {
-                        const card = document.createElement('div');
-                        card.className = 'hoster-card';
-                        card.innerHTML = `
-                            <div class="hoster-header">
-                                <div class="hoster-name">${hoster.firstName || 'N/A'} ${hoster.lastName || ''}</div>
-                                <div class="hoster-status ${hoster.status === 'banned' ? 'status-banned' : 'status-active'}">
-                                    ${hoster.status === 'banned' ? 'Banned' : 'Active'}
-                                </div>
-                            </div>
-                            <div class="hoster-content">
-                                <img src="${hoster.profileImage || 'https://via.placeholder.com/80'}" alt="${hoster.username}" class="hoster-image">
-                                <div class="hoster-details">
-                                    <div class="hoster-detail">
-                                        <label>Username:</label>
-                                        <span>${hoster.username || 'N/A'}</span>
-                                    </div>
-                                    <div class="hoster-detail">
-                                        <label>Email:</label>
-                                        <span>${hoster.email || 'N/A'}</span>
-                                    </div>
-                                    <div class="hoster-detail">
-                                        <label>Phone:</label>
-                                        <span>${hoster.phone || 'N/A'}</span>
-                                    </div>
-                                    <div class="hoster-detail">
-                                        <label>Matches Hosted:</label>
-                                        <span>${hoster.totalMatches || 0}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="hoster-actions">
-                                <button class="action-btn ${hoster.status === 'banned' ? 'unban-btn' : 'ban-btn'}" 
-                                    data-id="${hoster.id}" data-action="${hoster.status === 'banned' ? 'unban' : 'ban'}">
-                                    ${hoster.status === 'banned' ? 'Unban' : 'Ban'}
-                                </button>
-                                <button class="action-btn edit-btn" data-id="${hoster.id}">Edit Details</button>
-                                <button class="action-btn delete-btn" data-id="${hoster.id}">Delete</button>
-                            </div>
-                        `;
-                        hosterList.appendChild(card);
-                    });
-                    
-                    // Add event listeners to action buttons
-                    document.querySelectorAll('.action-btn').forEach(btn => {
-                        if (btn.classList.contains('ban-btn') || btn.classList.contains('unban-btn')) {
-                            btn.addEventListener('click', function() {
-                                const hosterId = this.getAttribute('data-id');
-                                const action = this.getAttribute('data-action');
-                                toggleHosterStatus(hosterId, action);
-                            });
-                        } else if (btn.classList.contains('edit-btn')) {
-                            btn.addEventListener('click', function() {
-                                const hosterId = this.getAttribute('data-id');
-                                loadHosterForEdit(hosterId);
-                            });
-                        } else if (btn.classList.contains('delete-btn')) {
-                            btn.addEventListener('click', function() {
-                                const hosterId = this.getAttribute('data-id');
-                                deleteHoster(hosterId);
-                            });
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading hosters:', error);
-                    hosterList.innerHTML = '<p>Error loading hosters. Please try again.</p>';
-                });
-        }
-        
-        // Delete hoster function
-        function deleteHoster(hosterId) {
-            if (confirm('Are you sure you want to delete this hoster? This action cannot be undone.')) {
-                database.ref('hosters/' + hosterId).remove()
-                    .then(() => {
-                        showSuccess('Hoster deleted successfully!');
-                        loadHosters(searchInput.value, document.querySelector('.filter-btn.active').getAttribute('data-filter'));
-                    })
-                    .catch(error => {
-                        showError('Error deleting hoster: ' + error.message);
-                    });
-            }
-        }
-        
-        // Toggle hoster status (ban/unban)
-        function toggleHosterStatus(hosterId, action) {
-            const newStatus = action === 'ban' ? 'banned' : 'active';
-            database.ref('hosters/' + hosterId).update({
-                status: newStatus
-            })
-            .then(() => {
-                showSuccess(`Hoster ${action === 'ban' ? 'banned' : 'unbanned'} successfully!`);
-                loadHosters(searchInput.value, document.querySelector('.filter-btn.active').getAttribute('data-filter'));
-            })
-            .catch(error => {
-                showError('Error updating hoster: ' + error.message);
+    }
+    loadMatchCounts();
+});
+
+// ── Load match counts per hoster ──────────────────────────────────────────────
+async function loadMatchCounts(){
+    try {
+        const snap = await db.ref('matches').once('value');
+        _matchCounts = {};
+        if(snap.exists()){
+            snap.forEach(child => {
+                const hu = child.val().hosterUsername;
+                if(hu) _matchCounts[hu] = (_matchCounts[hu] || 0) + 1;
             });
         }
-        
-        // Load hoster data for editing
-        function loadHosterForEdit(hosterId) {
-            database.ref('hosters/' + hosterId).once('value')
-                .then(snapshot => {
-                    const hoster = snapshot.val();
-                    
-                    // Populate form fields
-                    document.getElementById('editHosterId').value = hosterId;
-                    document.getElementById('editUsername').value = hoster.username || '';
-                    document.getElementById('editName').value = hoster.firstName || '';
-                    document.getElementById('editEmail').value = hoster.email || '';
-                    document.getElementById('editPhone').value = hoster.phone || '';
-                    document.getElementById('editStatus').value = hoster.status || 'active';
-                    document.getElementById('editMatches').value = hoster.totalMatches || 0;
-                    
-                    // Set image preview
-                    if (hoster.profileImage) {
-                        editPreviewImg.src = hoster.profileImage;
-                        editPreviewImg.style.display = 'block';
-                        document.querySelector('#editImagePreview i').style.display = 'none';
-                    } else {
-                        editPreviewImg.style.display = 'none';
-                        document.querySelector('#editImagePreview i').style.display = 'block';
-                    }
-                    
-                    // Store current image URL
-                    currentHosterImage = hoster.profileImage || null;
-                    
-                    // Show modal
-                    editHosterModal.style.display = 'flex';
-                })
-                .catch(error => {
-                    showError('Error loading hoster details: ' + error.message);
-                });
+    } catch(e){ /* non-critical */ }
+    renderList();
+}
+
+// ── Sort toggle ───────────────────────────────────────────────────────────────
+window.toggleSort = function(){
+    _sortByMost = !_sortByMost;
+    const btn = document.getElementById('sortBtn');
+    btn.classList.toggle('active', _sortByMost);
+    btn.innerHTML = _sortByMost
+        ? '<i class="fas fa-fire"></i> Most Hosted'
+        : '<i class="fas fa-sort-alpha-down"></i> A–Z';
+    renderList();
+};
+
+// ── Render list ───────────────────────────────────────────────────────────────
+window.renderList = function(){
+    const q    = document.getElementById('searchInput').value.trim().toLowerCase();
+    const list = document.getElementById('hosterList');
+    const info = document.getElementById('infoBar');
+
+    let hosters = Object.values(_hosters);
+
+    // Search filter
+    if(q) hosters = hosters.filter(h => h.username.toLowerCase().includes(q));
+
+    // Sort
+    if(_sortByMost){
+        hosters.sort((a,b) => (_matchCounts[b.username]||0) - (_matchCounts[a.username]||0));
+    } else {
+        hosters.sort((a,b) => a.username.localeCompare(b.username));
+    }
+
+    // Info bar
+    const total = Object.keys(_hosters).length;
+    info.textContent = q
+        ? `${hosters.length} result${hosters.length!==1?'s':''} for "${q}"`
+        : `${total} hoster${total!==1?'s':''}`;
+
+    if(!hosters.length){
+        list.innerHTML = `<div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-user-tie"></i></div>
+            <div class="empty-title">${q ? 'No results' : 'No hosters yet'}</div>
+            <div class="empty-sub">${q ? 'Try a different search.' : 'Tap "+ Add Hoster" to create one.'}</div>
+        </div>`;
+        return;
+    }
+
+    list.innerHTML = hosters.map(h => {
+        const count  = _matchCounts[h.username] || 0;
+        const initLetter = h.username.charAt(0).toUpperCase();
+        return `
+        <div class="hoster-card">
+            <div class="hc-top">
+                <div class="hc-avatar">${initLetter}</div>
+                <div class="hc-info">
+                    <div class="hc-name">${esc(h.username)}</div>
+                    <div class="hc-meta">
+                        <span class="hc-match-count loaded">
+                            <i class="fas fa-gamepad" style="font-size:10px;color:var(--purple);"></i>
+                            ${count} match${count!==1?'es':''}
+                        </span>
+                        <span style="color:var(--muted);">·</span>
+                        <span style="font-family:'Rajdhani',sans-serif;letter-spacing:.5px;">Key: ${esc(h._key)}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hc-divider"></div>
+            <div class="hc-actions">
+                <button class="hc-btn edit" onclick="openEditSheet('${esc(h._key)}','${esc(h.username)}')">
+                    <i class="fas fa-pen"></i> Edit
+                </button>
+                <button class="hc-btn pw" onclick="openPwSheet('${esc(h._key)}','${esc(h.username)}')">
+                    <i class="fas fa-key"></i> Password
+                </button>
+                <button class="hc-btn del" onclick="openDelSheet('${esc(h._key)}','${esc(h.username)}')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>`;
+    }).join('');
+};
+
+// ── Add hoster ────────────────────────────────────────────────────────────────
+// KEY = username (not auto-ID)
+// Structure: hosters/{username} = { username, password }
+window.openAddSheet = function(){
+    document.getElementById('addUsername').value = '';
+    document.getElementById('addPassword').value = '';
+    sheetMsg('addMsg','','');
+    document.getElementById('addSheet').classList.add('show');
+};
+
+window.addHoster = async function(){
+    const username = document.getElementById('addUsername').value.trim();
+    const password = document.getElementById('addPassword').value;
+
+    if(!username)       { sheetMsg('addMsg','Enter a username.','error'); return; }
+    if(username.includes(' ')) { sheetMsg('addMsg','Username cannot contain spaces.','error'); return; }
+    if(password.length < 6) { sheetMsg('addMsg','Password must be 6+ characters.','error'); return; }
+
+    const btn = document.getElementById('addBtn');
+    btn.disabled = true; btn.textContent = 'Adding…';
+    try {
+        // Check if username already exists
+        const existing = await db.ref('hosters').child(username).once('value');
+        if(existing.exists()){
+            sheetMsg('addMsg','Username already taken. Choose another.','error');
+            return;
         }
-        
-        // Close edit modal
-        closeEditModal.addEventListener('click', function() {
-            editHosterModal.style.display = 'none';
-        });
-        
-        // Click outside modal to close
-        window.addEventListener('click', function(event) {
-            if (event.target === editHosterModal) {
-                editHosterModal.style.display = 'none';
-            }
-        });
-        
-        // Add new hoster
-        addHosterForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('hosterUsername').value.trim();
-            const name = document.getElementById('hosterName').value.trim();
-            const email = document.getElementById('hosterEmail').value.trim();
-            const phone = document.getElementById('hosterPhone').value.trim();
-            const password = document.getElementById('hosterPassword').value;
-            
-            // Basic validation
-            if (!username || !name || !email || !password) {
-                showError('Please fill all required fields');
-                return;
-            }
-            
-            // Show loading state
-            addHosterForm.querySelector('span').textContent = 'Adding Hoster...';
-            addHosterLoader.style.display = 'block';
-            addHosterForm.querySelector('button').disabled = true;
-            
-            // Check if we have an image to upload
-            if (addHosterImage.files.length > 0) {
-                // Upload image first
-                uploadImageToImgBB(addHosterImage.files[0])
-                    .then(imageUrl => {
-                        // Create hoster object with image
-                        const hosterData = createHosterData(username, name, email, phone, password, imageUrl);
-                        saveHosterToDatabase(hosterData, true);
-                    })
-                    .catch(error => {
-                        showError('Error uploading image: ' + error.message);
-                        addHosterForm.querySelector('span').textContent = 'Add Hoster';
-                        addHosterLoader.style.display = 'none';
-                        addHosterForm.querySelector('button').disabled = false;
-                    });
-            } else {
-                // Create hoster object without image
-                const hosterData = createHosterData(username, name, email, phone, password);
-                saveHosterToDatabase(hosterData, true);
-            }
-        });
-        
-        // Edit hoster
-        editHosterForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const hosterId = document.getElementById('editHosterId').value;
-            const username = document.getElementById('editUsername').value.trim();
-            const name = document.getElementById('editName').value.trim();
-            const email = document.getElementById('editEmail').value.trim();
-            const phone = document.getElementById('editPhone').value.trim();
-            const password = document.getElementById('editPassword').value;
-            const status = document.getElementById('editStatus').value;
-            const matches = document.getElementById('editMatches').value;
-            
-            // Basic validation
-            if (!username || !name || !email) {
-                showError('Please fill all required fields');
-                return;
-            }
-            
-            // Show loading state
-            editHosterForm.querySelector('span').textContent = 'Updating Hoster...';
-            editHosterLoader.style.display = 'block';
-            editHosterForm.querySelector('button').disabled = true;
-            
-            // Check if we have a new image to upload
-            if (editHosterImage.files.length > 0) {
-                // Upload new image first
-                uploadImageToImgBB(editHosterImage.files[0])
-                    .then(imageUrl => {
-                        // Update hoster with new image
-                        updateHosterInDatabase(hosterId, username, name, email, phone, password, status, matches, imageUrl);
-                    })
-                    .catch(error => {
-                        showError('Error uploading image: ' + error.message);
-                        editHosterForm.querySelector('span').textContent = 'Update Hoster';
-                        editHosterLoader.style.display = 'none';
-                        editHosterForm.querySelector('button').disabled = false;
-                    });
-            } else {
-                // Update hoster without changing image
-                updateHosterInDatabase(hosterId, username, name, email, phone, password, status, matches, currentHosterImage);
-            }
-        });
-        
-        // Create hoster data object
-        function createHosterData(username, name, email, phone, password, imageUrl = null) {
-            const nameParts = name.split(' ');
-            const firstName = nameParts[0];
-            const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
-            
-            return {
-                username: username,
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                phone: phone,
-                password: password,
-                profileImage: imageUrl,
-                status: 'active',
-                totalMatches: 0,
-                registrationDate: new Date().toLocaleDateString()
-            };
+        // Save as hosters/{username} — key = username, no auto-ID
+        await db.ref('hosters').child(username).set({ username, password });
+        sheetMsg('addMsg','✅ Hoster added!','success');
+        document.getElementById('addUsername').value = '';
+        document.getElementById('addPassword').value = '';
+        setTimeout(() => closeSheet('addSheet'), 1500);
+        toast(`Hoster "${username}" added!`,'success');
+    } catch(e){ sheetMsg('addMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Add Hoster'; }
+};
+
+// ── Edit username ─────────────────────────────────────────────────────────────
+// Renames the key: copies data to new key, deletes old key
+window.openEditSheet = function(key, username){
+    document.getElementById('editOldUsername').value = key;
+    document.getElementById('editUsername').value    = username;
+    document.getElementById('editSheetSub').textContent = `Current: ${username}`;
+    sheetMsg('editMsg','','');
+    document.getElementById('editSheet').classList.add('show');
+};
+
+window.saveEdit = async function(){
+    const oldKey     = document.getElementById('editOldUsername').value;
+    const newUsername= document.getElementById('editUsername').value.trim();
+
+    if(!newUsername)          { sheetMsg('editMsg','Enter a username.','error'); return; }
+    if(newUsername.includes(' ')) { sheetMsg('editMsg','Username cannot contain spaces.','error'); return; }
+    if(newUsername === oldKey){ sheetMsg('editMsg','Username is the same.','error'); return; }
+
+    const btn = document.getElementById('editBtn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+        // Check new username not already taken
+        const existing = await db.ref('hosters').child(newUsername).once('value');
+        if(existing.exists()){
+            sheetMsg('editMsg','Username already taken.','error');
+            return;
         }
-        
-        // Save hoster to database
-        function saveHosterToDatabase(hosterData, isNew = false) {
-            const ref = isNew ? database.ref('hosters').push() : database.ref('hosters/' + hosterData.id);
-            
-            ref.set(hosterData)
-                .then(() => {
-                    showSuccess(`Hoster ${isNew ? 'added' : 'updated'} successfully!`);
-                    
-                    if (isNew) {
-                        addHosterForm.reset();
-                        addPreviewImg.style.display = 'none';
-                        document.querySelector('#addImagePreview i').style.display = 'block';
-                    } else {
-                        editHosterModal.style.display = 'none';
-                    }
-                    
-                    // Reload hosters list
-                    loadHosters();
-                })
-                .catch(error => {
-                    showError(`Error ${isNew ? 'adding' : 'updating'} hoster: ` + error.message);
-                })
-                .finally(() => {
-                    if (isNew) {
-                        addHosterForm.querySelector('span').textContent = 'Add Hoster';
-                        addHosterLoader.style.display = 'none';
-                        addHosterForm.querySelector('button').disabled = false;
-                    } else {
-                        editHosterForm.querySelector('span').textContent = 'Update Hoster';
-                        editHosterLoader.style.display = 'none';
-                        editHosterForm.querySelector('button').disabled = false;
-                    }
-                });
-        }
-        
-        // Update hoster in database
-        function updateHosterInDatabase(hosterId, username, name, email, phone, password, status, matches, imageUrl) {
-            const nameParts = name.split(' ');
-            const firstName = nameParts[0];
-            const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
-            
-            const updateData = {
-                username: username,
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                phone: phone,
-                status: status,
-                totalMatches: parseInt(matches) || 0,
-                profileImage: imageUrl
-            };
-            
-            // Only update password if provided
-            if (password) {
-                updateData.password = password;
-            }
-            
-            database.ref('hosters/' + hosterId).update(updateData)
-                .then(() => {
-                    showSuccess('Hoster updated successfully!');
-                    editHosterModal.style.display = 'none';
-                    loadHosters();
-                })
-                .catch(error => {
-                    showError('Error updating hoster: ' + error.message);
-                })
-                .finally(() => {
-                    editHosterForm.querySelector('span').textContent = 'Update Hoster';
-                    editHosterLoader.style.display = 'none';
-                    editHosterForm.querySelector('button').disabled = false;
-                });
-        }
-        
-        // Upload image to ImgBB
-        function uploadImageToImgBB(file) {
-            return new Promise((resolve, reject) => {
-                const formData = new FormData();
-                formData.append('image', file);
-                
-                fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        resolve(data.data.url);
-                    } else {
-                        reject(new Error(data.error.message || 'Image upload failed'));
-                    }
-                })
-                .catch(error => {
-                    reject(error);
-                });
-            });
-        }
-        
-        // Search hosters
-        searchBtn.addEventListener('click', function() {
-            const searchTerm = searchInput.value.trim();
-            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
-            loadHosters(searchTerm, activeFilter);
-        });
-        
-        // Filter hosters
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                const filter = this.getAttribute('data-filter');
-                const searchTerm = searchInput.value.trim();
-                loadHosters(searchTerm, filter);
-            });
-        });
-        
-        // Image preview for add form
-        addHosterImage.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    addPreviewImg.src = e.target.result;
-                    addPreviewImg.style.display = 'block';
-                    document.querySelector('#addImagePreview i').style.display = 'none';
-                }
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
-        
-        // Image preview for edit form
-        editHosterImage.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    editPreviewImg.src = e.target.result;
-                    editPreviewImg.style.display = 'block';
-                    document.querySelector('#editImagePreview i').style.display = 'none';
-                }
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
-        
-        // Helper functions for showing messages
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 5000);
-        }
-        
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 3000);
-        }
-        
-        // Check if user is already logged in
-        window.addEventListener('DOMContentLoaded', () => {
-            const adminRole = localStorage.getItem('adminRole');
-            const adminUser = localStorage.getItem('adminUsername');
-            const loginTime = localStorage.getItem('loginTime');
-            const currentTime = new Date().getTime();
-            
-            // If user was logged in less than 10 minutes ago, show dashboard
-            if (adminRole && adminUser && loginTime && (currentTime - parseInt(loginTime)) < 600000) {
-                adminUsernameSpan.textContent = adminUser;
-                currentAdmin = {
-                    username: adminUser,
-                    role: adminRole,
-                    email: localStorage.getItem('adminEmail')
-                };
-                
-                // Verify admin credentials with database
-                verifyAdminCredentials(adminUser);
-            } else {
-                if (adminRole) {
-                    // Clear expired login
-                    localStorage.removeItem('adminRole');
-                    localStorage.removeItem('adminUsername');
-                    localStorage.removeItem('adminEmail');
-                    localStorage.removeItem('loginTime');
-                }
-                // Redirect to login page (would be in a real scenario)
-                alert('Please login to access admin panel');
-                // In a real app: window.location.href = 'login.html';
-            }
-        });
-        
-        // Verify admin credentials with database
-        function verifyAdminCredentials(username) {
-            const adminsRef = database.ref('admins');
-            
-            adminsRef.once('value')
-                .then(snapshot => {
-                    let adminFound = false;
-                    
-                    snapshot.forEach(childSnapshot => {
-                        const admin = childSnapshot.val();
-                        
-                        // Check if username matches
-                        if (admin.username === username || admin.email === username) {
-                            adminFound = true;
-                            return true; // Break out of forEach
-                        }
-                    });
-                    
-                    if (!adminFound) {
-                        // Admin not found in database
-                        localStorage.removeItem('adminRole');
-                        localStorage.removeItem('adminUsername');
-                        localStorage.removeItem('adminEmail');
-                        localStorage.removeItem('loginTime');
-                        
-                        // Redirect to login page (would be in a real scenario)
-                        alert('Admin credentials invalid. Please login again.');
-                        // In a real app: window.location.href = 'login.html';
-                    } else {
-                        // Load hosters
-                        loadHosters();
-                    }
-                })
-                .catch(error => {
-                    showError('Error verifying admin credentials: ' + error.message);
-                });
-        }
-    </script>
+        // Read old data
+        const oldSnap = await db.ref('hosters').child(oldKey).once('value');
+        if(!oldSnap.exists()){ sheetMsg('editMsg','Hoster not found.','error'); return; }
+        const oldData = oldSnap.val();
+
+        // Write new key with updated username
+        await db.ref('hosters').child(newUsername).set({ ...oldData, username: newUsername });
+
+        // Delete old key
+        await db.ref('hosters').child(oldKey).remove();
+
+        sheetMsg('editMsg','✅ Username updated!','success');
+        setTimeout(() => closeSheet('editSheet'), 1500);
+        toast(`Renamed to "${newUsername}"`, 'success');
+    } catch(e){ sheetMsg('editMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save Username'; }
+};
+
+// ── Change password ───────────────────────────────────────────────────────────
+window.openPwSheet = function(key, username){
+    document.getElementById('pwUsername').value = key;
+    document.getElementById('pwSheetSub').textContent = username;
+    document.getElementById('newPw').value  = '';
+    document.getElementById('confPw').value = '';
+    sheetMsg('pwMsg','','');
+    document.getElementById('pwSheet').classList.add('show');
+};
+
+window.savePassword = async function(){
+    const key    = document.getElementById('pwUsername').value;
+    const newPw  = document.getElementById('newPw').value;
+    const confPw = document.getElementById('confPw').value;
+
+    if(!newPw || !confPw)   { sheetMsg('pwMsg','Fill both fields.','error'); return; }
+    if(newPw.length < 6)    { sheetMsg('pwMsg','Password must be 6+ characters.','error'); return; }
+    if(newPw !== confPw)    { sheetMsg('pwMsg','Passwords do not match.','error'); return; }
+
+    const btn = document.getElementById('pwBtn');
+    btn.disabled = true; btn.textContent = 'Updating…';
+    try {
+        await db.ref('hosters').child(key).update({ password: newPw });
+        sheetMsg('pwMsg','✅ Password updated!','success');
+        setTimeout(() => closeSheet('pwSheet'), 1500);
+        toast('Password changed.','success');
+    } catch(e){ sheetMsg('pwMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-key"></i> Update Password'; }
+};
+
+// ── Delete hoster ─────────────────────────────────────────────────────────────
+window.openDelSheet = function(key, username){
+    document.getElementById('delUsername').value = key;
+    document.getElementById('delConfSub').textContent = `Delete hoster "${username}"? This cannot be undone.`;
+    document.getElementById('delSheet').classList.add('show');
+};
+
+window.confirmDelete = async function(){
+    const key = document.getElementById('delUsername').value;
+    const btn = document.getElementById('delConfBtn');
+    btn.disabled = true; btn.textContent = 'Deleting…';
+    try {
+        await db.ref('hosters').child(key).remove();
+        closeSheet('delSheet');
+        toast('Hoster deleted.','success');
+    } catch(e){ toast('Error: '+e.message,'error'); }
+    finally { btn.disabled = false; btn.textContent = 'Delete'; }
+};
+
+// ── Sheet helpers ─────────────────────────────────────────────────────────────
+window.closeSheet = function(id){ document.getElementById(id).classList.remove('show'); };
+document.querySelectorAll('.sh-overlay').forEach(el =>
+    el.addEventListener('click', e => { if(e.target===el) el.classList.remove('show'); })
+);
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+let _tt;
+function toast(msg, type){
+    clearTimeout(_tt);
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.className = 'toast '+type+' show';
+    _tt = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+let _st = {};
+function sheetMsg(id, text, type){
+    clearTimeout(_st[id]);
+    const el = document.getElementById(id);
+    if(!text){ el.style.display='none'; return; }
+    el.textContent=text; el.className='sh-msg '+type; el.style.display='block';
+    _st[id] = setTimeout(() => el.style.display='none', 5000);
+}
+
+// Session check
+setInterval(() => { if(!getAdminSession()){ clearAdminSession(); window.location.href='index.html'; } }, 30000);
+
+})();
+</script>
 </body>
 </html>
