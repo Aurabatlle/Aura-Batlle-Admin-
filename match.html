@@ -267,18 +267,6 @@
         <!-- Match Management -->
         <div class="sec-head" style="animation:fadeUp .45s .18s ease both;">Match Management</div>
         <div class="grid" style="margin-bottom:10px;animation:fadeUp .45s .2s ease both;">
-            <a href="creatematch.html" class="acard accent-red">
-                <i class="fas fa-chevron-right a-arr"></i>
-                <div class="a-ico red"><i class="fas fa-plus-circle"></i></div>
-                <div class="a-title">Create Match</div>
-                <div class="a-desc">New tournament setup</div>
-            </a>
-            <a href="hostmatch.html" class="acard accent-orange">
-                <i class="fas fa-chevron-right a-arr"></i>
-                <div class="a-ico orange"><i class="fas fa-play-circle"></i></div>
-                <div class="a-title">Host Match</div>
-                <div class="a-desc">Manage live matches</div>
-            </a>
             <a href="manageresult.html" class="acard accent-green">
                 <i class="fas fa-chevron-right a-arr"></i>
                 <div class="a-ico green"><i class="fas fa-chart-line"></i></div>
@@ -288,8 +276,21 @@
             <a href="managematch.html" class="acard accent-blue">
                 <i class="fas fa-chevron-right a-arr"></i>
                 <div class="a-ico blue"><i class="fas fa-edit"></i></div>
-                <div class="a-title">Manage</div>
+                <div class="a-title">Manage Matches</div>
                 <div class="a-desc">Edit or delete matches</div>
+            </a>
+        </div>
+
+        <!-- Hosters -->
+        <div class="sec-head" style="animation:fadeUp .45s .22s ease both;">Hosters</div>
+        <div style="animation:fadeUp .45s .24s ease both;">
+            <a href="hoster.html" class="acard-wide accent-purple" style="margin-bottom:10px;">
+                <div class="a-ico purple"><i class="fas fa-user-tie"></i></div>
+                <div class="aw-info">
+                    <div class="aw-title">Manage Hosters</div>
+                    <div class="aw-desc">Add, view or remove hoster accounts</div>
+                </div>
+                <i class="fas fa-chevron-right aw-arr"></i>
             </a>
         </div>
 
@@ -300,9 +301,8 @@
     <!-- Bottom nav -->
     <nav class="bnav">
         <button class="nb active"><i class="fas fa-home"></i><span>Home</span></button>
-
-        <a href="creatematch.html" class="nb"><i class="fas fa-plus"></i><span>Create</span></button></a>
-        <a href="hostmatch.html" class="nb"><i class="fas fa-play"></i><span>Host</span></a>
+        <a href="hoster.html" class="nb"><i class="fas fa-user-tie"></i><span>Hosters</span></a>
+        <a href="managematch.html" class="nb"><i class="fas fa-edit"></i><span>Matches</span></a>
         <button class="nb" onclick="openSheet('settingsSheet')"><i class="fas fa-cog"></i><span>Settings</span></button>
     </nav>
 </div>
@@ -577,22 +577,20 @@ function initDashboard(adminId, username){
     document.getElementById('dName').textContent = username;
     document.getElementById('setUsername').value = username;
     loadStats();
-    loadHosterList();
-    loadNotices();
-    loadBanners();
 }
 
 // ── Stats ────────────────────────────────────────────────────────────────────
 function loadStats(){
-    // Total matches from maintenanceConfig/matchCounter
-    db.ref('maintenanceConfig/matchCounter').once('value').then(snap=>{
-        setText('statMatches', snap.val() ?? '—');
-    }).catch(()=>setText('statMatches','—'));
+    // Total matches — realtime listener on maintenanceConfig/matchCounter
+    db.ref('maintenanceConfig').child('matchCounter').on('value', function(snap){
+        var val = snap.val();
+        setText('statMatches', (val !== null && val !== undefined) ? val : '—');
+    }, function(){ setText('statMatches','—'); });
 
-    // Hosters count
-    db.ref('hosters').once('value').then(snap=>{
+    // Hosters count — realtime listener
+    db.ref('hosters').on('value', function(snap){
         setText('statHosters', snap.numChildren());
-    }).catch(()=>setText('statHosters','—'));
+    }, function(){ setText('statHosters','—'); });
 }
 
 function setText(id, val){
