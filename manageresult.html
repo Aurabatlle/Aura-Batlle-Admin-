@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin — Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --red: #e63946; --red-dark: #b5202d;
+            --gold: #f5c518; --gold-dark: #c9a000;
+            --green: #22c55e; --green-dark: #16a34a;
+            --blue: #3b82f6; --purple: #8b5cf6; --orange: #f97316;
+            --bg: #0d0d0f; --surface: #141418; --surface2: #1a1a1f; --surface3: #1f1f25;
+            --border: rgba(255,255,255,0.07); --border-red: rgba(230,57,70,0.2);
+            --text: #f0f0f2; --dim: #9898a8; --muted: #5a5a68;
+        }
+        html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(230,57,70,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(230,57,70,0.025) 1px, transparent 1px); background-size: 44px 44px; pointer-events: none; z-index: 0; }
+
+        /* ── Header ── */
+        .header { position: sticky; top: 0; z-index: 200; display: flex; align-items: center; gap: 12px; padding: 13px 18px; background: rgba(13,13,15,0.94); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+        .back-btn { width: 34px; height: 34px; border-radius: 9px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--dim); font-size: 14px; flex-shrink: 0; }
+        .h-logo { width: 30px; height: 30px; border-radius: 8px; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .h-logo i { color: var(--purple); font-size: 13px; }
+        .h-title { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; flex: 1; }
+        .h-title span { color: var(--purple); }
+        .h-admin-pill { padding: 3px 10px; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); border-radius: 20px; font-size: 10px; color: var(--purple); letter-spacing: 1px; font-weight: 600; text-transform: uppercase; flex-shrink: 0; }
+        .h-refresh { width: 34px; height: 34px; border-radius: 9px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 13px; cursor: pointer; transition: color .2s; flex-shrink: 0; }
+        .h-refresh:hover { color: var(--purple); }
+        .h-refresh.spin i { animation: spin .7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Tabs ── */
+        .tab-bar { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 57px; z-index: 190; }
+        .tab { flex: 1; padding: 13px 8px; text-align: center; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; position: relative; background: none; border-top: none; border-left: none; border-right: none; }
+        .tab.active { color: var(--red); border-bottom-color: var(--red); }
+        .tab-badge { position: absolute; top: 8px; right: 16px; background: var(--red); color: #fff; font-size: 9px; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 1px 5px; border-radius: 10px; min-width: 16px; text-align: center; display: none; }
+        .tab-badge.show { display: inline-block; }
+
+        /* ── Search ── */
+        .search-wrap { padding: 12px 16px 4px; max-width: 600px; margin: 0 auto; position: relative; z-index: 1; }
+        .search-row { display: flex; gap: 8px; margin-bottom: 8px; }
+        .search-box { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0 14px; transition: border-color .2s; }
+        .search-box:focus-within { border-color: rgba(230,57,70,.45); box-shadow: 0 0 0 3px rgba(230,57,70,.08); }
+        .search-box i { color: var(--muted); font-size: 13px; flex-shrink: 0; }
+        .search-box input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 11px 0; }
+        .search-box input::placeholder { color: var(--muted); font-size: 13px; }
+        .search-clear { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 4px; display: none; align-items: center; justify-content: center; }
+        .search-clear.show { display: flex; }
+        .filter-row { display: flex; gap: 8px; }
+        .filter-box { flex: 1; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; transition: border-color .2s; }
+        .filter-box:focus-within { border-color: rgba(230,57,70,.45); }
+        .filter-box i { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+        .filter-box input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 9px 0; min-width: 0; }
+        .filter-box input::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+        .filter-clear-btn { flex-shrink: 0; padding: 0 14px; height: 38px; background: var(--surface); border: 1px solid var(--border-red); border-radius: 10px; color: var(--red); font-size: 12px; font-weight: 600; cursor: pointer; display: none; align-items: center; gap: 5px; white-space: nowrap; }
+        .filter-clear-btn.show { display: flex; }
+        .search-results-info { font-size: 11px; color: var(--muted); padding: 4px 2px 8px; letter-spacing: .5px; }
+
+        /* ── Main ── */
+        .main { padding: 16px; max-width: 600px; margin: 0 auto; position: relative; z-index: 1; padding-bottom: 40px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeUp .3s ease both; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-icon { font-size: 48px; margin-bottom: 14px; opacity: .35; }
+        .empty-title { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: var(--dim); margin-bottom: 6px; }
+        .empty-sub { font-size: 13px; color: var(--muted); }
+        .skeleton { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; margin-bottom: 18px; padding: 20px; }
+        .skel-line { background: var(--surface2); border-radius: 4px; animation: pulse 1.4s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+
+        /* ── Match Card ── */
+        .match-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; margin-bottom: 18px; transition: border-color .2s; }
+        .match-card:hover { border-color: rgba(230,57,70,0.2); }
+        .mc-stripe { height: 3px; }
+        .mc-stripe.result_pending { background: linear-gradient(90deg, #f97316, #f5c518); animation: stripePulse 2s ease-in-out infinite; }
+        .mc-stripe.completed { background: linear-gradient(90deg, var(--green-dark), var(--green)); }
+        @keyframes stripePulse { 0%,100%{opacity:.7} 50%{opacity:1} }
+        .mc-head { padding: 14px 16px 4px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .mc-id { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: var(--red); letter-spacing: 2px; }
+        .mc-badges { display: flex; align-items: center; gap: 6px; }
+        .mc-status { padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+        .mc-status.result_pending { background: rgba(249,115,22,.12); color: #f97316; border: 1px solid rgba(249,115,22,.25); }
+        .mc-status.completed { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.25); }
+        .mode-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+        .mode-BR { background: rgba(249,115,22,.14); color: #f97316; border: 1px solid rgba(249,115,22,.3); }
+        .mode-CS { background: rgba(59,130,246,.14); color: #3b82f6; border: 1px solid rgba(59,130,246,.3); }
+        .mode-LW { background: rgba(168,85,247,.14); color: #a855f7; border: 1px solid rgba(168,85,247,.3); }
+        .mode-RC { background: rgba(34,197,94,.14); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+
+        /* Hoster line — admin only */
+        .mc-hoster { display: flex; align-items: center; gap: 6px; padding: 2px 16px 0; font-size: 11px; color: var(--muted); }
+        .mc-hoster i { color: var(--purple); font-size: 10px; }
+        .mc-hoster strong { color: var(--purple); font-weight: 600; }
+
+        .mc-title-block { padding: 6px 16px 4px; }
+        .mc-title { font-family: 'Rajdhani', sans-serif; font-size: 19px; font-weight: 700; color: var(--text); letter-spacing: .5px; }
+        .mc-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 10px; padding: 8px 16px 12px; }
+        .mc-info-row { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+        .mc-info-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .8px; min-width: 46px; }
+        .mc-info-val { color: var(--text); font-weight: 500; }
+        .mc-info-val.gold { color: var(--gold); }
+        .mc-info-val.green { color: var(--green); }
+        .mc-dt { display: flex; align-items: center; gap: 14px; padding: 0 16px 10px; font-size: 12px; color: var(--dim); }
+        .mc-dt-item { display: flex; align-items: center; gap: 5px; }
+        .mc-dt-item i { font-size: 10px; color: var(--muted); }
+        .mc-divider { height: 1px; background: var(--border); margin: 0 16px; }
+
+        /* Result Summary */
+        .result-summary { margin: 12px 16px 4px; }
+        .rs-head { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .rs-list { display: flex; flex-direction: column; gap: 6px; }
+        .rs-item { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: 10px; padding: 9px 12px; border: 1px solid var(--border); }
+        .rs-rank { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+        .rs-rank.r1 { background: rgba(245,197,24,.15); color: var(--gold); border: 1px solid rgba(245,197,24,.35); }
+        .rs-rank.r2 { background: rgba(148,163,184,.12); color: #94a3b8; border: 1px solid rgba(148,163,184,.25); }
+        .rs-rank.r3 { background: rgba(205,127,50,.12); color: #cd7f32; border: 1px solid rgba(205,127,50,.25); }
+        .rs-rank.rn { background: var(--surface3); color: var(--dim); border: 1px solid var(--border); }
+        .rs-info { flex: 1; min-width: 0; }
+        .rs-name { font-size: 13px; font-weight: 600; color: var(--gold); font-family: 'Rajdhani', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .rs-uid { font-size: 10px; color: var(--muted); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; margin-top: 2px; }
+        .rs-sub { font-size: 11px; color: var(--dim); margin-top: 1px; }
+        .rs-gold { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; color: var(--gold); display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+        .rs-gold i { font-size: 11px; }
+
+        .mc-actions { padding: 12px 16px 16px; }
+        .btn-set-result { width: 100%; padding: 13px 10px; border-radius: 12px; border: none; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--red), var(--red-dark)); color: #fff; box-shadow: 0 4px 16px rgba(230,57,70,.25); transition: opacity .2s, transform .1s; }
+        .btn-set-result:hover { box-shadow: 0 6px 22px rgba(230,57,70,.38); }
+        .btn-set-result:active { transform: scale(.97); }
+        /* Locked button for completed — cannot edit */
+        .btn-locked { width: 100%; padding: 13px 10px; border-radius: 12px; border: 1px solid var(--border); font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: not-allowed; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface2); color: var(--muted); }
+
+        /* ── Bottom Sheet ── */
+        .sh-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(4px); z-index: 400; align-items: flex-end; justify-content: center; }
+        .sh-overlay.show { display: flex; }
+        .sheet { background: var(--surface); border-radius: 20px 20px 0 0; border-top: 1px solid var(--border-red); width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto; animation: slideUp .3s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .sh-stripe { height: 3px; background: linear-gradient(90deg, var(--red-dark), var(--red)); border-radius: 20px 20px 0 0; }
+        .sh-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
+        .sh-head { padding: 16px 22px 14px; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border); }
+        .sh-head-info { flex: 1; min-width: 0; }
+        .sh-title { font-family: 'Rajdhani', sans-serif; font-size: 19px; font-weight: 700; letter-spacing: 1px; }
+        .sh-subtitle { font-size: 12px; color: var(--muted); margin-top: 3px; }
+        .sh-x { width: 30px; height: 30px; border-radius: 8px; background: var(--surface2); border: none; color: var(--dim); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; margin-left: 10px; }
+        .sh-body { padding: 20px 22px 30px; }
+        .sh-match-info { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+        .sh-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border); font-size: 12px; color: var(--dim); }
+        .sh-pill i { font-size: 10px; color: var(--muted); }
+        .sh-pill.gold-pill { color: var(--gold); border-color: rgba(245,197,24,.2); background: rgba(245,197,24,.06); }
+        .sh-pill.gold-pill i { color: var(--gold); }
+        .sh-pill.purple-pill { color: var(--purple); border-color: rgba(139,92,246,.2); background: rgba(139,92,246,.06); }
+        .sh-pill.purple-pill i { color: var(--purple); }
+        .prize-ref { background: var(--surface2); border: 1px solid rgba(245,197,24,.18); border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; }
+        .prize-ref-head { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .prize-ref-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .prize-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 10px; background: rgba(245,197,24,.08); border: 1px solid rgba(245,197,24,.2); font-size: 12px; }
+        .prize-chip .pr-label { color: var(--dim); font-size: 10px; }
+        .prize-chip .pr-val { color: var(--gold); font-weight: 600; font-family: 'Rajdhani', sans-serif; font-size: 14px; }
+        .sec-label { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .entry-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+        /* Solo player row */
+        .entry-row { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+        .entry-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(230,57,70,.1); border: 1px solid rgba(230,57,70,.2); display: flex; align-items: center; justify-content: center; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; color: var(--red); flex-shrink: 0; }
+        .entry-info { flex: 1; min-width: 0; }
+        /* IGN highlighted gold — most important */
+        .entry-ign { font-size: 15px; font-weight: 700; color: var(--gold); font-family: 'Rajdhani', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .entry-uid { font-size: 10px; color: var(--muted); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; margin-top: 2px; }
+        .entry-realname { font-size: 11px; color: var(--dim); margin-top: 1px; }
+        .entry-input-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+        .entry-input-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+        .entry-input { width: 72px; padding: 7px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: 'Rajdhani', sans-serif; font-weight: 600; text-align: center; transition: border-color .2s; -moz-appearance: textfield; }
+        .entry-input::-webkit-outer-spin-button, .entry-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .entry-input:focus { outline: none; border-color: rgba(230,57,70,.5); box-shadow: 0 0 0 3px rgba(230,57,70,.1); }
+
+        /* Team block */
+        .team-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .team-block-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(230,57,70,.06); border-bottom: 1px solid var(--border); }
+        .team-icon { width: 30px; height: 30px; border-radius: 8px; background: rgba(230,57,70,.1); border: 1px solid rgba(230,57,70,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .team-icon i { color: var(--red); font-size: 12px; }
+        .team-block-name { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+        .team-leader-badge { font-size: 10px; color: var(--gold); background: rgba(245,197,24,.1); border: 1px solid rgba(245,197,24,.2); padding: 2px 8px; border-radius: 10px; }
+        .team-block-members { padding: 8px 14px 10px; display: flex; flex-direction: column; gap: 6px; }
+        /* member row — IGN + UID per member */
+        .member-row { display: flex; align-items: center; gap: 8px; }
+        .member-chip { font-size: 12px; font-weight: 600; border-radius: 20px; padding: 5px 11px; border: 1px solid; display: inline-flex; align-items: center; gap: 5px; }
+        .member-chip.chip-leader { color: #f5c518; background: rgba(245,197,24,.12); border-color: rgba(245,197,24,.35); }
+        .member-chip.chip-leader i { font-size: 9px; }
+        .member-chip.chip-member { color: #60c8ff; background: rgba(59,130,246,.1); border-color: rgba(59,130,246,.28); }
+        .member-uid { font-size: 10px; color: var(--muted); font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
+        .team-block-input { padding: 10px 14px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid var(--border); }
+        .team-input-label { font-size: 12px; color: var(--dim); }
+        .team-input-label span { color: var(--gold); font-weight: 600; }
+
+        .sh-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--red), var(--red-dark)); color: #fff; border: none; border-radius: 12px; font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 16px rgba(230,57,70,.25); transition: opacity .2s, transform .1s; }
+        .sh-btn:active { transform: scale(.98); }
+        .sh-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+        .sh-msg { margin-top: 12px; padding: 11px 14px; border-radius: 8px; font-size: 13px; display: none; }
+        .sh-msg.success { background: rgba(34,197,94,.1); color: var(--green); border: 1px solid rgba(34,197,94,.2); }
+        .sh-msg.error { background: rgba(230,57,70,.1); color: var(--red); border: 1px solid rgba(230,57,70,.2); }
+
+        .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; font-size: 14px; color: var(--text); z-index: 999; transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .3s; opacity: 0; pointer-events: none; white-space: nowrap; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 28px rgba(0,0,0,.4); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.success { border-color: rgba(34,197,94,.3); }
+        .toast.success i { color: var(--green); }
+        .toast.error { border-color: rgba(230,57,70,.3); }
+        .toast.error i { color: var(--red); }
+
+        .loading-overlay { position: fixed; inset: 0; background: rgba(13,13,15,.75); backdrop-filter: blur(3px); z-index: 500; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+        .loading-overlay.show { display: flex; }
+        .spinner { width: 42px; height: 42px; border: 3px solid rgba(230,57,70,.2); border-top-color: var(--red); border-radius: 50%; animation: spin .7s linear infinite; }
+        .loading-text { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; }
+        .sheet::-webkit-scrollbar { width: 3px; }
+        .sheet::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Processing...</div>
+</div>
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg"></span></div>
+
+<div class="header">
+    <a href="dashboard.html" class="back-btn"><i class="fas fa-chevron-left"></i></a>
+    <div class="h-logo"><i class="fas fa-trophy"></i></div>
+    <div class="h-title">Admin <span>Results</span></div>
+    <div class="h-admin-pill">Admin</div>
+    <button class="h-refresh" id="refreshBtn" onclick="loadAll()"><i class="fas fa-sync-alt"></i></button>
+</div>
+
+<div class="tab-bar">
+    <button class="tab active" onclick="switchTab('pending')" id="tabPending">
+        Pending Result <span class="tab-badge" id="pendingBadge"></span>
+    </button>
+    <button class="tab" onclick="switchTab('completed')" id="tabCompleted">
+        Completed <span class="tab-badge" id="completedBadge"></span>
+    </button>
+</div>
+
+<div class="search-wrap">
+    <div class="search-row">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by ID, title or hoster…" oninput="applyFilters()">
+            <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <div class="filter-row">
+        <div class="filter-box"><i class="fas fa-calendar-alt"></i><input type="date" id="filterDate" onchange="applyFilters()"></div>
+        <div class="filter-box"><i class="fas fa-clock"></i><input type="time" id="filterTime" onchange="applyFilters()"></div>
+        <button class="filter-clear-btn" id="filterClear" onclick="clearFilters()"><i class="fas fa-times"></i> Clear</button>
+    </div>
+    <div class="search-results-info" id="searchInfo"></div>
+</div>
+
+<div class="main">
+    <div class="tab-content active" id="tabContentPending"><div id="pendingList"></div></div>
+    <div class="tab-content"        id="tabContentCompleted"><div id="completedList"></div></div>
+</div>
+
+<!-- Set Result Sheet -->
+<div class="sh-overlay" id="resultSheet" onclick="closeSheet()">
+    <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sh-stripe"></div>
+        <div class="sh-handle"></div>
+        <div class="sh-head">
+            <div class="sh-head-info">
+                <div class="sh-title" id="shMatchTitle">Set Result</div>
+                <div class="sh-subtitle" id="shMatchSub">—</div>
+            </div>
+            <button class="sh-x" onclick="closeSheet()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="sh-match-info" id="shPills"></div>
+            <div class="prize-ref" id="shPrizeRef" style="display:none">
+                <div class="prize-ref-head"><i class="fas fa-coins"></i> Prize Structure</div>
+                <div class="prize-ref-list" id="shPrizeList"></div>
+            </div>
+            <div class="sec-label" id="shEntryLabel">Players</div>
+            <div class="entry-list" id="shEntryList"></div>
+            <button class="sh-btn" id="shSubmitBtn" onclick="submitResult()">
+                <i class="fas fa-check-circle"></i>&nbsp; Confirm &amp; Send Prizes
+            </button>
+            <div class="sh-msg" id="shMsg"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script>
+(() => {
+    /* ── Firebase ── */
+    const _cfg = JSON.parse(atob('eyJhcGlLZXkiOiJBSXphU3lEN3BBc2RZcWtKekRiU3NpOHhiTHN5Mlg1czBiZ1AwNDAiLCJhdXRoRG9tYWluIjoiYXVyYS1iYXR0bGUtbWFpbi5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vYXVyYS1iYXR0bGUtbWFpbi1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20iLCJwcm9qZWN0SWQiOiJhdXJhLWJhdHRsZS1tYWluIiwic3RvcmFnZUJ1Y2tldCI6ImF1cmEtYmF0dGxlLW1haW4uZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiNzYzNzc5OTkwMjg5IiwiYXBwSWQiOiIxOjc2Mzc3OTk5MDI4OTp3ZWI6NWNhYTdiYzg2MWU4MGI2ZjBiMDJiMCIsIm1lYXN1cmVtZW50SWQiOiJHLVpaWFowMEhLMDcifQ=='));
+    if (!firebase.apps.length) firebase.initializeApp(_cfg);
+    const db = firebase.database();
+
+    /* ── Admin session — same keys as index.html login page ── */
+    const SESSION_MS = 30 * 60 * 1000;
+    function getAdminSession() {
+        const key  = localStorage.getItem('adminUsername');
+        const time = parseInt(localStorage.getItem('loginTime') || '0');
+        if (!key || (Date.now() - time) >= SESSION_MS) { clearAdminSession(); return null; }
+        return { id: key, username: localStorage.getItem('adminDisplayName') || key };
+    }
+    function clearAdminSession() {
+        ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime'].forEach(k => localStorage.removeItem(k));
+    }
+    const adminSess = getAdminSession();
+    if (!adminSess) { window.location.href = 'index.html'; return; }
+
+    /* ── State ── */
+    let _activeMatch  = null;
+    let _allPending   = [];
+    let _allCompleted = [];
+
+    /* ── Helpers ── */
+    function genTxId() { return String(Math.floor(1000000000 + Math.random() * 9000000000)); }
+    function nowDateStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    function nowTimeStr() { const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0'); }
+    function initials(n) { if(!n) return '?'; const p=n.trim().split(' '); return (p.length>1?(p[0][0]+p[1][0]):n.slice(0,2)).toUpperCase(); }
+    function rankSuffix(n) { return n===1?'1st':n===2?'2nd':n===3?'3rd':n+'th'; }
+    function isMulti(m) { const et=(m.entryType||'').toLowerCase(); return et==='squad'||et==='duo'||et==='team'||et==='6v6'; }
+    function countJoined(m) { return isMulti(m)?Object.keys(m.teams||{}).length:Object.keys(m.players||{}).length; }
+    function esc(s) { return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''; }
+    function skeletons(n) { return Array.from({length:n},()=>`<div class="skeleton"><div class="skel-line" style="height:14px;width:60%;margin-bottom:12px"></div><div class="skel-line" style="height:20px;width:80%;margin-bottom:10px"></div><div class="skel-line" style="height:12px;width:50%"></div></div>`).join(''); }
+    function emptyState(icon,title,sub) { return `<div class="empty-state"><div class="empty-icon"><i class="fas fa-${icon}"></i></div><div class="empty-title">${title}</div><div class="empty-sub">${sub}</div></div>`; }
+
+    /* ── Tab switch ── */
+    window.switchTab = function(tab) {
+        document.getElementById('tabPending').classList.toggle('active', tab==='pending');
+        document.getElementById('tabCompleted').classList.toggle('active', tab==='completed');
+        document.getElementById('tabContentPending').classList.toggle('active', tab==='pending');
+        document.getElementById('tabContentCompleted').classList.toggle('active', tab==='completed');
+    };
+
+    /* ── Load ALL matches — admin sees everything, no hoster filter ── */
+    window.loadAll = async function() {
+        const btn = document.getElementById('refreshBtn');
+        btn.classList.add('spin');
+        setTimeout(() => btn.classList.remove('spin'), 700);
+        document.getElementById('pendingList').innerHTML   = skeletons(3);
+        document.getElementById('completedList').innerHTML = skeletons(2);
+        try {
+            const snap = await db.ref('matches').once('value');
+            _allPending=[]; _allCompleted=[];
+            snap.forEach(s => {
+                const m = { ...s.val(), _key: s.key };
+                if (m.status === 'result_pending') _allPending.push(m);
+                else if (m.status === 'completed')  _allCompleted.push(m);
+            });
+            const pb=document.getElementById('pendingBadge'), cb=document.getElementById('completedBadge');
+            _allPending.length   ? (pb.textContent=_allPending.length,   pb.classList.add('show'))   : pb.classList.remove('show');
+            _allCompleted.length ? (cb.textContent=_allCompleted.length, cb.classList.add('show'))   : cb.classList.remove('show');
+            applyFilters();
+        } catch(e) {
+            document.getElementById('pendingList').innerHTML = emptyState('exclamation-circle','Load Failed','Check connection and refresh.');
+        }
+    };
+
+    /* ── Search + date/time filter ── */
+    window.applyFilters = function() {
+        const q  = (document.getElementById('searchInput').value||'').trim().toLowerCase();
+        const fd = (document.getElementById('filterDate').value||'').trim();
+        const ft = (document.getElementById('filterTime').value||'').trim();
+        document.getElementById('searchClear').classList.toggle('show', q.length>0);
+        document.getElementById('filterClear').classList.toggle('show', fd.length>0||ft.length>0);
+
+        function match(m) {
+            if (q) {
+                const id=String(m.matchId||m._key||'').toLowerCase();
+                const title=String(m.title||'').toLowerCase();
+                const hoster=String(m.hosterUsername||'').toLowerCase();
+                if (!id.includes(q) && !title.includes(q) && !hoster.includes(q)) return false;
+            }
+            if (fd && String(m.date||'').trim() !== fd) return false;
+            if (ft && String(m.time||'').trim().slice(0,5) !== ft) return false;
+            return true;
+        }
+
+        const fp=_allPending.filter(match), fc=_allCompleted.filter(match);
+        const hasFilter=q||fd||ft, total=fp.length+fc.length;
+        const info=document.getElementById('searchInfo');
+        info.textContent = hasFilter ? (total>0 ? `${total} match${total!==1?'es':''} found` : 'No matches found') : '';
+        info.style.color = total>0 ? 'var(--dim)' : 'var(--red)';
+
+        document.getElementById('pendingList').innerHTML   = fp.length ? fp.map(renderPendingCard).join('')   : emptyState('clock',        hasFilter?'No Results':'No Pending Results',    hasFilter?'Try a different search.':'All results have been set.');
+        document.getElementById('completedList').innerHTML = fc.length ? fc.map(renderCompletedCard).join('') : emptyState('check-circle', hasFilter?'No Results':'No Completed Matches',  hasFilter?'Try a different search.':'Results will appear here.');
+    };
+    window.clearSearch  = () => { document.getElementById('searchInput').value=''; applyFilters(); };
+    window.clearFilters = () => { document.getElementById('filterDate').value=''; document.getElementById('filterTime').value=''; applyFilters(); };
+
+    /* ── Pending card ── */
+    function renderPendingCard(m) {
+        const joined     = countJoined(m);
+        const prizeLabel = m.prizeType==='kill' ? `${m.perKillGold||0}G / Kill` : 'Rank Prize';
+        return `
+        <div class="match-card">
+            <div class="mc-stripe result_pending"></div>
+            <div class="mc-head">
+                <div class="mc-id">#${esc(m.matchId||m._key)}</div>
+                <div class="mc-badges">
+                    <span class="mode-badge mode-${m.matchType||'CS'}">${esc(m.matchType||'—')}</span>
+                    <span class="mc-status result_pending"><i class="fas fa-hourglass-half" style="font-size:9px"></i> Pending</span>
+                </div>
+            </div>
+            <div class="mc-hoster"><i class="fas fa-user-tie"></i> Hosted by <strong>${esc(m.hosterUsername||'Unknown')}</strong></div>
+            <div class="mc-title-block"><div class="mc-title">${esc(m.title||'Untitled Match')}</div></div>
+            <div class="mc-info-grid">
+                <div class="mc-info-row"><span class="mc-info-label">Mode</span><span class="mc-info-val">${esc(m.matchType||'—')}</span></div>
+                <div class="mc-info-row"><span class="mc-info-label">Type</span><span class="mc-info-val">${esc(m.entryType||'Solo')}</span></div>
+                <div class="mc-info-row"><span class="mc-info-label">Prize</span><span class="mc-info-val gold">${prizeLabel}</span></div>
+                <div class="mc-info-row"><span class="mc-info-label">Joined</span><span class="mc-info-val green">${joined} / ${m.spots||'—'}</span></div>
+                ${m.map?`<div class="mc-info-row"><span class="mc-info-label">Map</span><span class="mc-info-val">${esc(m.map)}</span></div>`:''}
+            </div>
+            <div class="mc-dt">
+                <div class="mc-dt-item"><i class="fas fa-calendar-alt"></i>${esc(m.date||'—')}</div>
+                <div class="mc-dt-item"><i class="fas fa-clock"></i>${esc(m.time||'—')}</div>
+            </div>
+            <div class="mc-actions">
+                <button class="btn-set-result" onclick="openSetResult('${m._key}')">
+                    <i class="fas fa-trophy"></i> Set Result
+                </button>
+            </div>
+        </div>`;
+    }
+
+    /* ── Completed card — result LOCKED, admin cannot edit ── */
+    function renderCompletedCard(m) {
+        const results       = m.results || {};
+        const prizeLabel    = m.prizeType==='kill' ? `${m.perKillGold||0}G / Kill` : 'Rank Prize';
+        const resultEntries = Object.entries(results).sort((a,b) => {
+            if (m.prizeType==='kill') return (b[1].kills||0)-(a[1].kills||0);
+            return (a[1].rank||99)-(b[1].rank||99);
+        });
+
+        const resultHtml = resultEntries.length ? `
+            <div class="result-summary">
+                <div class="rs-head"><i class="fas fa-crown"></i> Result Summary</div>
+                <div class="rs-list">
+                    ${resultEntries.map(([uid, data], idx) => {
+                        const rankClass = idx===0?'r1':idx===1?'r2':idx===2?'r3':'rn';
+                        const rankLabel = m.prizeType==='kill' ? (idx+1) : (data.rank||idx+1);
+                        const subLabel  = m.prizeType==='kill' ? `${data.kills||0} kills` : `${rankSuffix(data.rank||idx+1)} place`;
+                        return `<div class="rs-item">
+                            <div class="rs-rank ${rankClass}">${rankLabel}</div>
+                            <div class="rs-info">
+                                <div class="rs-name">${esc(data.displayName||uid)}</div>
+                                <div class="rs-uid">UID: ${esc(uid)}</div>
+                                <div class="rs-sub">${subLabel}</div>
+                            </div>
+                            <div class="rs-gold"><i class="fas fa-coins"></i>${data.goldAwarded||0}</div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>` : '';
+
+        return `
+        <div class="match-card">
+            <div class="mc-stripe completed"></div>
+            <div class="mc-head">
+                <div class="mc-id">#${esc(m.matchId||m._key)}</div>
+                <div class="mc-badges">
+                    <span class="mode-badge mode-${m.matchType||'CS'}">${esc(m.matchType||'—')}</span>
+                    <span class="mc-status completed"><i class="fas fa-check" style="font-size:9px"></i> Completed</span>
+                </div>
+            </div>
+            <div class="mc-hoster"><i class="fas fa-user-tie"></i> Hosted by <strong>${esc(m.hosterUsername||'Unknown')}</strong></div>
+            <div class="mc-title-block"><div class="mc-title">${esc(m.title||'Untitled Match')}</div></div>
+            <div class="mc-info-grid">
+                <div class="mc-info-row"><span class="mc-info-label">Mode</span><span class="mc-info-val">${esc(m.matchType||'—')}</span></div>
+                <div class="mc-info-row"><span class="mc-info-label">Type</span><span class="mc-info-val">${esc(m.entryType||'Solo')}</span></div>
+                <div class="mc-info-row"><span class="mc-info-label">Prize</span><span class="mc-info-val gold">${prizeLabel}</span></div>
+                ${m.map?`<div class="mc-info-row"><span class="mc-info-label">Map</span><span class="mc-info-val">${esc(m.map)}</span></div>`:''}
+            </div>
+            <div class="mc-dt">
+                <div class="mc-dt-item"><i class="fas fa-calendar-alt"></i>${esc(m.date||'—')}</div>
+                <div class="mc-dt-item"><i class="fas fa-clock"></i>${esc(m.time||'—')}</div>
+            </div>
+            ${resultEntries.length ? '<div class="mc-divider"></div>' : ''}
+            ${resultHtml}
+            <div class="mc-actions">
+                <div class="btn-locked"><i class="fas fa-lock"></i>&nbsp; Result Already Set — Cannot Edit</div>
+            </div>
+            <div style="height:14px"></div>
+        </div>`;
+    }
+
+    /* ── Open set result sheet ── */
+    window.openSetResult = async function(matchKey) {
+        showLoader('Loading match...');
+        try {
+            const snap = await db.ref('matches').child(matchKey).once('value');
+            if (!snap.exists()) { hideLoader(); showToast('Match not found.','error'); return; }
+            _activeMatch = { ...snap.val(), _key: matchKey };
+            await buildSheet(_activeMatch);
+            hideLoader();
+            document.getElementById('resultSheet').classList.add('show');
+        } catch(e) { hideLoader(); showToast('Failed to load match.','error'); }
+    };
+
+    /* ── Build sheet content ── */
+    async function buildSheet(m) {
+        const multi  = isMulti(m);
+        const isKill = m.prizeType === 'kill';
+
+        document.getElementById('shMatchTitle').textContent = m.title || 'Set Result';
+        document.getElementById('shMatchSub').textContent   = `#${m.matchId||m._key} · ${m.matchType||'—'} · ${m.entryType||'Solo'}`;
+
+        // Info pills — include hoster name for admin context
+        document.getElementById('shPills').innerHTML = [
+            `<span class="sh-pill"><i class="fas fa-gamepad"></i>${esc(m.matchType||'—')}</span>`,
+            `<span class="sh-pill"><i class="fas fa-users"></i>${esc(m.entryType||'Solo')}</span>`,
+            isKill ? `<span class="sh-pill gold-pill"><i class="fas fa-crosshairs"></i>${m.perKillGold||0}G per kill</span>`
+                   : `<span class="sh-pill gold-pill"><i class="fas fa-trophy"></i>Rank Prize</span>`,
+            m.map ? `<span class="sh-pill"><i class="fas fa-map"></i>${esc(m.map)}</span>` : '',
+            `<span class="sh-pill purple-pill"><i class="fas fa-user-tie"></i>${esc(m.hosterUsername||'Unknown')}</span>`
+        ].join('');
+
+        // Prize reference box
+        const prizeRef  = document.getElementById('shPrizeRef');
+        const prizeList = document.getElementById('shPrizeList');
+        if (!isKill && m.rankPrizes && m.rankPrizes.length) {
+            prizeList.innerHTML = m.rankPrizes.map(p =>
+                `<div class="prize-chip"><span class="pr-label">${rankSuffix(p.rank)}</span><span class="pr-val">&nbsp;${p.gold}G</span></div>`
+            ).join('');
+            prizeRef.style.display = '';
+        } else if (isKill) {
+            prizeList.innerHTML = `<div class="prize-chip"><span class="pr-label">Per Kill</span><span class="pr-val">&nbsp;${m.perKillGold||0}G</span></div>`;
+            prizeRef.style.display = '';
+        } else { prizeRef.style.display = 'none'; }
+
+        const inputLabel = isKill ? 'Enter Kills' : 'Assign Ranks';
+        document.getElementById('shEntryLabel').textContent = multi ? `Teams — ${inputLabel}` : `Players — ${inputLabel}`;
+
+        const entryList = document.getElementById('shEntryList');
+        entryList.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px"><i class="fas fa-spinner fa-spin"></i>&nbsp; Loading players...</div>';
+
+        if (multi) {
+            const teams    = m.teams || {};
+            const teamKeys = Object.keys(teams);
+            if (!teamKeys.length) { entryList.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px">No teams joined.</div>'; return; }
+
+            // Fetch leader real names from /users/
+            const leaderNames = {};
+            await Promise.all(teamKeys.map(async tk => {
+                const lid = teams[tk].leaderId;
+                if (lid && !leaderNames[lid]) {
+                    try { const u = await db.ref('users').child(lid).once('value'); leaderNames[lid] = u.val()?.name || lid; }
+                    catch { leaderNames[lid] = lid; }
+                }
+            }));
+
+            const placeholder = isKill ? 'Kills' : 'Rank';
+            const maxAttr     = !isKill && m.rankPrizes ? `max="${m.rankPrizes.length}"` : '';
+
+            entryList.innerHTML = teamKeys.map((tk, i) => {
+                const t          = teams[tk];
+                const membersObj = t.members || {};
+                const leaderId   = t.leaderId;
+                const leaderName = leaderNames[leaderId] || leaderId;
+
+                // Each member chip shows IGN + UID below
+                const mRows = Object.entries(membersObj).map(([uid, ign]) => {
+                    const isLeader = uid === leaderId;
+                    return `<div class="member-row">
+                        <span class="member-chip ${isLeader?'chip-leader':'chip-member'}">
+                            ${isLeader?'<i class="fas fa-crown"></i>':''}${esc(ign)}
+                        </span>
+                        <span class="member-uid">UID: ${esc(uid)}</span>
+                    </div>`;
+                }).join('');
+
+                return `
+                <div class="team-block">
+                    <div class="team-block-head">
+                        <div class="team-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="team-block-name">${esc(t.teamName||'Team '+(i+1))}</div>
+                        <span class="team-leader-badge"><i class="fas fa-crown"></i> ${esc(leaderName)}</span>
+                    </div>
+                    <div class="team-block-members">${mRows}</div>
+                    <div class="team-block-input">
+                        <span class="team-input-label">${isKill?'Total Kills':'Rank'} <span>(credit to leader)</span></span>
+                        <input class="entry-input" type="number" min="0" ${maxAttr} placeholder="${placeholder}"
+                            data-teamkey="${esc(tk)}" data-leaderid="${esc(leaderId)}" data-teamname="${esc(t.teamName||'Team '+(i+1))}"
+                            id="teamInput_${i}" oninput="validateRankInput(this, ${isKill?'false':'true'})">
+                    </div>
+                </div>`;
+            }).join('');
+
+        } else {
+            // Solo
+            const players    = m.players || {};
+            const playerKeys = Object.keys(players);
+            if (!playerKeys.length) { entryList.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:10px">No players joined.</div>'; return; }
+
+            // Fetch real names from /users/
+            const realNames = {};
+            await Promise.all(playerKeys.map(async uid => {
+                try { const u = await db.ref('users').child(uid).once('value'); realNames[uid] = u.val()?.name || uid; }
+                catch { realNames[uid] = uid; }
+            }));
+
+            const maxRank   = (!isKill && m.rankPrizes) ? m.rankPrizes.length : 999;
+            const maxAttr   = !isKill ? `max="${maxRank}"` : '';
+            const placeholder = isKill ? 'Kills' : 'Rank';
+
+            entryList.innerHTML = playerKeys.map((uid, i) => {
+                const igName   = players[uid].inGameName || '';
+                const realName = realNames[uid] || uid;
+                return `
+                <div class="entry-row">
+                    <div class="entry-avatar">${initials(igName||realName)}</div>
+                    <div class="entry-info">
+                        <div class="entry-ign">🎮 ${esc(igName||realName)}</div>
+                        <div class="entry-uid">UID: ${esc(uid)}</div>
+                        <div class="entry-realname">${esc(realName)}</div>
+                    </div>
+                    <div class="entry-input-wrap">
+                        <div class="entry-input-label">${isKill?'Kills':'Rank'}</div>
+                        <input class="entry-input" type="number" min="0" ${maxAttr} placeholder="${placeholder}"
+                            data-uid="${esc(uid)}" data-name="${esc(igName||realName)}"
+                            id="playerInput_${i}" oninput="validateRankInput(this, ${isKill?'false':'true'})">
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    /* ── Rank duplicate check ── */
+    window.validateRankInput = function(el, isRank) {
+        if (!isRank) return;
+        const val = parseInt(el.value);
+        if (!val) return;
+        const maxRank = _activeMatch?.rankPrizes?.length || 999;
+        if (val > maxRank) { el.value = maxRank; return; }
+        const allInputs = el.closest('.sh-body').querySelectorAll('.entry-input');
+        const vals = {};
+        allInputs.forEach(i => { const v=i.value; if(v) vals[v]=(vals[v]||0)+1; });
+        allInputs.forEach(i => { i.style.borderColor = (i.value && vals[i.value]>1) ? 'var(--red)' : ''; });
+    };
+
+    /* ── Submit result ── */
+    window.submitResult = async function() {
+        const m = _activeMatch;
+        if (!m) return;
+        const multi  = isMulti(m);
+        const isKill = m.prizeType === 'kill';
+        const inputs = document.querySelector('#resultSheet .sh-body').querySelectorAll('.entry-input');
+
+        const entries = [];
+        inputs.forEach(inp => {
+            const val = parseInt(inp.value);
+            if (isNaN(val) || val < 0) return;
+            if (multi) {
+                entries.push({ teamKey: inp.dataset.teamkey, leaderId: inp.dataset.leaderid, displayName: inp.dataset.teamname, value: val });
+            } else {
+                entries.push({ uid: inp.dataset.uid, displayName: inp.dataset.name, value: val });
+            }
+        });
+
+        if (!entries.length) { shMsg('Please fill at least one entry.','error'); return; }
+        if (!isKill) {
+            const rankVals = entries.map(e => e.value);
+            if (new Set(rankVals).size !== rankVals.length) { shMsg('Duplicate ranks found. Each rank must be unique.','error'); return; }
+            const maxRank = m.rankPrizes?.length || 999;
+            if (entries.some(e => e.value > maxRank)) { shMsg(`Max rank allowed is ${maxRank}.`,'error'); return; }
+        }
+
+        setShBtn(true);
+        showLoader('Calculating prizes...');
+
+        try {
+            const resultsObj = {}, updates = {};
+
+            for (const entry of entries) {
+                const uid = multi ? entry.leaderId : entry.uid;
+                if (!uid) continue;
+                let goldAmt = 0;
+                if (isKill) { goldAmt = (m.perKillGold||0) * entry.value; }
+                else { const prize = (m.rankPrizes||[]).find(p => p.rank===entry.value); goldAmt = prize ? prize.gold : 0; }
+
+                resultsObj[uid] = { displayName: entry.displayName, rank: isKill?null:entry.value, kills: isKill?entry.value:null, goldAwarded: goldAmt };
+
+                if (goldAmt > 0) {
+                    const wSnap = await db.ref('users').child(uid).child('wallet').child('winningGold').once('value');
+                    updates[`users/${uid}/wallet/winningGold`] = (wSnap.val()||0) + goldAmt;
+                    const txId = genTxId();
+                    updates[`users/${uid}/transactions/${txId}`] = { amount: goldAmt, date: nowDateStr(), time: nowTimeStr(), type: 'Match Reward' };
+                }
+            }
+
+            updates[`matches/${m._key}/results`]      = resultsObj;
+            updates[`matches/${m._key}/status`]        = 'completed';
+            updates[`matches/${m._key}/roomId`]        = null;
+            updates[`matches/${m._key}/roomPassword`]  = null;
+
+            await db.ref().update(updates);
+            hideLoader();
+            showToast('Result set! Prizes credited.','success');
+            closeSheet();
+            setTimeout(() => loadAll(), 700);
+        } catch(e) {
+            hideLoader();
+            shMsg('Failed to submit result. Try again.','error');
+        } finally { setShBtn(false); }
+    };
+
+    /* ── Helpers ── */
+    window.closeSheet = function() { document.getElementById('resultSheet').classList.remove('show'); _activeMatch=null; };
+    function shMsg(text, type) { const el=document.getElementById('shMsg'); el.textContent=text; el.className='sh-msg '+type; el.style.display='block'; setTimeout(()=>el.style.display='none',5000); }
+    function setShBtn(dis) { const btn=document.getElementById('shSubmitBtn'); btn.disabled=dis; btn.innerHTML=dis?'<i class="fas fa-spinner fa-spin"></i>&nbsp; Processing...':'<i class="fas fa-check-circle"></i>&nbsp; Confirm &amp; Send Prizes'; }
+    function showLoader(t) { document.getElementById('loadingText').textContent=t||'Processing...'; document.getElementById('loadingOverlay').classList.add('show'); }
+    function hideLoader() { document.getElementById('loadingOverlay').classList.remove('show'); }
+    let _toastTimer;
+    function showToast(msg, type) { const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=msg; t.className='toast '+type; t.querySelector('i').className=type==='success'?'fas fa-check-circle':'fas fa-exclamation-circle'; t.classList.add('show'); clearTimeout(_toastTimer); _toastTimer=setTimeout(()=>t.classList.remove('show'),3200); }
+
+    // Session check every 30 seconds
+    setInterval(() => { if (!getAdminSession()) { clearAdminSession(); window.location.href='index.html'; } }, 30000);
+
+    loadAll();
+})();
+</script>
+</body>
+</html>
