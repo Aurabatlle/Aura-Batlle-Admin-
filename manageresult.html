@@ -712,17 +712,8 @@
 
             await db.ref().update(updates);
 
-            // ── Delete joined player/team data after result is saved ──────────
-            // Solo: delete matches/{id}/players
-            // Multi: delete matches/{id}/teams
-            if (multi) {
-                await db.ref(`matches/${m._key}/teams`).remove();
-            } else {
-                await db.ref(`matches/${m._key}/players`).remove();
-            }
-
             hideLoader();
-            showToast('Result set! Prizes credited. Player data cleaned up.','success');
+            showToast('Result set! Prizes credited.','success');
             closeSheet();
             setTimeout(() => loadAll(), 700);
         } catch(e) {
