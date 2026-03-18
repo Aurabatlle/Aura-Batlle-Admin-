@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Dashboard - Aura Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --red:#e63946; --red-dark:#b5202d;
+            --gold:#f5c518; --gold-dark:#c9a000;
+            --green:#22c55e; --green-dark:#16a34a;
+            --purple:#8b5cf6; --purple-dark:#6d28d9;
+            --blue:#3b82f6; --blue-dark:#1d4ed8;
+            --orange:#f97316;
+            --bg:#0d0d0f; --surface:#141418; --surface2:#1a1a1f; --surface3:#1f1f25;
+            --border:rgba(255,255,255,0.06); --border-red:rgba(230,57,70,0.2);
+            --text:#f0f0f2; --dim:#9898a8; --muted:#5a5a68;
+        }
+        html,body { height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; -webkit-tap-highlight-color:transparent; overflow-x:hidden; }
+        body::before { content:''; position:fixed; inset:0; background-image:linear-gradient(rgba(230,57,70,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(230,57,70,0.025) 1px,transparent 1px); background-size:44px 44px; pointer-events:none; z-index:0; }
+        .app { display:flex; flex-direction:column; min-height:100vh; position:relative; z-index:1; padding-bottom:72px; }
+
+        /* ── Header ── */
+        .header { position:sticky; top:0; z-index:200; display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:rgba(13,13,15,0.94); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+        .header-left { display:flex; align-items:center; gap:10px; }
+        .h-logo { width:32px; height:32px; border-radius:8px; background:rgba(230,57,70,0.12); border:1px solid rgba(230,57,70,0.3); display:flex; align-items:center; justify-content:center; }
+        .h-logo i { color:var(--red); font-size:14px; }
+        .h-brand { font-family:'Rajdhani',sans-serif; font-size:17px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; }
+        .h-brand span { color:var(--red); }
+        .h-admin-badge { padding:3px 10px; background:rgba(139,92,246,0.15); border:1px solid rgba(139,92,246,0.35); border-radius:20px; font-size:10px; color:var(--purple); letter-spacing:1.5px; text-transform:uppercase; font-weight:600; }
+        .avatar-btn { width:38px; height:38px; border-radius:50%; background:rgba(139,92,246,0.1); border:2px solid rgba(139,92,246,0.35); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color .2s; }
+        .avatar-btn i { color:var(--purple); font-size:15px; }
+
+        /* ── Drawer ── */
+        .d-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(3px); z-index:300; }
+        .d-overlay.show { display:block; }
+        .drawer { position:fixed; top:0; right:0; height:100%; width:min(290px,85vw); background:var(--surface); border-left:1px solid var(--border); z-index:310; transform:translateX(100%); transition:transform .3s cubic-bezier(.22,1,.36,1); display:flex; flex-direction:column; }
+        .drawer.open { transform:translateX(0); }
+        .d-stripe { height:4px; background:linear-gradient(90deg,var(--purple-dark),var(--purple),#c4b5fd); background-size:200%; animation:shimmer 3s linear infinite; }
+        @keyframes shimmer { to { background-position:200%; } }
+        .d-profile { padding:28px 22px 18px; text-align:center; border-bottom:1px solid var(--border); }
+        .d-avatar { width:68px; height:68px; border-radius:50%; background:rgba(139,92,246,0.1); border:2px solid rgba(139,92,246,0.3); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:26px; color:var(--purple); }
+        .d-name { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; letter-spacing:1px; }
+        .d-badge { display:inline-block; margin-top:6px; padding:3px 10px; background:rgba(139,92,246,0.12); border:1px solid rgba(139,92,246,0.3); border-radius:20px; font-size:11px; color:var(--purple); letter-spacing:1.5px; text-transform:uppercase; }
+        .d-menu { flex:1; padding:14px 0; }
+        .d-item { display:flex; align-items:center; gap:14px; padding:14px 22px; font-size:15px; color:var(--dim); cursor:pointer; transition:background .15s,color .15s; background:none; border:none; width:100%; text-align:left; }
+        .d-item:hover { background:rgba(255,255,255,0.04); color:var(--text); }
+        .d-item i { width:18px; color:var(--purple); font-size:14px; }
+        .d-item.danger { color:#ff6b7a; }
+        .d-item.danger i { color:#ff6b7a; }
+        .d-sep { height:1px; background:var(--border); margin:8px 22px; }
+
+        /* ── Main ── */
+        .main { padding:20px 16px; max-width:600px; margin:0 auto; width:100%; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+        /* greeting */
+        .greeting { margin-bottom:22px; animation:fadeUp .45s ease both; }
+        .g-sub { font-size:11px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+        .g-name { font-family:'Rajdhani',sans-serif; font-size:26px; font-weight:700; }
+        .g-name span { color:var(--purple); }
+
+        /* stats grid */
+        .stats-row { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:24px; animation:fadeUp .45s .08s ease both; }
+        .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 14px; position:relative; overflow:hidden; }
+        .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; opacity:.7; }
+        .stat-card.red::before   { background:linear-gradient(90deg,var(--red-dark),var(--red)); }
+        .stat-card.green::before { background:linear-gradient(90deg,var(--green-dark),var(--green)); }
+        .stat-card.gold::before  { background:linear-gradient(90deg,var(--gold-dark),var(--gold)); }
+        .stat-card.purple::before{ background:linear-gradient(90deg,var(--purple-dark),var(--purple)); }
+        .stat-card.blue::before  { background:linear-gradient(90deg,var(--blue-dark),var(--blue)); }
+        .stat-card.orange::before{ background:linear-gradient(90deg,#c2600f,var(--orange)); }
+        .s-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; font-size:13px; }
+        .s-icon.red    { background:rgba(230,57,70,.1);  color:var(--red); }
+        .s-icon.green  { background:rgba(34,197,94,.1);  color:var(--green); }
+        .s-icon.gold   { background:rgba(245,197,24,.1); color:var(--gold); }
+        .s-icon.purple { background:rgba(139,92,246,.1); color:var(--purple); }
+        .s-icon.blue   { background:rgba(59,130,246,.1); color:var(--blue); }
+        .s-icon.orange { background:rgba(249,115,22,.1); color:var(--orange); }
+        .s-label { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px; }
+        .s-val { font-family:'Rajdhani',sans-serif; font-size:28px; font-weight:700; line-height:1; }
+        .s-val.loading { color:transparent; background:var(--surface2); border-radius:4px; animation:pulse 1.5s ease infinite; user-select:none; min-width:40px; display:inline-block; }
+        @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+
+        /* section label */
+        .sec-head { font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:600; color:var(--muted); letter-spacing:2.5px; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .sec-head::after { content:''; flex:1; height:1px; background:var(--border); }
+
+        /* action cards grid */
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .acard { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 14px; cursor:pointer; transition:border-color .2s,transform .15s; position:relative; overflow:hidden; text-decoration:none; display:block; }
+        .acard:hover { transform:translateY(-2px); }
+        .acard:active { transform:scale(.97); }
+        .acard.accent-red:hover    { border-color:rgba(230,57,70,.4); box-shadow:0 6px 20px rgba(230,57,70,.1); }
+        .acard.accent-green:hover  { border-color:rgba(34,197,94,.4); box-shadow:0 6px 20px rgba(34,197,94,.1); }
+        .acard.accent-gold:hover   { border-color:rgba(245,197,24,.4); box-shadow:0 6px 20px rgba(245,197,24,.1); }
+        .acard.accent-purple:hover { border-color:rgba(139,92,246,.4); box-shadow:0 6px 20px rgba(139,92,246,.1); }
+        .acard.accent-blue:hover   { border-color:rgba(59,130,246,.4); box-shadow:0 6px 20px rgba(59,130,246,.1); }
+        .acard.accent-orange:hover { border-color:rgba(249,115,22,.4); box-shadow:0 6px 20px rgba(249,115,22,.1); }
+        .a-ico { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; font-size:16px; }
+        .a-ico.red    { background:rgba(230,57,70,.1);  color:var(--red);    border:1px solid rgba(230,57,70,.2); }
+        .a-ico.green  { background:rgba(34,197,94,.1);  color:var(--green);  border:1px solid rgba(34,197,94,.2); }
+        .a-ico.gold   { background:rgba(245,197,24,.1); color:var(--gold);   border:1px solid rgba(245,197,24,.2); }
+        .a-ico.purple { background:rgba(139,92,246,.1); color:var(--purple); border:1px solid rgba(139,92,246,.2); }
+        .a-ico.blue   { background:rgba(59,130,246,.1); color:var(--blue);   border:1px solid rgba(59,130,246,.2); }
+        .a-ico.orange { background:rgba(249,115,22,.1); color:var(--orange); border:1px solid rgba(249,115,22,.2); }
+        .a-title { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; color:var(--text); margin-bottom:3px; }
+        .a-desc  { font-size:11px; color:var(--muted); line-height:1.4; }
+        .a-arr   { position:absolute; top:12px; right:12px; color:var(--muted); font-size:10px; }
+
+        /* ── Full-width action card ── */
+        .acard-wide { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px 18px; cursor:pointer; transition:border-color .2s,transform .15s; position:relative; text-decoration:none; display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+        .acard-wide:hover { transform:translateY(-1px); }
+        .acard-wide:active { transform:scale(.98); }
+        .acard-wide.accent-red:hover   { border-color:rgba(230,57,70,.4); box-shadow:0 4px 16px rgba(230,57,70,.08); }
+        .acard-wide.accent-gold:hover  { border-color:rgba(245,197,24,.4); box-shadow:0 4px 16px rgba(245,197,24,.08); }
+        .acard-wide .aw-info { flex:1; }
+        .acard-wide .aw-title { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; color:var(--text); margin-bottom:2px; }
+        .acard-wide .aw-desc  { font-size:11px; color:var(--muted); }
+        .acard-wide .aw-arr   { color:var(--muted); font-size:13px; }
+
+        /* ── Bottom nav ── */
+        .bnav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,13,15,.95); backdrop-filter:blur(12px); border-top:1px solid var(--border); display:flex; z-index:200; padding-bottom:env(safe-area-inset-bottom); }
+        .nb { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 4px 12px; background:none; border:none; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:10px; cursor:pointer; transition:color .2s; text-decoration:none; }
+        .nb i { font-size:20px; transition:transform .2s; }
+        .nb.active { color:var(--purple); }
+        .nb.active i { transform:translateY(-2px); }
+
+        /* ── Sheets ── */
+        .sh-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.72); backdrop-filter:blur(4px); z-index:400; align-items:flex-end; justify-content:center; }
+        .sh-overlay.show { display:flex; }
+        .sheet { background:var(--surface); border-radius:20px 20px 0 0; border-top:1px solid var(--border); width:100%; max-width:600px; max-height:90vh; overflow-y:auto; animation:slideUp .3s cubic-bezier(.22,1,.36,1) both; }
+        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+        .sh-stripe { height:3px; background:linear-gradient(90deg,var(--purple-dark),var(--purple)); border-radius:20px 20px 0 0; }
+        .sh-stripe.red { background:linear-gradient(90deg,var(--red-dark),var(--red)); }
+        .sh-stripe.gold { background:linear-gradient(90deg,var(--gold-dark),var(--gold)); }
+        .sh-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:12px auto 0; }
+        .sh-head { padding:16px 22px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+        .sh-title { font-family:'Rajdhani',sans-serif; font-size:19px; font-weight:700; letter-spacing:1px; }
+        .sh-subtitle { font-size:12px; color:var(--muted); margin-top:2px; }
+        .sh-x { width:30px; height:30px; border-radius:8px; background:var(--surface2); border:none; color:var(--dim); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; }
+        .sh-body { padding:22px; }
+        .field { margin-bottom:16px; }
+        .field label { display:block; font-size:11px; font-weight:600; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+        .field input, .field select, .field textarea { width:100%; padding:13px 16px; background:var(--bg); border:1px solid rgba(255,255,255,.07); border-radius:10px; color:var(--text); font-size:15px; font-family:'DM Sans',sans-serif; transition:border-color .2s,box-shadow .2s; }
+        .field input:focus, .field select:focus, .field textarea:focus { outline:none; border-color:rgba(139,92,246,.5); box-shadow:0 0 0 3px rgba(139,92,246,.1); }
+        .field input::placeholder, .field textarea::placeholder { color:var(--muted); font-size:14px; }
+        .field select option { background:var(--surface2); }
+        .field textarea { resize:vertical; min-height:80px; line-height:1.5; }
+        .sh-btn { width:100%; padding:14px; border:none; border-radius:10px; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; letter-spacing:2px; text-transform:uppercase; cursor:pointer; margin-top:8px; transition:opacity .2s; }
+        .sh-btn:disabled { opacity:.5; cursor:not-allowed; }
+        .sh-btn.purple { background:linear-gradient(135deg,var(--purple),var(--purple-dark)); color:#fff; box-shadow:0 4px 16px rgba(139,92,246,.25); }
+        .sh-btn.red    { background:linear-gradient(135deg,var(--red),var(--red-dark)); color:#fff; box-shadow:0 4px 16px rgba(230,57,70,.25); }
+        .sh-btn.green  { background:linear-gradient(135deg,var(--green),var(--green-dark)); color:#fff; box-shadow:0 4px 16px rgba(34,197,94,.2); }
+        .sh-btn.gold   { background:linear-gradient(135deg,var(--gold),var(--gold-dark)); color:#1a1200; box-shadow:0 4px 16px rgba(245,197,24,.2); }
+        .sh-btn.danger { background:linear-gradient(135deg,#ff4444,#cc0000); color:#fff; }
+        .sh-btn.secondary { background:var(--surface2); color:var(--dim); border:1px solid var(--border); margin-top:8px; }
+        .sh-msg { margin-top:12px; padding:11px 14px; border-radius:8px; font-size:13px; display:none; line-height:1.5; }
+        .sh-msg.error   { background:rgba(230,57,70,.1);  color:#ff8a91; border:1px solid rgba(230,57,70,.2); }
+        .sh-msg.success { background:rgba(34,197,94,.1);  color:#4ade80; border:1px solid rgba(34,197,94,.2); }
+        .sh-msg.info    { background:rgba(59,130,246,.1); color:#93c5fd; border:1px solid rgba(59,130,246,.2); }
+
+        /* ── User search results ── */
+        .user-result { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:10px; }
+        .ur-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+        .ur-name { font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; color:var(--text); }
+        .ur-uid  { font-size:11px; color:var(--muted); font-family:'Rajdhani',sans-serif; letter-spacing:1px; }
+        .ur-email { font-size:12px; color:var(--dim); margin-top:4px; }
+        .ur-phone { font-size:12px; color:var(--dim); }
+        .ur-wallet { display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+        .ur-chip { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+        .ur-chip.gold   { background:rgba(245,197,24,.12); color:var(--gold); border:1px solid rgba(245,197,24,.2); }
+        .ur-chip.green  { background:rgba(34,197,94,.12);  color:var(--green); border:1px solid rgba(34,197,94,.2); }
+        .ur-chip.status-active  { background:rgba(34,197,94,.1); color:var(--green); border:1px solid rgba(34,197,94,.2); }
+        .ur-chip.status-banned  { background:rgba(230,57,70,.1); color:var(--red);   border:1px solid rgba(230,57,70,.2); }
+        .ur-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+        .ur-btn { flex:1; min-width:90px; padding:9px 10px; border:none; border-radius:8px; font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:opacity .2s; }
+        .ur-btn.ban    { background:rgba(230,57,70,.12); color:var(--red);    border:1px solid rgba(230,57,70,.25); }
+        .ur-btn.unban  { background:rgba(34,197,94,.12);  color:var(--green); border:1px solid rgba(34,197,94,.25); }
+        .ur-btn.coins  { background:rgba(245,197,24,.12); color:var(--gold);  border:1px solid rgba(245,197,24,.25); }
+        .ur-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+        /* ── Hoster list ── */
+        .hoster-item { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:12px 16px; margin-bottom:8px; display:flex; align-items:center; gap:12px; }
+        .hi-avatar { width:38px; height:38px; border-radius:50%; background:rgba(139,92,246,.1); border:1px solid rgba(139,92,246,.25); display:flex; align-items:center; justify-content:center; color:var(--purple); font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px; flex-shrink:0; }
+        .hi-info { flex:1; min-width:0; }
+        .hi-name { font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; color:var(--text); }
+        .hi-meta { font-size:11px; color:var(--muted); margin-top:2px; }
+        .hi-del { width:32px; height:32px; border-radius:8px; background:rgba(230,57,70,.08); border:1px solid rgba(230,57,70,.15); color:var(--red); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+
+        /* ── Notice/Announcement ── */
+        .notice-item { background:var(--surface2); border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:12px 14px; margin-bottom:8px; }
+        .notice-title { font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; color:var(--gold); margin-bottom:3px; }
+        .notice-body  { font-size:12px; color:var(--dim); line-height:1.5; }
+        .notice-time  { font-size:10px; color:var(--muted); margin-top:5px; }
+
+        /* ── Toast ── */
+        .toast { position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:11px 18px; font-size:13px; z-index:999; opacity:0; transition:all .28s; pointer-events:none; white-space:nowrap; max-width:88vw; text-align:center; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .toast.error   { border-color:rgba(230,57,70,.45);  color:#ff8a91; }
+        .toast.success { border-color:rgba(34,197,94,.45);  color:#4ade80; }
+        .toast.info    { border-color:rgba(139,92,246,.45); color:#c4b5fd; }
+
+        .skeleton { background:var(--surface2); border-radius:12px; animation:pulse 1.5s ease infinite; }
+    </style>
+</head>
+<body>
+<div class="app">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="h-logo"><i class="fas fa-shield-alt"></i></div>
+            <div class="h-brand">Aura <span>Battle</span></div>
+            <div class="h-admin-badge">Admin</div>
+        </div>
+        <div class="avatar-btn" id="avatarBtn"><i class="fas fa-user-shield"></i></div>
+    </div>
+
+    <!-- Drawer overlay -->
+    <div class="d-overlay" id="dOverlay"></div>
+    <div class="drawer" id="drawer">
+        <div class="d-stripe"></div>
+        <div class="d-profile">
+            <div class="d-avatar"><i class="fas fa-user-shield"></i></div>
+            <div class="d-name" id="dName">Admin</div>
+            <div class="d-badge">Super Admin</div>
+        </div>
+        <div class="d-menu">
+            <button class="d-item" onclick="openSheet('settingsSheet')"><i class="fas fa-cog"></i> Profile Settings</button>
+            <button class="d-item" onclick="openSheet('passwordSheet')"><i class="fas fa-key"></i> Change Password</button>
+            <button class="d-item" onclick="openSheet('noticeSheet')"><i class="fas fa-bullhorn"></i> Post Announcement</button>
+            <div class="d-sep"></div>
+            <button class="d-item danger" onclick="openSheet('logoutSheet')"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main" id="mainContent" style="display:none;">
+
+        <!-- Greeting -->
+        <div class="greeting">
+            <div class="g-sub">Admin Panel</div>
+            <div class="g-name">Hello, <span id="greetName">Admin</span> 👋</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+            <div class="stat-card purple">
+                <div class="s-icon purple"><i class="fas fa-users"></i></div>
+                <div class="s-label">Total Users</div>
+                <div class="s-val loading" id="statUsers">000</div>
+            </div>
+            <div class="stat-card red">
+                <div class="s-icon red"><i class="fas fa-ban"></i></div>
+                <div class="s-label">Banned</div>
+                <div class="s-val loading" id="statBanned">00</div>
+            </div>
+            <div class="stat-card green">
+                <div class="s-icon green"><i class="fas fa-gamepad"></i></div>
+                <div class="s-label">Matches</div>
+                <div class="s-val loading" id="statMatches">00</div>
+            </div>
+        </div>
+        <div class="stats-row">
+            <div class="stat-card gold">
+                <div class="s-icon gold"><i class="fas fa-coins"></i></div>
+                <div class="s-label">Total Coins</div>
+                <div class="s-val loading" id="statCoins">000</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="s-icon blue"><i class="fas fa-user-tie"></i></div>
+                <div class="s-label">Hosters</div>
+                <div class="s-val loading" id="statHosters">0</div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="sec-head" style="margin-top:8px;animation:fadeUp .45s .12s ease both;">User Management</div>
+        <div class="grid" style="margin-bottom:10px;animation:fadeUp .45s .15s ease both;">
+            <div class="acard accent-purple" onclick="openSheet('userSearchSheet')">
+                <i class="fas fa-chevron-right a-arr"></i>
+                <div class="a-ico purple"><i class="fas fa-search"></i></div>
+                <div class="a-title">Search User</div>
+                <div class="a-desc">Find by UID, name or phone</div>
+            </div>
+            <div class="acard accent-red" onclick="openSheet('banSheet')">
+                <i class="fas fa-chevron-right a-arr"></i>
+                <div class="a-ico red"><i class="fas fa-ban"></i></div>
+                <div class="a-title">Ban User</div>
+                <div class="a-desc">Ban with reason + duration</div>
+            </div>
+            <div class="acard accent-gold" onclick="openSheet('coinsSheet')">
+                <i class="fas fa-chevron-right a-arr"></i>
+                <div class="a-ico gold"><i class="fas fa-coins"></i></div>
+                <div class="a-title">Adjust Coins</div>
+                <div class="a-desc">Add or deduct coins</div>
+            </div>
+            <div class="acard accent-green" onclick="openSheet('unbanSheet')">
+                <i class="fas fa-chevron-right a-arr"></i>
+                <div class="a-ico green"><i class="fas fa-user-check"></i></div>
+                <div class="a-title">Unban User</div>
+                <div class="a-desc">Remove ban by UID</div>
+            </div>
+        </div>
+
+        <!-- Match Management -->
+        <div class="sec-head" style="animation:fadeUp .45s .18s ease both;">Match Management</div>
+        <div class="grid" style="margin-bottom:10px;animation:fadeUp .45s .2s ease both;">
+            <a href="creatematch.html" class="acard accent-red">
+                <i class="fas fa-chevron-right a-arr"></i>
+                <div class="a-ico red"><i class="fas fa-plus-circle"></i></div>
+                <div class="a-title">Create Match</div>
+                <div class="a-desc">New tournament setup</div>
+            </a>
+            <a href="hostmatch.html" class="acard accent-orange">
+                <i class="fas fa-chevron-right a-arr"></i>
+                <div class="a-ico orange"><i class="fas fa-play-circle"></i></div>
+                <div class="a-title">Host Match</div>
+                <div class="a-desc">Manage live matches</div>
+            </a>
+            <a href="manageresult.html" class="acard accent-green">
+                <i class="fas fa-chevron-right a-arr"></i>
+                <div class="a-ico green"><i class="fas fa-chart-line"></i></div>
+                <div class="a-title">Results</div>
+                <div class="a-desc">Update match results</div>
+            </a>
+            <a href="managematch.html" class="acard accent-blue">
+                <i class="fas fa-chevron-right a-arr"></i>
+                <div class="a-ico blue"><i class="fas fa-edit"></i></div>
+                <div class="a-title">Manage</div>
+                <div class="a-desc">Edit or delete matches</div>
+            </a>
+        </div>
+
+        <!-- Hosters & Platform -->
+        <div class="sec-head" style="animation:fadeUp .45s .22s ease both;">Platform</div>
+        <div style="animation:fadeUp .45s .24s ease both;">
+            <div class="acard-wide accent-red" onclick="openSheet('hosterSheet')">
+                <div class="a-ico red"><i class="fas fa-user-tie"></i></div>
+                <div class="aw-info">
+                    <div class="aw-title">Manage Hosters</div>
+                    <div class="aw-desc">Add, view or remove hoster accounts</div>
+                </div>
+                <i class="fas fa-chevron-right aw-arr"></i>
+            </div>
+            <div class="acard-wide accent-gold" onclick="openSheet('noticeSheet')">
+                <div class="a-ico gold"><i class="fas fa-bullhorn"></i></div>
+                <div class="aw-info">
+                    <div class="aw-title">Announcements</div>
+                    <div class="aw-desc">Post notices visible to all users</div>
+                </div>
+                <i class="fas fa-chevron-right aw-arr"></i>
+            </div>
+            <div class="acard-wide accent-purple" onclick="openSheet('adBannerSheet')">
+                <div class="a-ico purple"><i class="fas fa-image"></i></div>
+                <div class="aw-info">
+                    <div class="aw-title">Ad Banners</div>
+                    <div class="aw-desc">Add or remove home page banners</div>
+                </div>
+                <i class="fas fa-chevron-right aw-arr"></i>
+            </div>
+        </div>
+
+    </div><!-- /main -->
+
+    <!-- Bottom nav -->
+    <nav class="bnav">
+        <button class="nb active"><i class="fas fa-home"></i><span>Home</span></button>
+        <button class="nb" onclick="openSheet('userSearchSheet')"><i class="fas fa-users"></i><span>Users</span></button>
+        <a href="creatematch.html" class="nb"><i class="fas fa-plus"></i><span>Create</span></button></a>
+        <a href="hostmatch.html" class="nb"><i class="fas fa-play"></i><span>Host</span></a>
+        <button class="nb" onclick="openSheet('settingsSheet')"><i class="fas fa-cog"></i><span>Settings</span></button>
+    </nav>
+</div>
+
+<!-- ══════════════════════ SHEETS ══════════════════════ -->
+
+<!-- User Search Sheet -->
+<div class="sh-overlay" id="userSearchSheet">
+    <div class="sheet">
+        <div class="sh-stripe"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div><div class="sh-title">🔍 Search User</div><div class="sh-subtitle">Search by UID, name or phone</div></div>
+            <button class="sh-x" onclick="closeSheet('userSearchSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field">
+                <label>Search Query</label>
+                <input type="text" id="userSearchInput" placeholder="Enter UID, name or phone..." autocomplete="off">
+            </div>
+            <button class="sh-btn purple" onclick="searchUser()"><i class="fas fa-search"></i> Search</button>
+            <div id="userSearchResults" style="margin-top:16px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Ban User Sheet -->
+<div class="sh-overlay" id="banSheet">
+    <div class="sheet">
+        <div class="sh-stripe red"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div><div class="sh-title">🚫 Ban User</div><div class="sh-subtitle">Suspend account access</div></div>
+            <button class="sh-x" onclick="closeSheet('banSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field"><label>User ID</label><input type="text" id="banUserId" placeholder="Enter exact User ID" autocomplete="off"></div>
+            <div class="field"><label>Ban Reason</label><textarea id="banReason" placeholder="Reason shown to the user..."></textarea></div>
+            <div class="field">
+                <label>Ban Duration</label>
+                <select id="banDuration">
+                    <option value="0">Permanent</option>
+                    <option value="1">1 Day</option>
+                    <option value="3">3 Days</option>
+                    <option value="7">7 Days</option>
+                    <option value="14">14 Days</option>
+                    <option value="30">30 Days</option>
+                </select>
+            </div>
+            <button class="sh-btn danger" id="banBtn" onclick="banUser()"><i class="fas fa-ban"></i> Ban User</button>
+            <div class="sh-msg" id="banMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Unban Sheet -->
+<div class="sh-overlay" id="unbanSheet">
+    <div class="sheet">
+        <div class="sh-stripe" style="background:linear-gradient(90deg,var(--green-dark),var(--green));"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div><div class="sh-title">✅ Unban User</div></div>
+            <button class="sh-x" onclick="closeSheet('unbanSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field"><label>User ID</label><input type="text" id="unbanUserId" placeholder="Enter exact User ID" autocomplete="off"></div>
+            <button class="sh-btn green" id="unbanBtn" onclick="unbanUser()"><i class="fas fa-user-check"></i> Unban User</button>
+            <div class="sh-msg" id="unbanMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Coins Sheet -->
+<div class="sh-overlay" id="coinsSheet">
+    <div class="sheet">
+        <div class="sh-stripe gold"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div><div class="sh-title">🪙 Adjust Coins</div><div class="sh-subtitle">Add or deduct from wallet</div></div>
+            <button class="sh-x" onclick="closeSheet('coinsSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field"><label>User ID</label><input type="text" id="coinsUserId" placeholder="Enter exact User ID" autocomplete="off"></div>
+            <div class="field">
+                <label>Wallet Type</label>
+                <select id="coinsWalletType">
+                    <option value="depositGold">Deposit Gold</option>
+                    <option value="winningGold">Winning Gold</option>
+                    <option value="silver">Silver</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Action</label>
+                <select id="coinsAction">
+                    <option value="add">Add Coins</option>
+                    <option value="deduct">Deduct Coins</option>
+                </select>
+            </div>
+            <div class="field"><label>Amount</label><input type="number" id="coinsAmount" placeholder="Enter amount" min="1"></div>
+            <div class="field"><label>Note (for transaction log)</label><input type="text" id="coinsNote" placeholder="e.g. Admin reward, correction..." autocomplete="off"></div>
+            <button class="sh-btn gold" id="coinsBtn" onclick="adjustCoins()"><i class="fas fa-coins"></i> Apply</button>
+            <div class="sh-msg" id="coinsMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Hoster Sheet -->
+<div class="sh-overlay" id="hosterSheet">
+    <div class="sheet">
+        <div class="sh-stripe"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div><div class="sh-title">👔 Hosters</div></div>
+            <button class="sh-x" onclick="closeSheet('hosterSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field"><label>New Hoster Username</label><input type="text" id="newHosterUsername" placeholder="Username" autocapitalize="none" autocomplete="off"></div>
+            <div class="field"><label>Password</label><input type="password" id="newHosterPassword" placeholder="Min. 6 characters"></div>
+            <button class="sh-btn purple" id="addHosterBtn" onclick="addHoster()"><i class="fas fa-plus"></i> Add Hoster</button>
+            <div class="sh-msg" id="hosterMsg"></div>
+            <div style="margin-top:20px;">
+                <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Existing Hosters</div>
+                <div id="hosterList"><div class="skeleton" style="height:52px;margin-bottom:8px;"></div><div class="skeleton" style="height:52px;"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Announcement Sheet -->
+<div class="sh-overlay" id="noticeSheet">
+    <div class="sheet">
+        <div class="sh-stripe gold"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div><div class="sh-title">📢 Announcement</div><div class="sh-subtitle">Visible on user home screen</div></div>
+            <button class="sh-x" onclick="closeSheet('noticeSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field"><label>Title</label><input type="text" id="noticeTitle" placeholder="e.g. Server Maintenance" autocomplete="off"></div>
+            <div class="field"><label>Message</label><textarea id="noticeBody" placeholder="Announcement text..."></textarea></div>
+            <button class="sh-btn gold" id="noticeBtn" onclick="postNotice()"><i class="fas fa-paper-plane"></i> Post</button>
+            <div class="sh-msg" id="noticeMsg"></div>
+            <div style="margin-top:20px;">
+                <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Recent Announcements</div>
+                <div id="noticeList"><div class="skeleton" style="height:70px;margin-bottom:8px;"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ad Banner Sheet -->
+<div class="sh-overlay" id="adBannerSheet">
+    <div class="sheet">
+        <div class="sh-stripe"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div><div class="sh-title">🖼️ Ad Banners</div></div>
+            <button class="sh-x" onclick="closeSheet('adBannerSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field"><label>Image URL</label><input type="url" id="bannerImageUrl" placeholder="https://..." autocomplete="off"></div>
+            <div class="field"><label>Redirect URL</label><input type="url" id="bannerRedirectUrl" placeholder="https://..." autocomplete="off"></div>
+            <button class="sh-btn purple" id="addBannerBtn" onclick="addBanner()"><i class="fas fa-plus"></i> Add Banner</button>
+            <div class="sh-msg" id="bannerMsg"></div>
+            <div style="margin-top:20px;">
+                <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Current Banners</div>
+                <div id="bannerList"><div class="skeleton" style="height:52px;margin-bottom:8px;"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Settings Sheet -->
+<div class="sh-overlay" id="settingsSheet">
+    <div class="sheet">
+        <div class="sh-stripe"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div class="sh-title">⚙️ Profile Settings</div>
+            <button class="sh-x" onclick="closeSheet('settingsSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field"><label>Username</label><input type="text" id="setUsername" placeholder="Admin username" autocapitalize="none"></div>
+            <button class="sh-btn purple" id="saveProfBtn" onclick="saveProfile()">Save Changes</button>
+            <div class="sh-msg" id="settingsMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Sheet -->
+<div class="sh-overlay" id="passwordSheet">
+    <div class="sheet">
+        <div class="sh-stripe"></div><div class="sh-handle"></div>
+        <div class="sh-head">
+            <div class="sh-title">🔑 Change Password</div>
+            <button class="sh-x" onclick="closeSheet('passwordSheet')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sh-body">
+            <div class="field"><label>Current Password</label><input type="password" id="curPw" placeholder="Current password"></div>
+            <div class="field"><label>New Password</label><input type="password" id="newPw" placeholder="Min. 6 characters"></div>
+            <div class="field"><label>Confirm Password</label><input type="password" id="confPw" placeholder="Repeat new password"></div>
+            <button class="sh-btn purple" id="changePwBtn" onclick="changePassword()">Update Password</button>
+            <div class="sh-msg" id="passwordMsg"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Logout Sheet -->
+<div class="sh-overlay" id="logoutSheet">
+    <div class="sheet">
+        <div class="sh-stripe red"></div><div class="sh-handle"></div>
+        <div style="padding:28px 22px 32px;text-align:center;">
+            <div style="font-size:36px;margin-bottom:12px;">👋</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px;">Sign Out?</div>
+            <div style="font-size:13px;color:var(--muted);margin-bottom:24px;">You'll need to log in again to access the admin panel.</div>
+            <div style="display:flex;gap:12px;">
+                <button style="flex:1;padding:13px;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;border:none;background:var(--surface2);color:var(--dim);" onclick="closeSheet('logoutSheet')">Cancel</button>
+                <button style="flex:1;padding:13px;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;border:none;background:var(--red);color:#fff;" onclick="doLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase + Logic -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+(function(){
+'use strict';
+
+const _cfg = JSON.parse(atob('eyJhcGlLZXkiOiJBSXphU3lEN3BBc2RZcWtKekRiU3NpOHhiTHN5Mlg1czBiZ1AwNDAiLCJhdXRoRG9tYWluIjoiYXVyYS1iYXR0bGUtbWFpbi5maXJlYmFzZWFwcC5jb20iLCJkYXRhYmFzZVVSTCI6Imh0dHBzOi8vYXVyYS1iYXR0bGUtbWFpbi1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20iLCJwcm9qZWN0SWQiOiJhdXJhLWJhdHRsZS1tYWluIiwic3RvcmFnZUJ1Y2tldCI6ImF1cmEtYmF0dGxlLW1haW4uZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiNzYzNzc5OTkwMjg5IiwiYXBwSWQiOiIxOjc2Mzc3OTk5MDI4OTp3ZWI6NWNhYTdiYzg2MWU4MGI2ZjBiMDJiMCIsIm1lYXN1cmVtZW50SWQiOiJHLVpaWFowMEhLMDcifQ=='));
+firebase.initializeApp(_cfg);
+const db = firebase.database();
+
+// ── Session (stored as 'a_sess' separate from hosters) ──────────────────────
+const SESS='a_sess', TTL=120*60*1000; // 2 hours
+function getSession(){ try{ const r=localStorage.getItem(SESS); if(!r) return null; const s=JSON.parse(atob(r)); if(Date.now()-s.t>TTL){clearSession();return null;} return s; }catch(_){clearSession();return null;} }
+function setSession(id,username){ localStorage.setItem(SESS,btoa(JSON.stringify({id,username,t:Date.now()}))); }
+function clearSession(){ localStorage.removeItem(SESS); }
+
+// ── Auth guard ───────────────────────────────────────────────────────────────
+const sess = getSession();
+if(!sess){ window.location.href='admin-login.html'; }
+else {
+    db.ref('admins').child(sess.id).once('value').then(snap=>{
+        if(!snap.exists()){ clearSession(); window.location.href='admin-login.html'; return; }
+        const d = snap.val();
+        setSession(sess.id, d.username);
+        initDashboard(sess.id, d.username);
+    }).catch(()=>{ initDashboard(sess.id, sess.username); });
+}
+
+function initDashboard(adminId, username){
+    window._aid = adminId;
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('greetName').textContent = username;
+    document.getElementById('dName').textContent = username;
+    document.getElementById('setUsername').value = username;
+    loadStats();
+    loadHosterList();
+    loadNotices();
+    loadBanners();
+}
+
+// ── Stats ────────────────────────────────────────────────────────────────────
+function loadStats(){
+    // Users
+    db.ref('users').once('value').then(snap=>{
+        let total=0, banned=0, coins=0;
+        snap.forEach(c=>{
+            total++;
+            const u=c.val();
+            if(u.status==='banned') banned++;
+            coins += (u.wallet?.depositGold||0) + (u.wallet?.winningGold||0);
+        });
+        setText('statUsers', total);
+        setText('statBanned', banned);
+        setText('statCoins', coins.toLocaleString());
+    }).catch(()=>{ setText('statUsers','—'); setText('statBanned','—'); setText('statCoins','—'); });
+
+    // Matches
+    db.ref('matches').once('value').then(snap=>{
+        setText('statMatches', snap.numChildren());
+    }).catch(()=>setText('statMatches','—'));
+
+    // Hosters
+    db.ref('hosters').once('value').then(snap=>{
+        setText('statHosters', snap.numChildren());
+    }).catch(()=>setText('statHosters','—'));
+}
+
+function setText(id, val){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.textContent = val;
+    el.classList.remove('loading');
+}
+
+// ── User Search ──────────────────────────────────────────────────────────────
+window.searchUser = async function(){
+    const q = document.getElementById('userSearchInput').value.trim();
+    if(!q){ toast('Enter a search query','error'); return; }
+    const res = document.getElementById('userSearchResults');
+    res.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Searching...</div>';
+
+    try {
+        // Try exact UID first
+        let found = [];
+        const byId = await db.ref('users').child(q).once('value');
+        if(byId.exists()) found.push({key:q, ...byId.val()});
+
+        // Search by name
+        if(!found.length){
+            const byName = await db.ref('users').orderByChild('name').equalTo(q).once('value');
+            byName.forEach(c=>found.push({key:c.key,...c.val()}));
+        }
+        // Search by phone
+        if(!found.length){
+            const byPhone = await db.ref('users').orderByChild('phone').equalTo(q).once('value');
+            byPhone.forEach(c=>found.push({key:c.key,...c.val()}));
+        }
+
+        if(!found.length){
+            res.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);">No user found.</div>';
+            return;
+        }
+
+        res.innerHTML = found.map(u=>`
+            <div class="user-result">
+                <div class="ur-row">
+                    <span class="ur-name">${esc(u.name||'—')}</span>
+                    <span class="ur-chip ${u.status==='banned'?'status-banned':'status-active'}">${u.status||'active'}</span>
+                </div>
+                <div class="ur-uid">UID: ${esc(u.key)}</div>
+                <div class="ur-email">${esc(u.email||'—')}</div>
+                <div class="ur-phone">📞 ${esc(u.phone||'—')}</div>
+                <div class="ur-wallet">
+                    <span class="ur-chip gold">Deposit: ${u.wallet?.depositGold||0}</span>
+                    <span class="ur-chip green">Winning: ${u.wallet?.winningGold||0}</span>
+                </div>
+                <div class="ur-actions">
+                    <button class="ur-btn coins" onclick="prefillCoins('${esc(u.key)}')">🪙 Coins</button>
+                    ${u.status==='banned'
+                        ? `<button class="ur-btn unban" onclick="prefillUnban('${esc(u.key)}')">✅ Unban</button>`
+                        : `<button class="ur-btn ban" onclick="prefillBan('${esc(u.key)}')">🚫 Ban</button>`
+                    }
+                </div>
+            </div>`).join('');
+    } catch(e){ res.innerHTML=`<div style="color:var(--red);padding:10px;">Error: ${esc(e.message)}</div>`; }
+};
+
+window.prefillBan = function(uid){ document.getElementById('banUserId').value=uid; closeSheet('userSearchSheet'); openSheet('banSheet'); };
+window.prefillUnban = function(uid){ document.getElementById('unbanUserId').value=uid; closeSheet('userSearchSheet'); openSheet('unbanSheet'); };
+window.prefillCoins = function(uid){ document.getElementById('coinsUserId').value=uid; closeSheet('userSearchSheet'); openSheet('coinsSheet'); };
+
+// ── Ban User ─────────────────────────────────────────────────────────────────
+window.banUser = async function(){
+    const uid    = document.getElementById('banUserId').value.trim();
+    const reason = document.getElementById('banReason').value.trim();
+    const days   = parseInt(document.getElementById('banDuration').value);
+    if(!uid)    { sheetMsg('banMsg','Enter a User ID.','error'); return; }
+    if(!reason) { sheetMsg('banMsg','Enter a ban reason.','error'); return; }
+    const btn = document.getElementById('banBtn');
+    btn.disabled=true; btn.textContent='Banning...';
+    try {
+        const updates = { status:'banned', banReason:reason };
+        if(days>0){ updates.unbanDate = Date.now() + days*24*60*60*1000; }
+        else { updates.unbanDate = null; }
+        await db.ref('users').child(uid).update(updates);
+        sheetMsg('banMsg',`✅ User ${uid} banned.`,'success');
+        loadStats();
+    } catch(e){ sheetMsg('banMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled=false; btn.textContent='Ban User'; }
+};
+
+// ── Unban User ───────────────────────────────────────────────────────────────
+window.unbanUser = async function(){
+    const uid = document.getElementById('unbanUserId').value.trim();
+    if(!uid){ sheetMsg('unbanMsg','Enter a User ID.','error'); return; }
+    const btn = document.getElementById('unbanBtn');
+    btn.disabled=true; btn.textContent='Unbanning...';
+    try {
+        await db.ref('users').child(uid).update({ status:'active', banReason:null, unbanDate:null });
+        sheetMsg('unbanMsg','✅ User unbanned successfully.','success');
+        loadStats();
+    } catch(e){ sheetMsg('unbanMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled=false; btn.textContent='Unban User'; }
+};
+
+// ── Adjust Coins ─────────────────────────────────────────────────────────────
+window.adjustCoins = async function(){
+    const uid     = document.getElementById('coinsUserId').value.trim();
+    const wallet  = document.getElementById('coinsWalletType').value;
+    const action  = document.getElementById('coinsAction').value;
+    const amount  = parseInt(document.getElementById('coinsAmount').value);
+    const note    = document.getElementById('coinsNote').value.trim() || 'Admin adjustment';
+    if(!uid)          { sheetMsg('coinsMsg','Enter a User ID.','error'); return; }
+    if(!amount||amount<1){ sheetMsg('coinsMsg','Enter a valid amount.','error'); return; }
+    const btn = document.getElementById('coinsBtn');
+    btn.disabled=true; btn.textContent='Applying...';
+    try {
+        const wRef = db.ref('users').child(uid).child('wallet').child(wallet);
+        const snap = await wRef.once('value');
+        const cur  = snap.val()||0;
+        const updated = action==='add' ? cur+amount : Math.max(0, cur-amount);
+        const txnId = String(Date.now());
+        const now = new Date();
+        const pad = n=>String(n).padStart(2,'0');
+        const updates = {};
+        updates[`users/${uid}/wallet/${wallet}`] = updated;
+        updates[`users/${uid}/transactions/${txnId}`] = {
+            transactionId: txnId,
+            type: action==='add' ? `Admin Credit — ${note}` : `Admin Deduct — ${note}`,
+            amount: action==='add' ? amount : -amount,
+            date: `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`,
+            time: `${pad(now.getHours())}:${pad(now.getMinutes())}`
+        };
+        await db.ref().update(updates);
+        sheetMsg('coinsMsg',`✅ ${action==='add'?'Added':'Deducted'} ${amount} coins. New balance: ${updated}`,'success');
+        loadStats();
+    } catch(e){ sheetMsg('coinsMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled=false; btn.textContent='Apply'; }
+};
+
+// ── Hosters ──────────────────────────────────────────────────────────────────
+function loadHosterList(){
+    db.ref('hosters').once('value').then(snap=>{
+        const el = document.getElementById('hosterList');
+        if(!snap.exists()){ el.innerHTML='<div style="color:var(--muted);font-size:13px;">No hosters yet.</div>'; return; }
+        let html='';
+        snap.forEach(c=>{
+            const h=c.val();
+            html+=`<div class="hoster-item">
+                <div class="hi-avatar">${(h.username||'?').charAt(0).toUpperCase()}</div>
+                <div class="hi-info">
+                    <div class="hi-name">${esc(h.username||'—')}</div>
+                    <div class="hi-meta">ID: ${esc(c.key)}</div>
+                </div>
+                <button class="hi-del" onclick="deleteHoster('${esc(c.key)}','${esc(h.username||'')}')"><i class="fas fa-trash"></i></button>
+            </div>`;
+        });
+        el.innerHTML = html;
+    });
+}
+
+window.addHoster = async function(){
+    const username = document.getElementById('newHosterUsername').value.trim();
+    const password = document.getElementById('newHosterPassword').value;
+    if(!username){ sheetMsg('hosterMsg','Enter a username.','error'); return; }
+    if(password.length<6){ sheetMsg('hosterMsg','Password must be 6+ characters.','error'); return; }
+    const btn = document.getElementById('addHosterBtn');
+    btn.disabled=true; btn.textContent='Adding...';
+    try {
+        const newRef = db.ref('hosters').push();
+        await newRef.set({ username, password, createdAt:Date.now() });
+        sheetMsg('hosterMsg',`✅ Hoster "${username}" added!`,'success');
+        document.getElementById('newHosterUsername').value='';
+        document.getElementById('newHosterPassword').value='';
+        loadHosterList();
+        setText('statHosters', '...');
+        loadStats();
+    } catch(e){ sheetMsg('hosterMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled=false; btn.textContent='Add Hoster'; }
+};
+
+window.deleteHoster = async function(id, name){
+    if(!confirm(`Delete hoster "${name}"? This cannot be undone.`)) return;
+    try {
+        await db.ref('hosters').child(id).remove();
+        toast(`Hoster "${name}" deleted`,'success');
+        loadHosterList();
+        loadStats();
+    } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+// ── Announcements ─────────────────────────────────────────────────────────────
+function loadNotices(){
+    db.ref('announcements').limitToLast(5).once('value').then(snap=>{
+        const el = document.getElementById('noticeList');
+        if(!snap.exists()){ el.innerHTML='<div style="color:var(--muted);font-size:13px;">No announcements yet.</div>'; return; }
+        const items=[];
+        snap.forEach(c=>items.unshift({key:c.key,...c.val()}));
+        el.innerHTML = items.map(n=>`
+            <div class="notice-item">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <div class="notice-title">${esc(n.title||'Notice')}</div>
+                    <button onclick="deleteNotice('${esc(n.key)}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 0 0 8px;"><i class="fas fa-trash"></i></button>
+                </div>
+                <div class="notice-body">${esc(n.body||'')}</div>
+                <div class="notice-time">${n.timestamp ? new Date(n.timestamp).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : ''}</div>
+            </div>`).join('');
+    });
+}
+
+window.postNotice = async function(){
+    const title = document.getElementById('noticeTitle').value.trim();
+    const body  = document.getElementById('noticeBody').value.trim();
+    if(!title){ sheetMsg('noticeMsg','Enter a title.','error'); return; }
+    if(!body){ sheetMsg('noticeMsg','Enter a message.','error'); return; }
+    const btn = document.getElementById('noticeBtn');
+    btn.disabled=true; btn.textContent='Posting...';
+    try {
+        await db.ref('announcements').push({ title, body, timestamp:Date.now() });
+        sheetMsg('noticeMsg','✅ Announcement posted!','success');
+        document.getElementById('noticeTitle').value='';
+        document.getElementById('noticeBody').value='';
+        loadNotices();
+    } catch(e){ sheetMsg('noticeMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled=false; btn.textContent='Post'; }
+};
+
+window.deleteNotice = async function(key){
+    if(!confirm('Delete this announcement?')) return;
+    try { await db.ref('announcements').child(key).remove(); loadNotices(); toast('Deleted','success'); }
+    catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+// ── Ad Banners ────────────────────────────────────────────────────────────────
+function loadBanners(){
+    db.ref('adBanners').once('value').then(snap=>{
+        const el = document.getElementById('bannerList');
+        if(!snap.exists()){ el.innerHTML='<div style="color:var(--muted);font-size:13px;">No banners yet.</div>'; return; }
+        let html='';
+        snap.forEach(c=>{
+            const b=c.val();
+            html+=`<div class="hoster-item">
+                <div style="width:44px;height:32px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--surface3);">
+                    <img src="${esc(b.imageUrl||'')}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+                </div>
+                <div class="hi-info">
+                    <div class="hi-name" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(b.imageUrl||'—')}</div>
+                    <div class="hi-meta" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(b.redirectUrl||'—')}</div>
+                </div>
+                <button class="hi-del" onclick="deleteBanner('${esc(c.key)}')"><i class="fas fa-trash"></i></button>
+            </div>`;
+        });
+        el.innerHTML = html;
+    });
+}
+
+window.addBanner = async function(){
+    const imageUrl    = document.getElementById('bannerImageUrl').value.trim();
+    const redirectUrl = document.getElementById('bannerRedirectUrl').value.trim();
+    if(!imageUrl)    { sheetMsg('bannerMsg','Enter an image URL.','error'); return; }
+    if(!redirectUrl) { sheetMsg('bannerMsg','Enter a redirect URL.','error'); return; }
+    const btn = document.getElementById('addBannerBtn');
+    btn.disabled=true; btn.textContent='Adding...';
+    try {
+        await db.ref('adBanners').push({ imageUrl, redirectUrl });
+        sheetMsg('bannerMsg','✅ Banner added!','success');
+        document.getElementById('bannerImageUrl').value='';
+        document.getElementById('bannerRedirectUrl').value='';
+        loadBanners();
+    } catch(e){ sheetMsg('bannerMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled=false; btn.textContent='Add Banner'; }
+};
+
+window.deleteBanner = async function(key){
+    if(!confirm('Delete this banner?')) return;
+    try { await db.ref('adBanners').child(key).remove(); loadBanners(); toast('Banner deleted','success'); }
+    catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+// ── Profile settings ──────────────────────────────────────────────────────────
+window.saveProfile = async function(){
+    const u = document.getElementById('setUsername').value.trim();
+    if(!u){ sheetMsg('settingsMsg','Username cannot be empty.','error'); return; }
+    const btn=document.getElementById('saveProfBtn');
+    btn.disabled=true; btn.textContent='Saving...';
+    try {
+        await db.ref('admins').child(window._aid).update({username:u});
+        setSession(window._aid, u);
+        document.getElementById('greetName').textContent=u;
+        document.getElementById('dName').textContent=u;
+        sheetMsg('settingsMsg','✅ Username updated!','success');
+    } catch(e){ sheetMsg('settingsMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled=false; btn.textContent='Save Changes'; }
+};
+
+window.changePassword = async function(){
+    const cur=document.getElementById('curPw').value;
+    const nw=document.getElementById('newPw').value;
+    const cf=document.getElementById('confPw').value;
+    if(!cur||!nw||!cf){ sheetMsg('passwordMsg','Fill all fields.','error'); return; }
+    if(nw.length<6){ sheetMsg('passwordMsg','Password must be 6+ characters.','error'); return; }
+    if(nw!==cf){ sheetMsg('passwordMsg','Passwords do not match.','error'); return; }
+    const btn=document.getElementById('changePwBtn');
+    btn.disabled=true; btn.textContent='Updating...';
+    try {
+        const snap=await db.ref('admins').child(window._aid).once('value');
+        if(snap.val().password!==cur){ sheetMsg('passwordMsg','Current password is incorrect.','error'); return; }
+        await db.ref('admins').child(window._aid).update({password:nw});
+        sheetMsg('passwordMsg','✅ Password changed!','success');
+        ['curPw','newPw','confPw'].forEach(i=>document.getElementById(i).value='');
+    } catch(e){ sheetMsg('passwordMsg','Error: '+e.message,'error'); }
+    finally { btn.disabled=false; btn.textContent='Update Password'; }
+};
+
+window.doLogout = function(){ clearSession(); window.location.href='admin-login.html'; };
+
+// ── Drawer & Sheets ───────────────────────────────────────────────────────────
+document.getElementById('avatarBtn').addEventListener('click',()=>{
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('dOverlay').classList.add('show');
+});
+document.getElementById('dOverlay').addEventListener('click',closeDrawer);
+function closeDrawer(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('dOverlay').classList.remove('show'); }
+window.openSheet  = function(id){ closeDrawer(); document.getElementById(id).classList.add('show'); };
+window.closeSheet = function(id){ document.getElementById(id).classList.remove('show'); };
+document.querySelectorAll('.sh-overlay').forEach(el=>el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('show'); }));
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+let _tt;
+function toast(msg,type){
+    clearTimeout(_tt);
+    const el=document.getElementById('toast');
+    el.textContent=msg; el.className='toast '+type+' show';
+    _tt=setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+let _st={};
+function sheetMsg(id,text,type){
+    clearTimeout(_st[id]);
+    const el=document.getElementById(id);
+    if(!text){ el.style.display='none'; return; }
+    el.textContent=text; el.className='sh-msg '+type; el.style.display='block';
+    _st[id]=setTimeout(()=>el.style.display='none',5000);
+}
+
+// Auto session refresh
+setInterval(()=>{ if(!getSession()){ clearSession(); window.location.href='admin-login.html'; } }, 60000);
+
+})();
+</script>
+</body>
+</html>
