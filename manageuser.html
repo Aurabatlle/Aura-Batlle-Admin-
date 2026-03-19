@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Manage Users — Aura Battle Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0a;--bg2:#111;--bg3:#181818;--bg4:#1e1e1e;
+  --surface:rgba(255,255,255,.04);--surface2:rgba(255,255,255,.07);--surface3:rgba(255,255,255,.10);
+  --border:rgba(255,255,255,.09);--border-r:rgba(220,30,50,.30);
+  --red:#e0192d;--red2:#ff3347;--red-dark:#9b0f1e;--red3:#c0101f;
+  --red-glow:rgba(224,25,45,.30);--red-soft:rgba(224,25,45,.12);--red-mid:rgba(224,25,45,.20);
+  --text:#f0f0f0;--muted:rgba(240,240,240,.50);--muted2:rgba(240,240,240,.28);
+  --gold:#f5c842;--gold-soft:rgba(245,200,66,.13);--gold-border:rgba(245,200,66,.25);
+  --green:#22c55e;--green-soft:rgba(34,197,94,.12);--green-border:rgba(34,197,94,.25);
+  --blue:#3b82f6;--blue-soft:rgba(59,130,246,.12);
+  --orange:#f97316;--orange-soft:rgba(249,115,22,.12);
+  --nav-h:56px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100dvh;color:var(--text);overflow-x:hidden}
+body::before{content:'';position:fixed;top:-120px;left:-120px;width:420px;height:420px;background:radial-gradient(circle,rgba(224,25,45,.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:0;animation:blobA 9s ease-in-out infinite alternate}
+body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(180,10,30,.09) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:0;animation:blobB 11s ease-in-out infinite alternate}
+@keyframes blobA{to{transform:translate(30px,25px) scale(1.1)}}
+@keyframes blobB{to{transform:translate(-20px,-15px) scale(1.07)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes shimmer{0%{background-position:-300px 0}100%{background-position:300px 0}}
+
+/* ── NAVBAR ── */
+.navbar{position:sticky;top:0;z-index:200;height:var(--nav-h);background:rgba(10,10,10,.93);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+.navbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.6}
+.nav-brand{display:flex;align-items:center;gap:9px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);text-decoration:none}
+.nav-brand img{height:36px;width:36px;object-fit:contain;border-radius:10px}
+.brand-dot{color:var(--red2)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-admin{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--muted)}
+.nav-admin i{color:var(--red2);font-size:11px}
+.btn-logout{background:var(--red-soft);border:1px solid var(--border-r);border-radius:8px;color:var(--red2);font-size:12px;padding:5px 10px;cursor:pointer;transition:all .2s}
+.btn-logout:hover{background:var(--red-mid)}
+
+/* ── PAGE ── */
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:18px 12px 100px}
+
+/* ── PAGE HEADER ── */
+.page-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.page-hdr-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--red-dark),var(--red2));box-shadow:0 0 18px var(--red-glow);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.page-hdr h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
+.page-hdr p{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* ── SEARCH ── */
+.search-wrap{position:relative;margin-bottom:16px}
+.search-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 44px 12px 44px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.search-input::placeholder{color:var(--muted)}
+.search-input:focus{border-color:rgba(224,25,45,.45);box-shadow:0 0 0 3px rgba(224,25,45,.08)}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--surface2);border:none;color:var(--muted);cursor:pointer;width:26px;height:26px;border-radius:7px;display:none;align-items:center;justify-content:center;font-size:12px;transition:background .2s}
+.search-clear:hover{background:var(--red-soft);color:var(--red2)}
+.search-clear.visible{display:flex}
+.search-hint{font-size:11.5px;color:var(--muted);margin-top:5px;padding-left:2px}
+.search-hint span{color:var(--red2);font-weight:600}
+
+/* ── STATS BAR ── */
+.stats-bar{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.stats-bar::-webkit-scrollbar{display:none}
+.stat-pill{flex-shrink:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:7px}
+.stat-pill i{color:var(--red2);font-size:12px}
+.stat-pill .sv{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text)}
+.stat-pill .sl{font-size:11px;color:var(--muted)}
+
+/* ── USER CARDS GRID ── */
+.users-grid{display:flex;flex-direction:column;gap:10px}
+@media(min-width:600px){.users-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
+@media(min-width:820px){.users-grid{grid-template-columns:1fr 1fr 1fr}}
+
+/* ── USER CARD ── */
+.user-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp .28s ease both;transition:border-color .2s,transform .2s,box-shadow .2s;cursor:pointer;position:relative}
+.user-card:hover{border-color:var(--border-r);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.user-card.banned-card{border-color:rgba(224,25,45,.4)}
+.card-inner{padding:14px}
+.card-top{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+.avatar{width:48px;height:48px;border-radius:13px;object-fit:cover;border:2px solid var(--border);flex-shrink:0}
+.avatar-ph{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--red-dark),var(--red2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;border:2px solid var(--border-r)}
+.card-meta{flex:1;min-width:0}
+.card-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-phone{font-size:11.5px;color:var(--muted);margin-top:1px}
+.card-uid{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:3px 8px;font-size:11px;color:var(--muted);font-family:monospace;margin-top:5px}
+.card-uid i{font-size:9px;color:var(--red2)}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.active{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
+.status-dot.banned{background:var(--red2);box-shadow:0 0 6px var(--red-glow);animation:pulse 1.5s infinite}
+.status-dot.inactive{background:var(--muted2)}
+.card-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--border);padding-top:10px}
+.wallet-chips{display:flex;gap:5px;flex-wrap:wrap}
+.wchip{display:flex;align-items:center;gap:3px;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:600}
+.wchip.gold{background:var(--gold-soft);border:1px solid var(--gold-border);color:var(--gold)}
+.wchip.win{background:var(--green-soft);border:1px solid var(--green-border);color:var(--green)}
+.wchip.silver{background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.btn-view{background:linear-gradient(135deg,var(--red-dark),var(--red2));border:none;border-radius:8px;color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:opacity .2s,box-shadow .2s}
+.btn-view:hover{opacity:.85;box-shadow:0 0 12px var(--red-glow)}
+
+/* ── SKELETON ── */
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:600px 100%;animation:shimmer 1.5s infinite linear}
+.skel-card{border-radius:16px;height:130px}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state i{font-size:40px;color:var(--red-soft);margin-bottom:14px;display:block}
+.empty-state h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:500;display:none;align-items:flex-end;justify-content:center;padding:0}
+@media(min-width:600px){.modal-overlay{align-items:center;padding:20px}}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:94dvh;overflow-y:auto;animation:slideDown .3s ease;scrollbar-width:thin;scrollbar-color:var(--border) transparent;position:relative}
+@media(min-width:600px){.modal{border-radius:24px}}
+.modal::-webkit-scrollbar{width:5px}
+.modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.modal-drag{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;display:block}
+@media(min-width:600px){.modal-drag{display:none}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:10}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+.modal-close{width:32px;height:32px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .2s}
+.modal-close:hover{background:var(--red-soft);color:var(--red2)}
+.modal-body{padding:16px 18px 20px}
+
+/* ── MODAL TABS ── */
+.tabs{display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:16px}
+.tab{flex:1;padding:8px;border:none;background:transparent;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;text-align:center}
+.tab.active{background:linear-gradient(135deg,var(--red-dark),var(--red2));color:#fff;box-shadow:0 2px 8px var(--red-glow)}
+
+/* ── DETAIL ROWS ── */
+.detail-section{margin-bottom:14px}
+.detail-label{font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.detail-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:6px}
+.detail-row i{width:18px;text-align:center;color:var(--red2);font-size:13px;flex-shrink:0}
+.detail-row .dr-label{font-size:12px;color:var(--muted);flex:1}
+.detail-row .dr-val{font-size:13px;font-weight:600;color:var(--text);text-align:right;word-break:break-all}
+
+/* ── WALLET SECTION ── */
+.wallet-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.wallet-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px}
+.wallet-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.wallet-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+.wallet-name.gold-w{color:var(--gold)}
+.wallet-name.win-w{color:var(--green)}
+.wallet-name.silver-w{color:#94a3b8}
+.wallet-bal{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text)}
+.wallet-actions{display:flex;gap:6px;margin-top:8px}
+.wallet-inp{flex:1;background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;color:var(--text);outline:none;-webkit-appearance:none}
+.wallet-inp:focus{border-color:rgba(224,25,45,.4)}
+.btn-add-w{background:var(--green-soft);border:1px solid var(--green-border);color:var(--green);border-radius:8px;font-size:12px;font-weight:700;padding:8px 10px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-add-w:hover{background:rgba(34,197,94,.22)}
+.btn-ded-w{background:var(--red-soft);border:1px solid var(--border-r);color:var(--red2);border-radius:8px;font-size:12px;font-weight:700;padding:8px 10px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-ded-w:hover{background:var(--red-mid)}
+
+/* ── BAN SECTION ── */
+.ban-section{margin-bottom:14px}
+.ban-status-active{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--green-soft);border:1px solid var(--green-border);border-radius:10px;margin-bottom:10px;font-size:13px;font-weight:600;color:var(--green)}
+.ban-status-banned{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--red-soft);border:1px solid var(--border-r);border-radius:10px;margin-bottom:10px;font-size:13px;font-weight:600;color:var(--red2)}
+.ban-quick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ban-quick-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-weight:600;padding:7px 12px;cursor:pointer;transition:all .2s}
+.ban-quick-btn:hover,.ban-quick-btn.selected{background:var(--red-soft);border-color:var(--border-r);color:var(--red2)}
+.ban-custom{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.ban-custom label{font-size:11.5px;color:var(--muted);font-weight:600}
+.ban-custom input{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;width:100%;-webkit-appearance:none}
+.ban-custom input:focus{border-color:rgba(224,25,45,.4)}
+.btn-ban{width:100%;background:linear-gradient(135deg,var(--red-dark),var(--red2));border:none;border-radius:10px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:12px;cursor:pointer;margin-top:6px;transition:opacity .2s;box-shadow:0 4px 14px var(--red-glow)}
+.btn-ban:hover{opacity:.85}
+.btn-unban{width:100%;background:var(--green-soft);border:1px solid var(--green-border);border-radius:10px;color:var(--green);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:12px;cursor:pointer;margin-top:6px;transition:all .2s}
+.btn-unban:hover{background:rgba(34,197,94,.22)}
+
+/* ── TRANSACTIONS ── */
+.txn-list{display:flex;flex-direction:column;gap:8px}
+.txn-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;border-left:3px solid var(--border)}
+.txn-item.credited{border-left-color:var(--green)}
+.txn-item.pending{border-left-color:var(--orange)}
+.txn-item.failed{border-left-color:var(--red2)}
+.txn-item.auto{border-left-color:var(--blue)}
+.txn-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.txn-type{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text)}
+.txn-amt-badge{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;padding:2px 8px;border-radius:6px}
+.txn-amt-badge.plus{background:var(--green-soft);color:var(--green)}
+.txn-amt-badge.minus{background:var(--red-soft);color:var(--red2)}
+.txn-meta-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.txn-date{font-size:11px;color:var(--muted)}
+.txn-status{font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px}
+.txn-status.credited{background:var(--green-soft);color:var(--green)}
+.txn-status.pending{background:var(--orange-soft);color:var(--orange)}
+.txn-status.failed{background:var(--red-soft);color:var(--red2)}
+.txn-id{font-size:10.5px;color:var(--muted2);font-family:monospace;margin-top:3px}
+.txn-upi{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--text);z-index:9999;display:none;align-items:center;gap:8px;white-space:nowrap;animation:fadeUp .3s ease;box-shadow:0 8px 28px rgba(0,0,0,.5)}
+.toast.show{display:flex}
+.toast.success{border-color:var(--green-border);color:var(--green)}
+.toast.error{border-color:var(--border-r);color:var(--red2)}
+
+/* ── LOADER ── */
+.spin-loader{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--red2);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+
+/* ── BANNED BADGE on card ── */
+.banned-badge{position:absolute;top:10px;right:10px;background:var(--red-soft);border:1px solid var(--border-r);border-radius:6px;font-size:10px;font-weight:700;color:var(--red2);padding:2px 7px;text-transform:uppercase;letter-spacing:.05em}
+
+/* ── SECTION DIVIDER ── */
+.sec-div{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.sec-div::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* mobile bottom safe area */
+.bottom-safe{height:env(safe-area-inset-bottom,0)}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-brand" href="#">
+    <img src="https://i.imghippo.com/files/JaE9679Nc.png" alt="Logo" onerror="this.style.display='none'">
+    Aura<span class="brand-dot">·</span>Admin
+  </a>
+  <div class="nav-right">
+    <div class="nav-admin"><i class="fas fa-shield-alt"></i><span id="navAdminName">Admin</span></div>
+    <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-hdr">
+    <div class="page-hdr-icon"><i class="fas fa-users"></i></div>
+    <div>
+      <h1>Manage Users</h1>
+      <p>View, search, manage and ban players</p>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <i class="fas fa-search search-icon"></i>
+    <input type="search" class="search-input" id="searchInput" placeholder="Search by name, phone, email or user ID…" autocomplete="off" oninput="onSearch(this)">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="search-hint" id="searchHint" style="display:none">Showing results for: <span id="searchQuery"></span></div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-pill"><i class="fas fa-users"></i><span class="sv" id="statTotal">-</span><span class="sl">Total</span></div>
+    <div class="stat-pill"><i class="fas fa-circle" style="color:#22c55e"></i><span class="sv" id="statActive">-</span><span class="sl">Active</span></div>
+    <div class="stat-pill"><i class="fas fa-ban"></i><span class="sv" id="statBanned">-</span><span class="sl">Banned</span></div>
+    <div class="stat-pill"><i class="fas fa-coins" style="color:var(--gold)"></i><span class="sv" id="statCoins">-</span><span class="sl">Total Coins</span></div>
+  </div>
+
+  <!-- USERS GRID -->
+  <div class="users-grid" id="usersGrid">
+    <!-- Skeletons -->
+    <div class="skeleton skel-card"></div>
+    <div class="skeleton skel-card"></div>
+    <div class="skeleton skel-card"></div>
+    <div class="skeleton skel-card"></div>
+  </div>
+
+</div>
+
+<!-- USER DETAIL MODAL -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal" id="modalBox">
+    <span class="modal-drag"></span>
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle"><i class="fas fa-user-circle"></i> User Details</div>
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this,'tabInfo')"><i class="fas fa-id-card"></i> Info</button>
+        <button class="tab" onclick="switchTab(this,'tabWallet')"><i class="fas fa-wallet"></i> Wallet</button>
+        <button class="tab" onclick="switchTab(this,'tabTxn')"><i class="fas fa-history"></i> Txns</button>
+        <button class="tab" onclick="switchTab(this,'tabBan')"><i class="fas fa-ban"></i> Ban</button>
+      </div>
+
+      <!-- TAB: INFO -->
+      <div id="tabInfo">
+        <div class="detail-section">
+          <div class="detail-label">Profile</div>
+          <div class="detail-row"><i class="fas fa-user"></i><span class="dr-label">Name</span><span class="dr-val" id="dName">-</span></div>
+          <div class="detail-row"><i class="fas fa-envelope"></i><span class="dr-label">Email</span><span class="dr-val" id="dEmail" style="font-size:11.5px">-</span></div>
+          <div class="detail-row"><i class="fas fa-phone"></i><span class="dr-label">Phone</span><span class="dr-val" id="dPhone">-</span></div>
+          <div class="detail-row"><i class="fas fa-fingerprint"></i><span class="dr-label">User ID</span><span class="dr-val" id="dUid" style="font-family:monospace">-</span></div>
+          <div class="detail-row"><i class="fas fa-sign-in-alt"></i><span class="dr-label">Login Method</span><span class="dr-val" id="dLoginMethod">-</span></div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">Activity</div>
+          <div class="detail-row"><i class="fas fa-clock"></i><span class="dr-label">Last Login</span><span class="dr-val" id="dLastLogin">-</span></div>
+          <div class="detail-row"><i class="fas fa-calendar-plus"></i><span class="dr-label">Account Created</span><span class="dr-val" id="dCreated">-</span></div>
+          <div class="detail-row"><i class="fas fa-circle"></i><span class="dr-label">Status</span><span class="dr-val" id="dStatus">-</span></div>
+        </div>
+      </div>
+
+      <!-- TAB: WALLET -->
+      <div id="tabWallet" style="display:none">
+        <div class="sec-div">Wallet Balances &amp; Management</div>
+        <div class="wallet-grid">
+          <!-- Deposit Gold -->
+          <div class="wallet-card" style="border-color:rgba(245,200,66,.2)">
+            <div class="wallet-card-top">
+              <span class="wallet-name gold-w"><i class="fas fa-coins"></i> Deposit Gold</span>
+              <span class="wallet-bal" id="wDepositBal">0</span>
+            </div>
+            <div class="wallet-actions">
+              <input type="number" class="wallet-inp" id="wDepositAmt" placeholder="Amount" min="0">
+              <button class="btn-add-w" onclick="adjustWallet('depositGold','add')">+ Add</button>
+              <button class="btn-ded-w" onclick="adjustWallet('depositGold','deduct')">- Deduct</button>
+            </div>
+          </div>
+          <!-- Winning Gold -->
+          <div class="wallet-card" style="border-color:rgba(34,197,94,.2)">
+            <div class="wallet-card-top">
+              <span class="wallet-name win-w"><i class="fas fa-trophy"></i> Winning Gold</span>
+              <span class="wallet-bal" id="wWinBal">0</span>
+            </div>
+            <div class="wallet-actions">
+              <input type="number" class="wallet-inp" id="wWinAmt" placeholder="Amount" min="0">
+              <button class="btn-add-w" onclick="adjustWallet('winningGold','add')">+ Add</button>
+              <button class="btn-ded-w" onclick="adjustWallet('winningGold','deduct')">- Deduct</button>
+            </div>
+          </div>
+          <!-- Silver -->
+          <div class="wallet-card" style="border-color:rgba(148,163,184,.2)">
+            <div class="wallet-card-top">
+              <span class="wallet-name silver-w"><i class="fas fa-gem"></i> Silver</span>
+              <span class="wallet-bal" id="wSilverBal">0</span>
+            </div>
+            <div class="wallet-actions">
+              <input type="number" class="wallet-inp" id="wSilverAmt" placeholder="Amount" min="0">
+              <button class="btn-add-w" onclick="adjustWallet('silver','add')">+ Add</button>
+              <button class="btn-ded-w" onclick="adjustWallet('silver','deduct')">- Deduct</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: TRANSACTIONS -->
+      <div id="tabTxn" style="display:none">
+        <div class="sec-div">Transaction History</div>
+        <div class="txn-list" id="txnList"><div class="spin-loader"></div></div>
+      </div>
+
+      <!-- TAB: BAN -->
+      <div id="tabBan" style="display:none">
+        <div class="ban-section">
+          <div id="banStatusDisplay"></div>
+          <div class="sec-div" id="banActionLabel">Ban Duration</div>
+          <div class="ban-quick" id="banQuickBtns">
+            <button class="ban-quick-btn" onclick="selectBanPreset(this,1)">1 Day</button>
+            <button class="ban-quick-btn" onclick="selectBanPreset(this,7)">7 Days</button>
+            <button class="ban-quick-btn" onclick="selectBanPreset(this,14)">14 Days</button>
+            <button class="ban-quick-btn" onclick="selectBanPreset(this,30)">30 Days</button>
+            <button class="ban-quick-btn" onclick="selectBanPreset(this,-1)">Permanent</button>
+          </div>
+          <div class="ban-custom" id="banCustomBlock" style="display:none">
+            <label><i class="fas fa-calendar-alt"></i> Custom Unban Date &amp; Time</label>
+            <input type="datetime-local" id="banCustomDate">
+          </div>
+          <button class="ban-btn ban-custom-toggle" onclick="toggleCustomBan()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;font-weight:600;padding:7px 12px;cursor:pointer;margin-bottom:6px">
+            <i class="fas fa-clock"></i> Custom Date/Time
+          </button>
+          <button class="btn-ban" id="doBanBtn" onclick="doBan()"><i class="fas fa-ban"></i> Apply Ban</button>
+          <button class="btn-unban" id="doUnbanBtn" onclick="doUnban()" style="display:none"><i class="fas fa-unlock"></i> Remove Ban</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="bottom-safe"></div>
+
+<script>
+// ── Firebase Config (same XOR encoding as login page) ──
+const _e=(s,k)=>s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+const _k='aB3xQ9mZ';
+const _cfg={
+  a:"\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+  b:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+  c:"\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+  d:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+  e:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+  f:"\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+  g:"\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
+};
+function _d(s){return _e(s,_k);}
+function _getConfig(){return{apiKey:_d(_cfg.a),authDomain:_d(_cfg.b),databaseURL:_d(_cfg.c),projectId:_d(_cfg.d),storageBucket:_d(_cfg.e),messagingSenderId:_d(_cfg.f),appId:_d(_cfg.g)};}
+
+// ── Session Check ──
+const SESSION_MS = 30*60*1000;
+const adminUser = localStorage.getItem('adminUsername');
+const loginTime = parseInt(localStorage.getItem('loginTime')||'0');
+if(!adminUser || (Date.now()-loginTime)>=SESSION_MS){
+  window.location.href='index.html';
+}
+document.getElementById('navAdminName').textContent = localStorage.getItem('adminDisplayName')||adminUser;
+
+firebase.initializeApp(_getConfig());
+const db = firebase.database();
+
+// ── State ──
+let allUsers = {};
+let currentUid = null;
+let banPresetDays = null;
+let customBanOpen = false;
+
+// ── Format timestamp to 12-hour ──
+function fmt12(ts){
+  if(!ts) return '-';
+  const d = new Date(typeof ts==='number'?ts:parseInt(ts));
+  if(isNaN(d)) return ts;
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+    +' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+}
+
+// ── Load all users ──
+function loadUsers(){
+  db.ref('users').on('value', snap=>{
+    allUsers = snap.val()||{};
+    renderStats();
+    renderCards(Object.keys(allUsers));
+
+    // Check URL for direct user link e.g. ?uid=6E6MSM
+    const params = new URLSearchParams(window.location.search);
+    const directUid = params.get('uid') || window.location.pathname.split('/').pop().replace('.html','');
+    if(directUid && allUsers[directUid]){
+      setTimeout(()=>openUser(directUid),400);
+    }
+  });
+}
+
+function renderStats(){
+  const uids = Object.keys(allUsers);
+  let active=0,banned=0,totalCoins=0;
+  uids.forEach(uid=>{
+    const u=allUsers[uid];
+    if(u.status==='banned') banned++; else active++;
+    const w=u.wallet||{};
+    totalCoins += (w.depositGold||0)+(w.winningGold||0)+(w.silver||0);
+  });
+  document.getElementById('statTotal').textContent=uids.length;
+  document.getElementById('statActive').textContent=active;
+  document.getElementById('statBanned').textContent=banned;
+  document.getElementById('statCoins').textContent=totalCoins.toLocaleString();
+}
+
+function renderCards(uids){
+  const grid = document.getElementById('usersGrid');
+  if(!uids.length){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-user-slash"></i><h3>No users found</h3><p>Try a different search term</p></div>`;
+    return;
+  }
+  grid.innerHTML='';
+  uids.forEach((uid,i)=>{
+    const u = allUsers[uid];
+    if(!u) return;
+    const w = u.wallet||{};
+    const isBanned = u.status==='banned';
+    const firstName = (u.name||'?').charAt(0).toUpperCase();
+    const avatarHtml = u.profileImage
+      ? `<img class="avatar" src="${u.profileImage}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""><div class="avatar-ph" style="display:none">${firstName}</div>`
+      : `<div class="avatar-ph">${firstName}</div>`;
+
+    const card = document.createElement('div');
+    card.className = 'user-card'+(isBanned?' banned-card':'');
+    card.style.animationDelay=(i*0.04)+'s';
+    card.onclick = ()=>openUser(uid);
+    card.innerHTML=`
+      ${isBanned?'<div class="banned-badge"><i class="fas fa-ban"></i> Banned</div>':''}
+      <div class="card-inner">
+        <div class="card-top">
+          ${avatarHtml}
+          <div class="card-meta">
+            <div class="card-name">${u.name||'Unknown'}</div>
+            <div class="card-phone">${u.phone||u.email||'-'}</div>
+            <div class="card-uid"><i class="fas fa-hashtag"></i>${uid}</div>
+          </div>
+          <div class="status-dot ${isBanned?'banned':u.status==='active'?'active':'inactive'}"></div>
+        </div>
+        <div class="card-footer">
+          <div class="wallet-chips">
+            <div class="wchip gold"><i class="fas fa-coins"></i>${w.depositGold||0}</div>
+            <div class="wchip win"><i class="fas fa-trophy"></i>${w.winningGold||0}</div>
+            <div class="wchip silver"><i class="fas fa-gem"></i>${w.silver||0}</div>
+          </div>
+          <button class="btn-view" onclick="event.stopPropagation();openUser('${uid}')">View</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ── SEARCH ──
+function onSearch(inp){
+  const q = inp.value.trim().toLowerCase();
+  document.getElementById('searchClear').classList.toggle('visible',q.length>0);
+  const hint = document.getElementById('searchHint');
+  if(!q){
+    hint.style.display='none';
+    renderCards(Object.keys(allUsers));
+    return;
+  }
+  hint.style.display='block';
+  document.getElementById('searchQuery').textContent=inp.value.trim();
+  const filtered = Object.keys(allUsers).filter(uid=>{
+    const u=allUsers[uid];
+    return (u.name||'').toLowerCase().includes(q)
+      ||(u.phone||'').toLowerCase().includes(q)
+      ||(u.email||'').toLowerCase().includes(q)
+      ||uid.toLowerCase().includes(q);
+  });
+  renderCards(filtered);
+}
+
+function clearSearch(){
+  const inp=document.getElementById('searchInput');
+  inp.value='';
+  document.getElementById('searchClear').classList.remove('visible');
+  document.getElementById('searchHint').style.display='none';
+  renderCards(Object.keys(allUsers));
+}
+
+// ── OPEN USER MODAL ──
+function openUser(uid){
+  currentUid = uid;
+  const u = allUsers[uid];
+  if(!u) return;
+
+  // Set modal title
+  document.getElementById('modalTitle').innerHTML=`<i class="fas fa-user-circle"></i> ${u.name||uid}`;
+
+  // Info tab
+  document.getElementById('dName').textContent=u.name||'-';
+  document.getElementById('dEmail').textContent=u.email||'-';
+  document.getElementById('dPhone').textContent=u.phone||'-';
+  document.getElementById('dUid').textContent=uid;
+  document.getElementById('dLoginMethod').textContent=u.loginMethod||'-';
+  document.getElementById('dLastLogin').textContent=fmt12(u.lastLogin);
+  document.getElementById('dCreated').textContent=fmt12(u.createdAt);
+  const isBanned=u.status==='banned';
+  document.getElementById('dStatus').innerHTML=isBanned
+    ?`<span style="color:var(--red2);font-weight:700"><i class="fas fa-ban"></i> Banned</span>`
+    :`<span style="color:var(--green)"><i class="fas fa-check-circle"></i> ${u.status||'active'}</span>`;
+
+  // Wallet tab
+  const w=u.wallet||{};
+  document.getElementById('wDepositBal').textContent=w.depositGold||0;
+  document.getElementById('wWinBal').textContent=w.winningGold||0;
+  document.getElementById('wSilverBal').textContent=w.silver||0;
+  document.getElementById('wDepositAmt').value='';
+  document.getElementById('wWinAmt').value='';
+  document.getElementById('wSilverAmt').value='';
+
+  // Ban tab
+  renderBanTab(u,uid);
+
+  // Switch to info tab
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab')[0].classList.add('active');
+  ['tabInfo','tabWallet','tabTxn','tabBan'].forEach((id,i)=>{
+    document.getElementById(id).style.display=i===0?'block':'none';
+  });
+
+  // Load transactions
+  loadTransactions(uid);
+
+  document.getElementById('userModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(){
+  document.getElementById('userModal').classList.remove('open');
+  document.body.style.overflow='';
+  currentUid=null;
+}
+
+// Click outside modal
+document.getElementById('userModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('userModal')) closeModal();
+});
+
+// ── TABS ──
+function switchTab(btn,tabId){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['tabInfo','tabWallet','tabTxn','tabBan'].forEach(id=>{
+    document.getElementById(id).style.display=id===tabId?'block':'none';
+  });
+}
+
+// ── WALLET ADJUST ──
+function adjustWallet(walletKey, action){
+  const amtInputId = walletKey==='depositGold'?'wDepositAmt':walletKey==='winningGold'?'wWinAmt':'wSilverAmt';
+  const balDisplayId = walletKey==='depositGold'?'wDepositBal':walletKey==='winningGold'?'wWinBal':'wSilverBal';
+  const amt = parseInt(document.getElementById(amtInputId).value);
+  if(!amt||amt<=0){ showToast('Enter a valid amount','error'); return; }
+  if(!currentUid) return;
+
+  const u=allUsers[currentUid];
+  const w=u.wallet||{};
+  let current = w[walletKey]||0;
+  let newVal = action==='add'? current+amt : current-amt;
+  if(newVal<0){ showToast('Balance cannot go below 0','error'); return; }
+
+  db.ref(`users/${currentUid}/wallet/${walletKey}`).set(newVal).then(()=>{
+    allUsers[currentUid].wallet = allUsers[currentUid].wallet||{};
+    allUsers[currentUid].wallet[walletKey]=newVal;
+    document.getElementById(balDisplayId).textContent=newVal;
+    document.getElementById(amtInputId).value='';
+    showToast((action==='add'?'Added ':'Deducted ')+amt+' '+walletKey,'success');
+    renderCards(Object.keys(allUsers));
+  }).catch(e=>showToast('Error: '+e.message,'error'));
+}
+
+// ── TRANSACTIONS ──
+function loadTransactions(uid){
+  const list=document.getElementById('txnList');
+  list.innerHTML='<div class="spin-loader"></div>';
+  db.ref(`users/${uid}/transactions`).once('value').then(snap=>{
+    const txns=snap.val();
+    if(!txns){list.innerHTML='<div class="empty-state"><i class="fas fa-receipt"></i><h3>No transactions</h3></div>';return;}
+    const items=Object.entries(txns).sort((a,b)=>{
+      // Sort by date+time desc
+      const aDate=(a[1].date||'')+(a[1].time||'');
+      const bDate=(b[1].date||'')+(b[1].time||'');
+      return bDate.localeCompare(aDate);
+    });
+    list.innerHTML='';
+    items.forEach(([tid,t])=>{
+      // Determine credit/debit
+      const type=(t.type||'').toLowerCase();
+      const isWithdraw=type.includes('withdrawal');
+      const isMatchJoin=type.includes('match join');
+      const isReward=type.includes('reward');
+      const isCoinAdd=type.includes('coin add');
+
+      // Status logic: credited if approved/credited, match reward auto-credited
+      let status=t.status||'';
+      if(!status && isReward) status='credited';
+      if(!status && isMatchJoin) status='auto';
+
+      const statusClass = status==='credited'?'credited':status==='pending'?'pending':status==='auto'?'auto':'failed';
+      const amtPrefix = isWithdraw||isMatchJoin?'-':'+';
+      const amtClass = isWithdraw||isMatchJoin?'minus':'plus';
+      const borderClass = statusClass;
+
+      const div=document.createElement('div');
+      div.className=`txn-item ${borderClass}`;
+      div.innerHTML=`
+        <div class="txn-top">
+          <span class="txn-type">${t.type||'Unknown'}</span>
+          <span class="txn-amt-badge ${amtClass}">${amtPrefix}${t.amount||t.__amount__||0}</span>
+        </div>
+        <div class="txn-meta-row">
+          <span class="txn-date"><i class="fas fa-calendar-alt"></i> ${t.date||''} ${t.time||''}</span>
+          <span class="txn-status ${statusClass}">${status||'auto'}</span>
+        </div>
+        ${t.transactionId?`<div class="txn-id">TXN: ${t.transactionId}</div>`:''}
+        ${t.upiId?`<div class="txn-upi"><i class="fas fa-credit-card"></i> ${t.upiHolderName||''} · ${t.upiId}</div>`:''}
+      `;
+      list.appendChild(div);
+    });
+  }).catch(()=>{list.innerHTML='<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Failed to load</h3></div>';});
+}
+
+// ── BAN ──
+function renderBanTab(u,uid){
+  const isBanned=u.status==='banned';
+  const banDisplay=document.getElementById('banStatusDisplay');
+  const doBanBtn=document.getElementById('doBanBtn');
+  const doUnbanBtn=document.getElementById('doUnbanBtn');
+  const quickBtns=document.getElementById('banQuickBtns');
+  const banActionLabel=document.getElementById('banActionLabel');
+
+  banPresetDays=null;
+  customBanOpen=false;
+  document.getElementById('banCustomBlock').style.display='none';
+  document.querySelectorAll('.ban-quick-btn').forEach(b=>b.classList.remove('selected'));
+
+  if(isBanned){
+    const banUntil=u.banUntil;
+    const banReason = banUntil===-1||banUntil==='permanent'?'Permanently banned':`Banned until ${fmt12(banUntil)}`;
+    banDisplay.innerHTML=`<div class="ban-status-banned"><i class="fas fa-ban"></i>${banReason}</div>`;
+    doBanBtn.style.display='none';
+    doUnbanBtn.style.display='block';
+    quickBtns.style.display='none';
+    banActionLabel.style.display='none';
+    document.querySelector('.ban-custom-toggle').style.display='none';
+  } else {
+    banDisplay.innerHTML=`<div class="ban-status-active"><i class="fas fa-check-circle"></i> User is currently active</div>`;
+    doBanBtn.style.display='block';
+    doUnbanBtn.style.display='none';
+    quickBtns.style.display='flex';
+    banActionLabel.style.display='flex';
+    document.querySelector('.ban-custom-toggle').style.display='inline-block';
+  }
+}
+
+function selectBanPreset(btn, days){
+  document.querySelectorAll('.ban-quick-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  banPresetDays=days;
+  customBanOpen=false;
+  document.getElementById('banCustomBlock').style.display='none';
+}
+
+function toggleCustomBan(){
+  customBanOpen=!customBanOpen;
+  document.getElementById('banCustomBlock').style.display=customBanOpen?'flex':'none';
+  if(customBanOpen){
+    banPresetDays=null;
+    document.querySelectorAll('.ban-quick-btn').forEach(b=>b.classList.remove('selected'));
+    // Set min to now
+    const now=new Date();
+    now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
+    document.getElementById('banCustomDate').min=now.toISOString().slice(0,16);
+  }
+}
+
+function doBan(){
+  if(!currentUid) return;
+  let banUntil;
+  const customDate=document.getElementById('banCustomDate').value;
+  if(customBanOpen && customDate){
+    banUntil=new Date(customDate).getTime();
+  } else if(banPresetDays===-1){
+    banUntil='permanent';
+  } else if(banPresetDays){
+    banUntil=Date.now()+(banPresetDays*24*60*60*1000);
+  } else {
+    showToast('Select a ban duration first','error'); return;
+  }
+
+  db.ref(`users/${currentUid}`).update({status:'banned',banUntil:banUntil}).then(()=>{
+    allUsers[currentUid].status='banned';
+    allUsers[currentUid].banUntil=banUntil;
+    renderBanTab(allUsers[currentUid],currentUid);
+    document.getElementById('dStatus').innerHTML=`<span style="color:var(--red2);font-weight:700"><i class="fas fa-ban"></i> Banned</span>`;
+    renderCards(Object.keys(allUsers));
+    renderStats();
+    showToast('User banned successfully','success');
+  }).catch(e=>showToast('Error: '+e.message,'error'));
+}
+
+function doUnban(){
+  if(!currentUid) return;
+  db.ref(`users/${currentUid}`).update({status:'active',banUntil:null}).then(()=>{
+    allUsers[currentUid].status='active';
+    delete allUsers[currentUid].banUntil;
+    renderBanTab(allUsers[currentUid],currentUid);
+    document.getElementById('dStatus').innerHTML=`<span style="color:var(--green)"><i class="fas fa-check-circle"></i> active</span>`;
+    renderCards(Object.keys(allUsers));
+    renderStats();
+    showToast('User unbanned successfully','success');
+  }).catch(e=>showToast('Error: '+e.message,'error'));
+}
+
+// ── TOAST ──
+let toastTimer=null;
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.innerHTML=(type==='success'?'<i class="fas fa-check-circle"></i>':'<i class="fas fa-exclamation-circle"></i>')+' '+msg;
+  t.className='toast show '+type;
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{ t.classList.remove('show'); },2800);
+}
+
+// ── LOGOUT ──
+function logout(){
+  ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime'].forEach(k=>localStorage.removeItem(k));
+  window.location.href='index.html';
+}
+
+// ── INIT ──
+loadUsers();
+</script>
+</body>
+</html>
