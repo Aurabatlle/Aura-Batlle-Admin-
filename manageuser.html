@@ -234,6 +234,34 @@ body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;heigh
 .btn-unban-action{width:100%;background:var(--green-soft);border:1px solid var(--green-border);border-radius:12px;color:var(--green);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:13px;cursor:pointer;margin-top:4px;-webkit-tap-highlight-color:transparent}
 .btn-unban-action:active{background:rgba(34,197,94,.24)}
 
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filter-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;margin-right:2px}
+.filter-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;padding:6px 13px;cursor:pointer;transition:all .2s;white-space:nowrap;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:5px}
+.filter-chip i{font-size:10px}
+.filter-chip.active{background:var(--red-soft);border-color:var(--border-r);color:var(--red2)}
+.filter-chip:active{opacity:.75}
+
+/* ── NOTIFY BUTTON on card ── */
+.btn-notify-card{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);border-radius:11px;color:var(--blue);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .2s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.btn-notify-card:active{background:rgba(59,130,246,.22)}
+
+/* ── REFERRAL TAB ── */
+.referral-grid{display:flex;flex-direction:column;gap:8px}
+.ref-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:11px}
+.ref-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--red-dark),var(--red2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.ref-avatar img{width:36px;height:36px;border-radius:10px;object-fit:cover}
+.ref-info{flex:1;min-width:0}
+.ref-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ref-uid{font-size:10.5px;color:var(--muted);font-family:monospace;margin-top:1px}
+.ref-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.ref-badge.referred-by{background:var(--blue-soft);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.ref-badge.referred{background:var(--green-soft);color:var(--green);border:1px solid var(--green-border)}
+.ref-open-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:11px;padding:5px 10px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.ref-open-btn:active{background:var(--surface3)}
+.ref-empty{text-align:center;padding:28px;color:var(--muted);font-size:13px}
+.ref-empty i{display:block;font-size:26px;opacity:.25;margin-bottom:10px}
+.ref-section-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:10px 0 6px;display:flex;align-items:center;gap:7px}
 /* ── TOAST ── */
 .toast{position:fixed;bottom:max(20px,env(safe-area-inset-bottom,20px));left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border);border-radius:14px;padding:11px 18px;font-size:13px;font-weight:600;color:var(--text);z-index:9999;display:none;align-items:center;gap:8px;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.55);max-width:calc(100vw - 32px)}
 .toast.show{display:flex;animation:fadeUp .25s ease}
@@ -296,7 +324,14 @@ body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;heigh
     Results for: <span id="searchQuery"></span>
   </div>
 
-  <!-- ④ USERS GRID -->
+  <!-- ④ FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label"><i class="fas fa-sliders-h"></i> Sort:</span>
+    <button class="filter-chip" id="fDefault" onclick="setFilter('default')"><i class="fas fa-clock"></i> Default</button>
+    <button class="filter-chip" id="fAmount" onclick="setFilter('amount')"><i class="fas fa-coins"></i> Most Balance</button>
+    <button class="filter-chip" id="fTxn" onclick="setFilter('txn')"><i class="fas fa-receipt"></i> Most Transactions</button>
+    <button class="filter-chip" id="fReferral" onclick="setFilter('referral')"><i class="fas fa-user-plus"></i> Most Referrals</button>
+  </div>
   <div class="users-grid" id="usersGrid">
     <div class="skeleton"></div>
     <div class="skeleton"></div>
@@ -324,6 +359,7 @@ body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;heigh
         <button class="tab active" onclick="switchTab(this,'tabInfo')"><i class="fas fa-id-card"></i> Info</button>
         <button class="tab" onclick="switchTab(this,'tabWallet')"><i class="fas fa-wallet"></i> Wallet</button>
         <button class="tab" onclick="switchTab(this,'tabTxn')"><i class="fas fa-history"></i> Txns</button>
+        <button class="tab" onclick="switchTab(this,'tabReferral')"><i class="fas fa-user-plus"></i> Refs</button>
         <button class="tab" onclick="switchTab(this,'tabBan')"><i class="fas fa-ban"></i> Ban</button>
       </div>
 
@@ -385,6 +421,12 @@ body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;heigh
       <div id="tabTxn" style="display:none">
         <div class="sec-label">Transaction History</div>
         <div class="txn-list" id="txnList"><div class="spin-loader"></div></div>
+      </div>
+
+      <!-- REFERRALS -->
+      <div id="tabReferral" style="display:none">
+        <div id="refBySection"></div>
+        <div id="refListSection"></div>
       </div>
 
       <!-- BAN -->
@@ -515,8 +557,10 @@ function avatarHtml(u,cls='avatar',phCls='avatar-ph'){
   return `<div class="${phCls}">${first}</div>`;
 }
 function banUntilText(until){
-  if(until==='permanent'||until===-1) return 'Permanent';
-  return fmt12(until);
+  if(!until||until==='permanent'||until===-1) return 'Permanent';
+  const ts=typeof until==='number'?until:parseInt(until);
+  if(isNaN(ts)) return 'Permanent';
+  return fmt12(ts);
 }
 
 // ── Load ──
@@ -524,7 +568,7 @@ function loadUsers(){
   db.ref('users').on('value',snap=>{
     allUsers=snap.val()||{};
     renderStats();
-    renderCards(Object.keys(allUsers));
+    renderCards(applySortFilter(Object.keys(allUsers)));
     const p=new URLSearchParams(window.location.search).get('uid');
     if(p&&allUsers[p]) setTimeout(()=>openUser(p),350);
   });
@@ -590,6 +634,7 @@ function renderCards(uids){
       </div>
       <div class="card-footer">
         <button class="btn-view-card" onclick="openUser('${uid}')"><i class="fas fa-eye"></i> View</button>
+        <button class="btn-notify-card" onclick="sendNotifyToUser('${uid}',event)"><i class="fas fa-bell"></i></button>
         ${isBanned
           ?`<button class="btn-unban-card" onclick="openQuickBan('${uid}')"><i class="fas fa-unlock"></i> Unban</button>`
           :`<button class="btn-ban-card" onclick="openQuickBan('${uid}')"><i class="fas fa-ban"></i> Ban</button>`}
@@ -603,7 +648,7 @@ function onSearch(inp){
   const q=inp.value.trim().toLowerCase();
   document.getElementById('searchClear').classList.toggle('visible',q.length>0);
   const hint=document.getElementById('searchHint');
-  if(!q){hint.style.display='none';renderCards(Object.keys(allUsers));return;}
+  if(!q){hint.style.display='none';renderCards(applySortFilter(Object.keys(allUsers)));return;}
   hint.style.display='block';
   document.getElementById('searchQuery').textContent=inp.value.trim();
   const filtered=Object.keys(allUsers).filter(uid=>{
@@ -613,13 +658,13 @@ function onSearch(inp){
       ||(u.email||'').toLowerCase().includes(q)
       ||uid.toLowerCase().includes(q);
   });
-  renderCards(filtered);
+  renderCards(applySortFilter(filtered));
 }
 function clearSearch(){
   document.getElementById('searchInput').value='';
   document.getElementById('searchClear').classList.remove('visible');
   document.getElementById('searchHint').style.display='none';
-  renderCards(Object.keys(allUsers));
+  renderCards(applySortFilter(Object.keys(allUsers)));
 }
 
 // ── OPEN DETAIL MODAL ──
@@ -662,7 +707,7 @@ function openUser(uid){
   // Reset tabs
   document.querySelectorAll('#userModal .tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('#userModal .tab')[0].classList.add('active');
-  ['tabInfo','tabWallet','tabTxn','tabBan'].forEach((id,i)=>document.getElementById(id).style.display=i===0?'block':'none');
+  ['tabInfo','tabWallet','tabTxn','tabReferral','tabBan'].forEach((id,i)=>document.getElementById(id).style.display=i===0?'block':'none');
 
   loadTransactions(uid);
   document.getElementById('userModal').classList.add('open');
@@ -675,7 +720,8 @@ document.getElementById('userModal').addEventListener('click',e=>{if(e.target===
 function switchTab(btn,tabId){
   document.querySelectorAll('#userModal .tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  ['tabInfo','tabWallet','tabTxn','tabBan'].forEach(id=>document.getElementById(id).style.display=id===tabId?'block':'none');
+  ['tabInfo','tabWallet','tabTxn','tabReferral','tabBan'].forEach(id=>document.getElementById(id).style.display=id===tabId?'block':'none');
+  if(tabId==='tabReferral') loadReferrals(currentUid);
 }
 
 // ── WALLET ──
@@ -748,7 +794,7 @@ function renderBanTab(u){
   document.getElementById('banReasonInput').value='';
   if(ib){
     const reasonHtml=u.banReason?`<div class="ban-reason-show"><i class="fas fa-comment-alt"></i> ${u.banReason}</div>`:'';
-    display.innerHTML=`<div class="ban-status-banned"><i class="fas fa-ban"></i><div class="ban-info-text"><div>Banned · ${banUntilText(u.banUntil)}</div>${reasonHtml}</div></div>`;
+    display.innerHTML=`<div class="ban-status-banned"><i class="fas fa-ban"></i><div class="ban-info-text"><div>Banned · ${banUntilText(u.unbanDate)}</div>${reasonHtml}</div></div>`;
     area.style.display='none'; unbanBtn.style.display='block';
   } else {
     display.innerHTML=`<div class="ban-status-active"><i class="fas fa-check-circle"></i><div>User is currently active</div></div>`;
@@ -780,34 +826,34 @@ function doBan(){
   if(!currentUid) return;
   const customDate=document.getElementById('banCustomDate').value;
   const reason=document.getElementById('banReasonInput').value.trim();
-  let banUntil;
+  let unbanDate; // ← app reads 'unbanDate' key (null = permanent)
   if(document.getElementById('banCustomBlock').style.display==='flex'&&customDate){
-    banUntil=new Date(customDate).getTime();
+    unbanDate=new Date(customDate).getTime();
   } else if(banPresetDays===-1){
-    banUntil='permanent';
+    unbanDate=null; // permanent
   } else if(banPresetDays){
-    banUntil=Date.now()+(banPresetDays*24*60*60*1000);
+    unbanDate=Date.now()+(banPresetDays*24*60*60*1000);
   } else {showToast('Select a ban duration first','error');return;}
-  const upd={status:'banned',banUntil};
+  const upd={status:'banned',unbanDate:unbanDate||null};
   if(reason) upd.banReason=reason; else upd.banReason=null;
   db.ref(`users/${currentUid}`).update(upd).then(()=>{
-    allUsers[currentUid].status='banned'; allUsers[currentUid].banUntil=banUntil;
+    allUsers[currentUid].status='banned'; allUsers[currentUid].unbanDate=unbanDate;
     if(reason) allUsers[currentUid].banReason=reason; else delete allUsers[currentUid].banReason;
     renderBanTab(allUsers[currentUid]);
     document.getElementById('dStatus').innerHTML=`<span style="color:var(--red2);font-weight:700"><i class="fas fa-ban"></i> Banned</span>`;
-    renderCards(Object.keys(allUsers)); renderStats();
+    renderCards(currentFilteredUids()); renderStats();
     showToast('User banned successfully','success');
   }).catch(e=>showToast('Error: '+e.message,'error'));
 }
 
 function doUnban(){
   if(!currentUid) return;
-  db.ref(`users/${currentUid}`).update({status:'active',banUntil:null,banReason:null}).then(()=>{
+  db.ref(`users/${currentUid}`).update({status:'active',unbanDate:null,banReason:null}).then(()=>{
     allUsers[currentUid].status='active';
-    delete allUsers[currentUid].banUntil; delete allUsers[currentUid].banReason;
+    delete allUsers[currentUid].unbanDate; delete allUsers[currentUid].banReason;
     renderBanTab(allUsers[currentUid]);
     document.getElementById('dStatus').innerHTML=`<span style="color:var(--green)"><i class="fas fa-check-circle"></i> Active</span>`;
-    renderCards(Object.keys(allUsers)); renderStats();
+    renderCards(currentFilteredUids()); renderStats();
     showToast('User unbanned','success');
   }).catch(e=>showToast('Error: '+e.message,'error'));
 }
@@ -830,7 +876,7 @@ function openQuickBan(uid){
   const ib=u.status==='banned';
   if(ib){
     const reasonHtml=u.banReason?`<div class="ban-reason-show"><i class="fas fa-comment-alt"></i> ${u.banReason}</div>`:'';
-    document.getElementById('qbStatusDisplay').innerHTML=`<div class="ban-status-banned"><i class="fas fa-ban"></i><div class="ban-info-text"><div>Banned · ${banUntilText(u.banUntil)}</div>${reasonHtml}</div></div>`;
+    document.getElementById('qbStatusDisplay').innerHTML=`<div class="ban-status-banned"><i class="fas fa-ban"></i><div class="ban-info-text"><div>Banned · ${banUntilText(u.unbanDate)}</div>${reasonHtml}</div></div>`;
     document.getElementById('qbActionArea').style.display='none';
     document.getElementById('qbUnbanBtn').style.display='block';
   } else {
@@ -855,30 +901,30 @@ function doQuickBan(){
   if(!qbUid) return;
   const customDate=document.getElementById('qbCustomDate').value;
   const reason=document.getElementById('qbReasonInput').value.trim();
-  let banUntil;
+  let unbanDate;
   if(document.getElementById('qbCustomBlock').style.display==='flex'&&customDate){
-    banUntil=new Date(customDate).getTime();
+    unbanDate=new Date(customDate).getTime();
   } else if(qbPresetDays===-1){
-    banUntil='permanent';
+    unbanDate=null; // permanent
   } else if(qbPresetDays){
-    banUntil=Date.now()+(qbPresetDays*24*60*60*1000);
+    unbanDate=Date.now()+(qbPresetDays*24*60*60*1000);
   } else {showToast('Select a ban duration','error');return;}
-  const upd={status:'banned',banUntil};
+  const upd={status:'banned',unbanDate:unbanDate||null};
   if(reason) upd.banReason=reason; else upd.banReason=null;
   db.ref(`users/${qbUid}`).update(upd).then(()=>{
-    allUsers[qbUid].status='banned'; allUsers[qbUid].banUntil=banUntil;
+    allUsers[qbUid].status='banned'; allUsers[qbUid].unbanDate=unbanDate;
     if(reason) allUsers[qbUid].banReason=reason; else delete allUsers[qbUid].banReason;
-    renderCards(Object.keys(allUsers)); renderStats();
+    renderCards(currentFilteredUids()); renderStats();
     closeQuickBan(); showToast('User banned','success');
     if(currentUid===qbUid) renderBanTab(allUsers[qbUid]);
   }).catch(e=>showToast('Error: '+e.message,'error'));
 }
 function doQuickUnban(){
   if(!qbUid) return;
-  db.ref(`users/${qbUid}`).update({status:'active',banUntil:null,banReason:null}).then(()=>{
+  db.ref(`users/${qbUid}`).update({status:'active',unbanDate:null,banReason:null}).then(()=>{
     allUsers[qbUid].status='active';
-    delete allUsers[qbUid].banUntil; delete allUsers[qbUid].banReason;
-    renderCards(Object.keys(allUsers)); renderStats();
+    delete allUsers[qbUid].unbanDate; delete allUsers[qbUid].banReason;
+    renderCards(currentFilteredUids()); renderStats();
     closeQuickBan(); showToast('User unbanned','success');
     if(currentUid===qbUid) renderBanTab(allUsers[qbUid]);
   }).catch(e=>showToast('Error: '+e.message,'error'));
@@ -892,6 +938,136 @@ function showToast(msg,type='success'){
   t.className='toast show '+type;
   if(toastTimer) clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── FILTER STATE ──
+let activeFilter='default';
+
+function currentFilteredUids(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  let uids=Object.keys(allUsers);
+  if(q) uids=uids.filter(uid=>{
+    const u=allUsers[uid];
+    return (u.name||'').toLowerCase().includes(q)||(u.phone||'').toLowerCase().includes(q)
+      ||(u.email||'').toLowerCase().includes(q)||uid.toLowerCase().includes(q);
+  });
+  return applySortFilter(uids);
+}
+
+function applySortFilter(uids){
+  if(activeFilter==='amount'){
+    return [...uids].sort((a,b)=>{
+      const wa=allUsers[a].wallet||{}, wb=allUsers[b].wallet||{};
+      const ta=(wa.depositGold||0)+(wa.winningGold||0);
+      const tb=(wb.depositGold||0)+(wb.winningGold||0);
+      return tb-ta;
+    });
+  }
+  if(activeFilter==='txn'){
+    return [...uids].sort((a,b)=>{
+      const ta=Object.keys(allUsers[a].transactions||{}).length;
+      const tb=Object.keys(allUsers[b].transactions||{}).length;
+      return tb-ta;
+    });
+  }
+  if(activeFilter==='referral'){
+    return [...uids].sort((a,b)=>{
+      const ra=Object.keys(allUsers[a].referrals||{}).length;
+      const rb=Object.keys(allUsers[b].referrals||{}).length;
+      return rb-ra;
+    });
+  }
+  return uids; // default order
+}
+
+function setFilter(f){
+  activeFilter=f;
+  ['fDefault','fAmount','fTxn','fReferral'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  const map={default:'fDefault',amount:'fAmount',txn:'fTxn',referral:'fReferral'};
+  document.getElementById(map[f]).classList.add('active');
+  renderCards(currentFilteredUids());
+}
+
+// ── SEND NOTIFY TO USER (redirect to push page with uid) ──
+function sendNotifyToUser(uid,e){
+  if(e){e.stopPropagation();}
+  window.location.href='push.html?uid='+encodeURIComponent(uid);
+}
+
+// ── LOAD REFERRALS ──
+function loadReferrals(uid){
+  const bySection=document.getElementById('refBySection');
+  const listSection=document.getElementById('refListSection');
+  if(!uid){bySection.innerHTML='';listSection.innerHTML='';return;}
+  const u=allUsers[uid];
+
+  // ── WHO REFERRED THIS USER ──
+  // Find any user whose referrals object contains this uid
+  let referredByUid=null;
+  Object.keys(allUsers).forEach(k=>{
+    if(k!==uid && allUsers[k].referrals && allUsers[k].referrals[uid]) referredByUid=k;
+  });
+
+  if(referredByUid){
+    const ru=allUsers[referredByUid]||{};
+    const first=(ru.name||'?').charAt(0).toUpperCase();
+    const avatarHtmlStr=ru.profileImage
+      ?`<img src="${ru.profileImage}" onerror="this.style.display='none'" style="width:36px;height:36px;border-radius:10px;object-fit:cover">`
+      :`<div class="ref-avatar">${first}</div>`;
+    bySection.innerHTML=`
+      <div class="ref-section-label"><i class="fas fa-arrow-down"></i> Referred By</div>
+      <div class="ref-card">
+        <div class="ref-avatar" style="background:none;padding:0">${avatarHtmlStr}</div>
+        <div class="ref-info">
+          <div class="ref-name">${esc(ru.name||referredByUid)}</div>
+          <div class="ref-uid">${referredByUid} · ${ru.phone||ru.email||'—'}</div>
+        </div>
+        <span class="ref-badge referred-by">Referrer</span>
+        <button class="ref-open-btn" onclick="openUser('${referredByUid}');closeModal()">View</button>
+      </div>`;
+  } else {
+    bySection.innerHTML=`<div class="ref-section-label"><i class="fas fa-arrow-down"></i> Referred By</div>
+      <div style="font-size:12px;color:var(--muted);padding:8px 2px 10px">No referrer — joined organically</div>`;
+  }
+
+  // ── WHO THIS USER REFERRED ──
+  const referredUids=Object.keys(u.referrals||{});
+  if(!referredUids.length){
+    listSection.innerHTML=`<div class="ref-section-label"><i class="fas fa-arrow-up"></i> Users Referred (0)</div>
+      <div class="ref-empty"><i class="fas fa-user-plus"></i>No referrals yet</div>`;
+    return;
+  }
+
+  listSection.innerHTML=`<div class="ref-section-label"><i class="fas fa-arrow-up"></i> Users Referred (${referredUids.length})</div>
+    <div class="referral-grid" id="referralGrid"></div>`;
+  const grid=document.getElementById('referralGrid');
+  referredUids.forEach(ruid=>{
+    const ru=allUsers[ruid];
+    if(!ru){
+      const row=document.createElement('div');
+      row.className='ref-card';
+      row.innerHTML=`<div class="ref-avatar">?</div>
+        <div class="ref-info"><div class="ref-name" style="color:var(--muted)">${ruid}</div><div class="ref-uid">Not in current data</div></div>
+        <span class="ref-badge referred">Referred</span>`;
+      grid.appendChild(row); return;
+    }
+    const first=(ru.name||'?').charAt(0).toUpperCase();
+    const avatarHtmlStr=ru.profileImage
+      ?`<img src="${ru.profileImage}" onerror="this.style.display='none'" style="width:36px;height:36px;border-radius:10px;object-fit:cover">`
+      :`<div class="ref-avatar">${first}</div>`;
+    const w=ru.wallet||{};
+    const row=document.createElement('div');
+    row.className='ref-card';
+    row.innerHTML=`
+      <div class="ref-avatar" style="background:none;padding:0">${avatarHtmlStr}</div>
+      <div class="ref-info">
+        <div class="ref-name">${esc(ru.name||ruid)}</div>
+        <div class="ref-uid">${ruid} · ${ru.phone||ru.email||'—'}</div>
+      </div>
+      <span class="ref-badge referred">Referred</span>
+      <button class="ref-open-btn" onclick="openUser('${ruid}');closeModal()">View</button>`;
+    grid.appendChild(row);
+  });
 }
 
 loadUsers();
