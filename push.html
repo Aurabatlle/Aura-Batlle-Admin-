@@ -2,151 +2,174 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Aura Battle — Push Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #080608;
-      --surface: #100a0a;
+      --bg:       #080608;
+      --surface:  #100a0a;
       --surface2: #160c0c;
-      --border: #2a1010;
-      --accent: #e02020;
-      --accent2: #ff4444;
-      --text: #f0e8e8;
-      --muted: #7a5050;
-      --success: #2ecc87;
-      --error: #ff4757;
-      --font-head: 'Syne', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --border:   #2a1010;
+      --accent:   #e02020;
+      --accent2:  #ff4444;
+      --text:     #f0e8e8;
+      --muted:    #7a5050;
+      --success:  #2ecc87;
+      --error:    #ff4757;
+      --fh:       'Syne', sans-serif;
+      --fm:       'JetBrains Mono', monospace;
     }
+
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--font-mono);
-      min-height: 100vh;
+      font-family: var(--fm);
+      min-height: 100dvh;
       overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
+
     .bg-grid {
-      position: fixed; inset: 0; z-index: 0;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background-image:
         linear-gradient(rgba(220,30,30,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(220,30,30,0.04) 1px, transparent 1px);
       background-size: 40px 40px;
-      pointer-events: none;
     }
     .bg-glow {
-      position: fixed; inset: 0; z-index: 0;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background:
         radial-gradient(ellipse 60% 40% at 70% 20%, rgba(200,20,20,0.09), transparent),
         radial-gradient(ellipse 40% 50% at 10% 80%, rgba(180,10,10,0.06), transparent);
-      pointer-events: none;
     }
 
-    /* ── Auth guard overlay ── */
+    /* ── Auth guard ── */
     #authGuard {
-      display: none;
-      position: fixed; inset: 0; z-index: 999;
-      background: var(--bg);
-      align-items: center; justify-content: center;
-      flex-direction: column; gap: 14px;
-      font-family: var(--font-head); font-size: 1rem;
-      color: var(--error);
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: var(--bg); flex-direction: column;
+      align-items: center; justify-content: center; gap: 14px;
+      padding: 24px; text-align: center;
+      font-family: var(--fh); font-size: 1rem; color: var(--error);
     }
     #authGuard.show { display: flex; }
-    #authGuard .g-icon { font-size: 2.5rem; }
-    #authGuard p { color: var(--muted); font-size: 0.75rem; margin-top: 4px; }
+    #authGuard .g-icon { font-size: 2.8rem; }
+    #authGuard p { color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
     #authGuard a {
-      margin-top: 10px; padding: 10px 28px;
+      margin-top: 10px; padding: 12px 32px;
       background: linear-gradient(135deg, #b00000, #ff3333);
       color: #fff; border-radius: 8px; text-decoration: none;
-      font-family: var(--font-head); font-weight: 700; font-size: 0.85rem;
+      font-family: var(--fh); font-weight: 700; font-size: 0.9rem;
       box-shadow: 0 0 20px rgba(220,30,30,0.3);
     }
 
+    /* ── Layout ── */
     .wrapper {
       position: relative; z-index: 1;
       max-width: 980px; margin: 0 auto;
-      padding: 28px 20px 60px;
+      padding: 16px 14px 80px;
     }
+
+    /* ── Header ── */
     header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 40px; padding-bottom: 20px;
+      margin-bottom: 20px; padding-bottom: 14px;
       border-bottom: 1px solid var(--border);
+      gap: 10px;
     }
-    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .logo-icon {
-      font-size: 2.4rem;
-      filter: drop-shadow(0 0 14px rgba(220,30,30,0.8));
+      font-size: 1.8rem; flex-shrink: 0;
+      filter: drop-shadow(0 0 10px rgba(220,30,30,0.8));
       animation: pulse 2.5s ease-in-out infinite;
     }
     @keyframes pulse {
-      0%,100% { filter: drop-shadow(0 0 12px rgba(220,30,30,0.6)); }
-      50%      { filter: drop-shadow(0 0 28px rgba(220,30,30,1)); }
+      0%,100% { filter: drop-shadow(0 0 10px rgba(220,30,30,0.6)); }
+      50%      { filter: drop-shadow(0 0 22px rgba(220,30,30,1)); }
     }
     .logo-title {
-      font-family: var(--font-head); font-weight: 800;
-      font-size: 1.5rem; letter-spacing: 0.15em; color: var(--accent2);
+      font-family: var(--fh); font-weight: 800;
+      font-size: 1.1rem; letter-spacing: 0.12em; color: var(--accent2);
+      white-space: nowrap;
     }
-    .logo-sub { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .logo-sub {
+      font-size: 0.58rem; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
 
-    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-right {
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
     .admin-badge {
-      font-size: 0.65rem; color: var(--muted);
-      border: 1px solid var(--border); padding: 5px 12px; border-radius: 4px;
-      background: var(--surface); letter-spacing: 0.08em;
+      font-size: 0.6rem; color: var(--muted);
+      border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px;
+      background: var(--surface); letter-spacing: 0.06em;
+      display: none; /* hidden on small screens */
     }
     .admin-badge span { color: var(--accent2); }
     .logout-btn {
-      font-size: 0.62rem; font-family: var(--font-mono);
+      font-size: 0.6rem; font-family: var(--fm);
       color: var(--muted); background: none;
       border: 1px solid var(--border); border-radius: 4px;
-      padding: 5px 12px; cursor: pointer;
+      padding: 6px 11px; cursor: pointer;
       transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
     }
     .logout-btn:hover { color: var(--error); border-color: var(--error); }
     .status-badge {
-      font-size: 0.68rem; letter-spacing: 0.12em; color: var(--success);
-      border: 1px solid rgba(46,204,135,0.3); padding: 6px 14px; border-radius: 4px;
+      font-size: 0.6rem; letter-spacing: 0.1em; color: var(--success);
+      border: 1px solid rgba(46,204,135,0.3); padding: 5px 10px; border-radius: 4px;
       background: rgba(46,204,135,0.05); transition: color 0.3s, border-color 0.3s;
+      white-space: nowrap;
     }
+
+    /* ── Two-col on desktop, single-col on mobile ── */
     main {
-      display: grid; grid-template-columns: 1.2fr 1fr;
-      gap: 20px; align-items: start;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px; align-items: start;
     }
-    @media (max-width: 700px) { main { grid-template-columns: 1fr; } }
+
+    /* ── Cards ── */
     .card {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 28px; animation: fadeUp 0.5s ease both;
+      border-radius: 12px; padding: 18px;
+      animation: fadeUp 0.4s ease both;
     }
-    #historyCard { animation-delay: 0.12s; }
+    #historyCard { animation-delay: 0.1s; }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
+      from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .card-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
     }
-    .card-header h2 { font-family: var(--font-head); font-weight: 700; font-size: 1.05rem; }
+    .card-header h2 { font-family: var(--fh); font-weight: 700; font-size: 0.95rem; }
     .tag {
-      font-size: 0.62rem; padding: 3px 10px; border-radius: 4px;
+      font-size: 0.58rem; padding: 3px 9px; border-radius: 4px;
       background: rgba(220,30,30,0.12); border: 1px solid rgba(220,30,30,0.35);
-      color: var(--accent2); letter-spacing: 0.08em;
+      color: var(--accent2); letter-spacing: 0.06em;
     }
-    .field { margin-bottom: 16px; position: relative; }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 14px; position: relative; }
     .field.hidden { display: none; }
     label {
-      display: block; font-size: 0.65rem; color: var(--muted);
-      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 7px;
+      display: block; font-size: 0.6rem; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px;
     }
-    .optional { color: #4a2525; text-transform: none; font-size: 0.62rem; }
+    .optional { color: #4a2525; text-transform: none; font-size: 0.58rem; }
     input, textarea {
       width: 100%; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-family: var(--font-mono);
-      font-size: 0.8rem; padding: 10px 13px; outline: none;
+      border-radius: 8px; color: var(--text); font-family: var(--fm);
+      font-size: 16px; /* prevents iOS zoom */
+      padding: 11px 13px; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s; resize: vertical;
+      -webkit-appearance: none;
     }
     input:focus, textarea:focus {
       border-color: rgba(220,30,30,0.55);
@@ -154,73 +177,88 @@
     }
     input::placeholder, textarea::placeholder { color: #3a1818; }
 
-    .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    /* ── Mode toggle: 2x2 grid on mobile ── */
+    .toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
     .toggle-btn {
-      flex: 1; min-width: 0; padding: 9px 6px;
-      font-family: var(--font-mono); font-size: 0.68rem;
+      padding: 10px 6px;
+      font-family: var(--fm); font-size: 0.65rem;
       border: 1px solid var(--border); border-radius: 8px;
       background: var(--surface2); color: var(--muted);
-      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+      cursor: pointer; transition: all 0.2s;
+      text-align: center; line-height: 1.3;
     }
     .toggle-btn.active {
       border-color: rgba(220,30,30,0.55);
       background: rgba(220,30,30,0.1);
       color: var(--accent2);
     }
+    .toggle-btn:active { transform: scale(0.97); }
 
-    /* User chip */
+    /* ── User chip ── */
     .user-chip {
-      margin-top: 8px; padding: 8px 12px; border-radius: 6px;
-      font-size: 0.7rem; display: flex; align-items: center; gap: 8px;
+      margin-top: 8px; padding: 9px 12px; border-radius: 6px;
+      font-size: 0.68rem; display: flex; align-items: flex-start;
+      gap: 8px; flex-wrap: wrap;
       border: 1px solid var(--border); background: var(--surface2);
+      line-height: 1.5;
     }
     .user-chip.hidden { display: none; }
     .user-chip.found  { border-color: rgba(46,204,135,0.35); background: rgba(46,204,135,0.06); color: var(--success); }
     .user-chip.notfound { border-color: rgba(255,71,87,0.35); background: rgba(255,71,87,0.06); color: var(--error); }
 
-    /* Broadcast banner */
+    /* ── Broadcast banner ── */
     .broadcast-banner {
       padding: 12px 14px; border-radius: 8px;
       background: rgba(220,30,30,0.08); border: 1px solid rgba(220,30,30,0.25);
-      font-size: 0.73rem; color: var(--accent2);
-      display: flex; align-items: center; gap: 8px;
+      font-size: 0.7rem; color: var(--accent2);
+      display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
     }
 
-    .char-count { position: absolute; right: 10px; bottom: 8px; font-size: 0.58rem; color: var(--muted); }
-    .hint { font-size: 0.62rem; color: var(--muted); margin-top: 5px; display: block; }
+    .char-count {
+      position: absolute; right: 10px; bottom: 9px;
+      font-size: 0.55rem; color: var(--muted); pointer-events: none;
+    }
+    .hint { font-size: 0.6rem; color: var(--muted); margin-top: 5px; display: block; }
 
+    /* ── Send button ── */
     .send-btn {
-      width: 100%; margin-top: 10px; padding: 14px;
+      width: 100%; margin-top: 8px; padding: 15px;
       background: linear-gradient(135deg, #b00000 0%, #ff3333 100%);
-      color: #fff; font-family: var(--font-head); font-weight: 700;
-      font-size: 0.95rem; letter-spacing: 0.05em;
-      border: none; border-radius: 8px; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+      color: #fff; font-family: var(--fh); font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.04em;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
       display: flex; align-items: center; justify-content: center; gap: 10px;
       box-shadow: 0 0 20px rgba(220,30,30,0.3);
+      -webkit-appearance: none;
+      min-height: 50px; /* easy tap target */
     }
-    .send-btn:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(220,30,30,0.5); }
-    .send-btn:active { transform: translateY(0); }
+    .send-btn:active { transform: scale(0.98); }
     .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .btn-loader {
-      width: 16px; height: 16px;
+      width: 18px; height: 18px;
       border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
       border-radius: 50%; animation: spin 0.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── Result box ── */
     .result-box {
-      margin-top: 14px; padding: 13px; border-radius: 8px;
+      margin-top: 12px; padding: 12px; border-radius: 8px;
       display: flex; align-items: flex-start; gap: 10px;
-      font-size: 0.76rem; line-height: 1.5; word-break: break-all;
+      font-size: 0.72rem; line-height: 1.6; word-break: break-all;
     }
     .result-box.hidden { display: none; }
     .result-box.success { background: rgba(46,204,135,0.08); border: 1px solid rgba(46,204,135,0.25); color: var(--success); }
     .result-box.error   { background: rgba(255,71,87,0.08);  border: 1px solid rgba(255,71,87,0.25);  color: var(--error); }
-    .result-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .result-icon { font-size: 1rem; flex-shrink: 0; }
 
-    /* Progress bar */
+    /* ── Progress bar ── */
     .progress-wrap { margin-top: 10px; display: none; }
     .progress-wrap.visible { display: block; }
     .progress-bar-bg {
@@ -231,40 +269,78 @@
       height: 100%; background: linear-gradient(90deg, #b00000, #ff3333);
       border-radius: 4px; width: 0%; transition: width 0.3s;
     }
-    .progress-label { font-size: 0.62rem; color: var(--muted); margin-top: 5px; }
+    .progress-label { font-size: 0.6rem; color: var(--muted); margin-top: 5px; }
 
+    /* ── History ── */
     .clear-btn {
-      font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted);
+      font-family: var(--fm); font-size: 0.6rem; color: var(--muted);
       background: none; border: 1px solid var(--border); border-radius: 4px;
-      padding: 4px 10px; cursor: pointer; transition: color 0.2s, border-color 0.2s;
+      padding: 5px 11px; cursor: pointer; transition: color 0.2s, border-color 0.2s;
     }
     .clear-btn:hover { color: var(--error); border-color: var(--error); }
 
-    .empty-state { color: var(--muted); font-size: 0.72rem; text-align: center; padding: 32px 0; }
-    .history-item { padding: 12px 0; border-bottom: 1px solid var(--border); animation: fadeUp 0.3s ease both; }
+    .empty-state { color: var(--muted); font-size: 0.7rem; text-align: center; padding: 28px 0; }
+    .history-item { padding: 11px 0; border-bottom: 1px solid var(--border); }
     .history-item:last-child { border-bottom: none; }
-    .history-status { font-size: 0.62rem; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .history-status { font-size: 0.6rem; letter-spacing: 0.06em; margin-bottom: 3px; }
     .history-status.ok  { color: var(--success); }
     .history-status.err { color: var(--error); }
-    .history-title { font-size: 0.78rem; font-weight: 600; color: var(--text); }
-    .history-body  { font-size: 0.7rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .history-mode  { font-size: 0.6rem; color: var(--accent2); margin-top: 3px; }
-    .history-time  { font-size: 0.6rem; color: #3a1818; margin-top: 4px; }
+    .history-title { font-size: 0.75rem; font-weight: 600; color: var(--text); }
+    .history-body  { font-size: 0.68rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-mode  { font-size: 0.58rem; color: var(--accent2); margin-top: 3px; }
+    .history-time  { font-size: 0.58rem; color: #3a1818; margin-top: 3px; }
 
     footer {
-      margin-top: 40px; display: flex; justify-content: space-between;
-      font-size: 0.62rem; color: #3a1818; padding-top: 16px;
-      border-top: 1px solid var(--border);
+      margin-top: 32px; display: flex; flex-direction: column; gap: 4px;
+      font-size: 0.58rem; color: #3a1818; padding-top: 14px;
+      border-top: 1px solid var(--border); text-align: center;
     }
 
     .hidden { display: none !important; }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE BREAKPOINTS
+    ════════════════════════════════════════ */
+
+    /* Tablet & up: show admin badge, side-by-side layout */
+    @media (min-width: 640px) {
+      .wrapper { padding: 24px 20px 60px; }
+      .logo-icon { font-size: 2rem; }
+      .logo-title { font-size: 1.3rem; }
+      .admin-badge { display: block; }
+      header { margin-bottom: 28px; }
+      .card { padding: 24px; }
+      .toggle-group { grid-template-columns: repeat(4, 1fr); }
+      footer { flex-direction: row; justify-content: space-between; }
+    }
+
+    /* Desktop */
+    @media (min-width: 860px) {
+      .wrapper { padding: 28px 20px 60px; }
+      .logo-title { font-size: 1.5rem; }
+      .card { padding: 28px; }
+    }
+
+    /* Mobile only: stack cards vertically */
+    @media (max-width: 639px) {
+      main { grid-template-columns: 1fr; }
+      /* put history below send form */
+      #historyCard { order: 2; }
+    }
+
+    /* Very small screens */
+    @media (max-width: 360px) {
+      .logo-title { font-size: 0.95rem; letter-spacing: 0.06em; }
+      .logo-sub { display: none; }
+      .status-badge { display: none; }
+    }
   </style>
 </head>
 <body>
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 
-<!-- Auth guard — shown if session missing/expired -->
+<!-- Auth guard -->
 <div id="authGuard">
   <div class="g-icon">🔒</div>
   <strong>Session Expired or Not Logged In</strong>
@@ -273,6 +349,7 @@
 </div>
 
 <div class="wrapper" id="mainContent">
+
   <header>
     <div class="logo">
       <span class="logo-icon">🔴</span>
@@ -289,7 +366,8 @@
   </header>
 
   <main>
-    <!-- Send Card -->
+
+    <!-- ── Send Card ── -->
     <section class="card">
       <div class="card-header">
         <h2>Send Notification</h2>
@@ -310,7 +388,11 @@
       <!-- User ID -->
       <div class="field" id="userIdField">
         <label for="inputUserId">User ID</label>
-        <input type="text" id="inputUserId" placeholder="e.g. 0FVP2F" oninput="lookupUser(this.value)" autocomplete="off"/>
+        <input type="text" id="inputUserId"
+               placeholder="e.g. 0FVP2F"
+               oninput="lookupUser(this.value)"
+               autocomplete="off"
+               autocorrect="off" autocapitalize="characters" spellcheck="false"/>
         <div class="user-chip hidden" id="userChip"></div>
       </div>
 
@@ -344,7 +426,7 @@
       <!-- Body -->
       <div class="field">
         <label for="notifBody">Message</label>
-        <textarea id="notifBody" rows="4" placeholder="Your notification message..." maxlength="500"></textarea>
+        <textarea id="notifBody" rows="3" placeholder="Your notification message..." maxlength="500"></textarea>
         <span class="char-count" id="bodyCount">0/500</span>
       </div>
 
@@ -361,11 +443,11 @@
       </div>
 
       <button class="send-btn" id="sendBtn" onclick="sendPush()">
-        <span id="btnText">🔴 Send Push Notification</span>
+        <span id="btnText">🔴 Send Notification</span>
         <div class="btn-loader hidden" id="btnLoader"></div>
       </button>
 
-      <!-- Progress (broadcast) -->
+      <!-- Broadcast progress -->
       <div class="progress-wrap" id="progressWrap">
         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
         <div class="progress-label" id="progressLabel">Sending…</div>
@@ -377,7 +459,7 @@
       </div>
     </section>
 
-    <!-- History Card -->
+    <!-- ── History Card ── -->
     <section class="card" id="historyCard">
       <div class="card-header">
         <h2>Send History</h2>
@@ -387,6 +469,7 @@
         <div class="empty-state">No notifications sent yet.</div>
       </div>
     </section>
+
   </main>
 
   <footer>
@@ -396,44 +479,38 @@
 </div>
 
 <script>
-  // ── Session constants — must match login page exactly ──────────────────
-  const SESSION_MS = 30 * 60 * 1000; // 30 minutes, same as login page
+  // ── Session constants — must match login page exactly ──────────────
+  const SESSION_MS = 30 * 60 * 1000;
 
-  // ── Auth check on load ─────────────────────────────────────────────────
+  // ── Auth check ─────────────────────────────────────────────────────
   (function checkSession() {
     const savedUser = localStorage.getItem('adminUsername');
     const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
     const isValid   = savedUser && (Date.now() - loginTime) < SESSION_MS;
-
     if (!isValid) {
-      // Show guard, hide content
       document.getElementById('authGuard').classList.add('show');
       document.getElementById('mainContent').style.display = 'none';
     } else {
-      // Show admin name in header
-      const displayName = localStorage.getItem('adminDisplayName') || savedUser;
-      document.getElementById('adminName').textContent = displayName;
+      const name = localStorage.getItem('adminDisplayName') || savedUser;
+      document.getElementById('adminName').textContent = name;
     }
   })();
 
-  // Refresh session timestamp on any activity so it doesn't expire mid-use
-  document.addEventListener('click', refreshSession);
-  document.addEventListener('keydown', refreshSession);
-  function refreshSession() {
-    if (localStorage.getItem('adminUsername')) {
-      localStorage.setItem('loginTime', Date.now().toString());
-    }
-  }
+  // Refresh session on any user activity
+  ['click','keydown','touchstart'].forEach(ev =>
+    document.addEventListener(ev, () => {
+      if (localStorage.getItem('adminUsername'))
+        localStorage.setItem('loginTime', Date.now().toString());
+    }, { passive: true })
+  );
 
-  // ── Logout ─────────────────────────────────────────────────────────────
   function doLogout() {
     ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime']
       .forEach(k => localStorage.removeItem(k));
     window.location.href = 'index.html';
   }
 
-  // ── User database ──────────────────────────────────────────────────────
-  // Add more users here as they register in Firebase
+  // ── User database ──────────────────────────────────────────────────
   const USERS = {
     "0FVP2F": {
       name: "Amir",
@@ -442,11 +519,10 @@
       fcmToken: "ctaUoCLTQ6ewcPWbvkZQFG:APA91bGgMmYCd17unfvj3aE8hiwINZnxbGwVZTPPC59SkCAjZ1FgAMx2nP-ki_JvTXlud3I1q9gGjQKlYjVYCYIeDrB-97UjNrdrUkO0OSCRxcLsL8P6MEM",
       status: "active"
     }
-    // Add more users below:
     // "USERID2": { name: "...", email: "...", fcmToken: "...", status: "active" },
   };
 
-  // ── State ──────────────────────────────────────────────────────────────
+  // ── State ──────────────────────────────────────────────────────────
   let currentMode  = 'userid';
   let resolvedUser = null;
   let sendHistory  = JSON.parse(localStorage.getItem('ab_push_history') || '[]');
@@ -463,75 +539,68 @@
     document.getElementById('bodyCount').textContent = this.value.length + '/500';
   });
 
-  // ── Mode switching ─────────────────────────────────────────────────────
+  // ── Mode switching ─────────────────────────────────────────────────
   function setMode(mode) {
     currentMode  = mode;
     resolvedUser = null;
-    ['userIdField','allUsersField','tokenField','topicField'].forEach(id =>
-      document.getElementById(id).classList.add('hidden')
-    );
+    ['userIdField','allUsersField','tokenField','topicField']
+      .forEach(id => document.getElementById(id).classList.add('hidden'));
+    ({ userid:'userIdField', all:'allUsersField', device:'tokenField', topic:'topicField' });
     const fieldMap = { userid:'userIdField', all:'allUsersField', device:'tokenField', topic:'topicField' };
     document.getElementById(fieldMap[mode]).classList.remove('hidden');
-
-    ['modeUserId','modeAll','modeDevice','modeTopic'].forEach(id =>
-      document.getElementById(id).classList.remove('active')
-    );
+    ['modeUserId','modeAll','modeDevice','modeTopic']
+      .forEach(id => document.getElementById(id).classList.remove('active'));
     const btnMap = { userid:'modeUserId', all:'modeAll', device:'modeDevice', topic:'modeTopic' };
     document.getElementById(btnMap[mode]).classList.add('active');
-
     hideResult();
     document.getElementById('userChip').className = 'user-chip hidden';
   }
 
-  // ── User ID lookup ─────────────────────────────────────────────────────
+  // ── User ID lookup ─────────────────────────────────────────────────
   function lookupUser(val) {
     const chip = document.getElementById('userChip');
     const uid  = val.trim().toUpperCase();
     if (!uid) { chip.className = 'user-chip hidden'; resolvedUser = null; return; }
-
     const user = USERS[uid];
     if (user) {
       resolvedUser = user;
       chip.className = 'user-chip found';
-      chip.innerHTML = `✅ <strong>${esc(user.name)}</strong> &nbsp;·&nbsp; ${esc(user.email)} &nbsp;·&nbsp; <em>${esc(user.status)}</em>`;
+      chip.innerHTML = `✅ <strong>${esc(user.name)}</strong> · ${esc(user.email)} · <em>${esc(user.status)}</em>`;
     } else {
       resolvedUser = null;
       chip.className = 'user-chip notfound';
-      chip.innerHTML = `❌ User ID <strong>${esc(uid)}</strong> not found in database`;
+      chip.innerHTML = `❌ User <strong>${esc(uid)}</strong> not found`;
     }
   }
 
-  // ── Send ───────────────────────────────────────────────────────────────
+  // ── Send ───────────────────────────────────────────────────────────
   async function sendPush() {
     const title   = document.getElementById('notifTitle').value.trim();
     const body    = document.getElementById('notifBody').value.trim();
     const image   = document.getElementById('notifImage').value.trim();
     const dataRaw = document.getElementById('notifData').value.trim();
 
-    if (!title) return showResult('error', '❌', 'Title is required.');
-    if (!body)  return showResult('error', '❌', 'Message body is required.');
+    if (!title) return showResult('error','❌','Title is required.');
+    if (!body)  return showResult('error','❌','Message body is required.');
 
     let customData = {};
     if (dataRaw) {
       try { customData = JSON.parse(dataRaw); }
-      catch(e) { return showResult('error', '❌', 'Custom Data JSON is invalid.'); }
+      catch { return showResult('error','❌','Custom Data JSON is invalid.'); }
     }
 
-    // ── ALL USERS broadcast ────────────────────────────────────────────
+    // ALL USERS
     if (currentMode === 'all') {
       const users = Object.entries(USERS).filter(([,u]) => u.fcmToken);
-      if (!users.length) return showResult('error', '❌', 'No users with FCM tokens found.');
-
-      setLoading(true); hideResult(); setBadge('BROADCASTING...', '#e02020');
+      if (!users.length) return showResult('error','❌','No users with FCM tokens found.');
+      setLoading(true); hideResult(); setBadge('BROADCASTING...','#e02020');
       showProgress(0, users.length);
-
       let ok = 0, fail = 0;
       for (let i = 0; i < users.length; i++) {
-        const [uid, u] = users[i];
+        const [, u] = users[i];
         try {
           const res = await fetch('/.netlify/functions/send-push', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ target: u.fcmToken, title, body, image, data: customData })
           });
           const r = await res.json();
@@ -539,71 +608,59 @@
         } catch { fail++; }
         showProgress(i + 1, users.length);
       }
-
       hideProgress(); setLoading(false);
       const allOk = fail === 0;
-      showResult(allOk ? 'success' : 'error',
-        allOk ? '✅' : '⚠️',
-        `Broadcast done — ✅ ${ok} sent, ❌ ${fail} failed out of ${users.length} user(s).`
-      );
+      showResult(allOk ? 'success' : 'error', allOk ? '✅' : '⚠️',
+        `Broadcast done — ✅ ${ok} sent, ❌ ${fail} failed out of ${users.length}.`);
       addHistory(allOk, title, body, 'All Users (' + users.length + ')');
       setBadge(allOk ? '● READY' : '● PARTIAL', allOk ? '#2ecc87' : '#ff4757');
-      if (!allOk) setTimeout(() => setBadge('● READY', '#2ecc87'), 4000);
+      if (!allOk) setTimeout(() => setBadge('● READY','#2ecc87'), 4000);
       return;
     }
 
-    // ── SINGLE target ──────────────────────────────────────────────────
+    // SINGLE
     let target, modeLabel;
-
     if (currentMode === 'userid') {
-      if (!resolvedUser)          return showResult('error', '❌', 'Enter a valid User ID first.');
-      if (!resolvedUser.fcmToken) return showResult('error', '❌', 'This user has no FCM token registered.');
-      target    = resolvedUser.fcmToken;
-      modeLabel = 'User: ' + resolvedUser.name;
-
+      if (!resolvedUser)          return showResult('error','❌','Enter a valid User ID first.');
+      if (!resolvedUser.fcmToken) return showResult('error','❌','This user has no FCM token.');
+      target = resolvedUser.fcmToken; modeLabel = 'User: ' + resolvedUser.name;
     } else if (currentMode === 'device') {
       target = document.getElementById('fcmToken').value.trim();
-      if (!target) return showResult('error', '❌', 'Please enter a device FCM token.');
+      if (!target) return showResult('error','❌','Please enter a device FCM token.');
       modeLabel = 'FCM Token';
-
     } else {
       const topic = document.getElementById('fcmTopic').value.trim();
-      if (!topic) return showResult('error', '❌', 'Please enter a topic name.');
-      target    = '/topics/' + topic;
-      modeLabel = 'Topic: ' + topic;
+      if (!topic) return showResult('error','❌','Please enter a topic name.');
+      target = '/topics/' + topic; modeLabel = 'Topic: ' + topic;
     }
 
-    setLoading(true); hideResult(); setBadge('SENDING...', '#e02020');
-
+    setLoading(true); hideResult(); setBadge('SENDING...','#e02020');
     try {
       const res = await fetch('/.netlify/functions/send-push', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ target, title, body, image, data: customData })
       });
       const result = await res.json();
-
       if (res.ok && result.success) {
-        showResult('success', '✅', 'Sent! Message ID: ' + (result.messageId || 'OK'));
+        showResult('success','✅','Sent! ID: ' + (result.messageId || 'OK'));
         addHistory(true, title, body, modeLabel);
-        setBadge('● READY', '#2ecc87');
+        setBadge('● READY','#2ecc87');
       } else {
         const msg = result.error?.message || result.error || JSON.stringify(result);
-        showResult('error', '❌', 'Failed: ' + msg);
+        showResult('error','❌','Failed: ' + msg);
         addHistory(false, title, body, modeLabel);
-        setBadge('● ERROR', '#ff4757');
-        setTimeout(() => setBadge('● READY', '#2ecc87'), 3000);
+        setBadge('● ERROR','#ff4757');
+        setTimeout(() => setBadge('● READY','#2ecc87'), 3000);
       }
     } catch (err) {
-      showResult('error', '❌', 'Network error: ' + err.message);
-      setBadge('● ERROR', '#ff4757');
-      setTimeout(() => setBadge('● READY', '#2ecc87'), 3000);
+      showResult('error','❌','Network error: ' + err.message);
+      setBadge('● ERROR','#ff4757');
+      setTimeout(() => setBadge('● READY','#2ecc87'), 3000);
     }
-
     setLoading(false);
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────
   function setLoading(on) {
     document.getElementById('btnText').classList.toggle('hidden', on);
     document.getElementById('btnLoader').classList.toggle('hidden', !on);
@@ -614,6 +671,7 @@
     box.className = 'result-box ' + type;
     document.getElementById('resultIcon').textContent = icon;
     document.getElementById('resultText').textContent = text;
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   function hideResult() { document.getElementById('resultBox').className = 'result-box hidden'; }
   function setBadge(text, color) {
@@ -648,8 +706,7 @@
         <div class="history-body">${esc(h.body)}</div>
         ${h.mode ? `<div class="history-mode">→ ${esc(h.mode)}</div>` : ''}
         <div class="history-time">${h.time}</div>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
   function clearHistory() {
     sendHistory = []; localStorage.removeItem('ab_push_history'); renderHistory();
