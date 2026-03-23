@@ -252,6 +252,7 @@
       margin-top: 12px; padding: 12px; border-radius: 8px;
       display: flex; align-items: flex-start; gap: 10px;
       font-size: 0.72rem; line-height: 1.6; word-break: break-all;
+      white-space: pre-wrap;
     }
     .result-box.hidden { display: none; }
     .result-box.success { background: rgba(46,204,135,0.08); border: 1px solid rgba(46,204,135,0.25); color: var(--success); }
@@ -676,22 +677,44 @@
       setLoading(true); hideResult(); setBadge('BROADCASTING...','#e02020');
       showProgress(0, users.length);
       let ok = 0, fail = 0;
+      const errors = [];
+
+      // Build clean payload — only include optional fields if non-empty
+      const buildPayload = (token) => {
+        const payload = { target: token, title, body };
+        if (image && image.trim()) payload.image = image.trim();
+        if (customData && Object.keys(customData).length > 0) payload.data = customData;
+        return payload;
+      };
+
       for (let i = 0; i < users.length; i++) {
-        const [, u] = users[i];
+        const [uid, u] = users[i];
         try {
           const res = await fetch('/.netlify/functions/send-push', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ target: u.fcmToken, title, body, image, data: customData })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(buildPayload(u.fcmToken))
           });
           const r = await res.json();
-          if (res.ok && r.success) ok++; else fail++;
-        } catch { fail++; }
+          if (res.ok && r.success) {
+            ok++;
+          } else {
+            fail++;
+            const errMsg = r.error?.message || r.error || JSON.stringify(r);
+            errors.push(`${uid}: ${errMsg}`);
+          }
+        } catch (err) {
+          fail++;
+          errors.push(`${uid}: ${err.message}`);
+        }
         showProgress(i + 1, users.length);
       }
+
       hideProgress(); setLoading(false);
       const allOk = fail === 0;
-      showResult(allOk ? 'success' : 'error', allOk ? '✅' : '⚠️',
-        `Broadcast done — ✅ ${ok} sent, ❌ ${fail} failed out of ${users.length}.`);
+      let resultMsg = `Broadcast done — ✅ ${ok} sent, ❌ ${fail} failed out of ${users.length}.`;
+      if (errors.length > 0) resultMsg += '\n\nErrors:\n' + errors.slice(0,5).join('\n') + (errors.length > 5 ? `\n…+${errors.length-5} more` : '');
+      showResult(allOk ? 'success' : 'error', allOk ? '✅' : '⚠️', resultMsg);
       addHistory(allOk, title, body, 'All Users (' + users.length + ')');
       setBadge(allOk ? '● READY' : '● PARTIAL', allOk ? '#2ecc87' : '#ff4757');
       if (!allOk) setTimeout(() => setBadge('● READY','#2ecc87'), 4000);
@@ -717,9 +740,15 @@
 
     setLoading(true); hideResult(); setBadge('SENDING...','#e02020');
     try {
+      // Build clean payload — skip empty optional fields
+      const payload = { target, title, body };
+      if (image && image.trim()) payload.image = image.trim();
+      if (customData && Object.keys(customData).length > 0) payload.data = customData;
+
       const res = await fetch('/.netlify/functions/send-push', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target, title, body, image, data: customData })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
       const result = await res.json();
       if (res.ok && result.success) {
