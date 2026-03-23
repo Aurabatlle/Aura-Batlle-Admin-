@@ -234,7 +234,22 @@ body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;heigh
 .btn-unban-action{width:100%;background:var(--green-soft);border:1px solid var(--green-border);border-radius:12px;color:var(--green);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:13px;cursor:pointer;margin-top:4px;-webkit-tap-highlight-color:transparent}
 .btn-unban-action:active{background:rgba(34,197,94,.24)}
 
-/* ── FILTER BAR ── */
+/* ── DELETE BUTTON on card ── */
+.btn-delete-card{background:rgba(220,30,30,0.08);border:1px solid rgba(220,30,30,0.25);border-radius:11px;color:var(--red2);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .2s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.btn-delete-card:active{background:rgba(220,30,30,0.22)}
+
+/* ── DELETE CONFIRM MODAL ── */
+.delete-modal-box{background:var(--bg2);border:1px solid var(--border-r);border-radius:20px;width:100%;max-width:360px;padding:24px;animation:slideUp .25s ease;text-align:center}
+.delete-modal-icon{font-size:2.4rem;margin-bottom:10px}
+.delete-modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px}
+.delete-modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.delete-modal-name{color:var(--red2);font-weight:700}
+.delete-modal-btns{display:flex;gap:10px}
+.btn-cancel-delete{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:11px;color:var(--muted);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:13px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn-cancel-delete:active{background:var(--surface3)}
+.btn-confirm-delete{flex:1;background:linear-gradient(135deg,var(--red-dark),var(--red2));border:none;border-radius:11px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:13px;cursor:pointer;box-shadow:0 4px 14px var(--red-glow);-webkit-tap-highlight-color:transparent}
+.btn-confirm-delete:active{opacity:.82}
+.btn-confirm-delete:disabled{opacity:.45;cursor:not-allowed}
 .filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
 .filter-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;margin-right:2px}
 .filter-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;padding:6px 13px;cursor:pointer;transition:all .2s;white-space:nowrap;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:5px}
@@ -327,10 +342,11 @@ body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;heigh
   <!-- ④ FILTER BAR -->
   <div class="filter-bar">
     <span class="filter-label"><i class="fas fa-sliders-h"></i> Sort:</span>
-    <button class="filter-chip" id="fDefault" onclick="setFilter('default')"><i class="fas fa-clock"></i> Default</button>
+    <button class="filter-chip active" id="fDefault" onclick="setFilter('default')"><i class="fas fa-clock"></i> Default</button>
     <button class="filter-chip" id="fAmount" onclick="setFilter('amount')"><i class="fas fa-coins"></i> Most Balance</button>
-    <button class="filter-chip" id="fTxn" onclick="setFilter('txn')"><i class="fas fa-receipt"></i> Most Transactions</button>
-    <button class="filter-chip" id="fReferral" onclick="setFilter('referral')"><i class="fas fa-user-plus"></i> Most Referrals</button>
+    <button class="filter-chip" id="fTxn" onclick="setFilter('txn')"><i class="fas fa-receipt"></i> Most Txns</button>
+    <button class="filter-chip" id="fReferral" onclick="setFilter('referral')"><i class="fas fa-user-plus"></i> Most Refs</button>
+    <button class="filter-chip" id="fInactive" onclick="setFilter('inactive')"><i class="fas fa-moon"></i> Inactive 1 Month</button>
   </div>
   <div class="users-grid" id="usersGrid">
     <div class="skeleton"></div>
@@ -511,6 +527,19 @@ body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;heigh
   </div>
 </div>
 
+<!-- ── DELETE CONFIRM MODAL ── -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="delete-modal-box">
+    <div class="delete-modal-icon">🗑️</div>
+    <div class="delete-modal-title">Delete Account</div>
+    <div class="delete-modal-sub">This will permanently delete <span class="delete-modal-name" id="deleteUserName">this user</span>'s account and all their data from Firebase. This cannot be undone.</div>
+    <div class="delete-modal-btns">
+      <button class="btn-cancel-delete" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-confirm-delete" id="confirmDeleteBtn" onclick="executeDelete()"><i class="fas fa-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -638,6 +667,7 @@ function renderCards(uids){
         ${isBanned
           ?`<button class="btn-unban-card" onclick="openQuickBan('${uid}')"><i class="fas fa-unlock"></i> Unban</button>`
           :`<button class="btn-ban-card" onclick="openQuickBan('${uid}')"><i class="fas fa-ban"></i> Ban</button>`}
+        <button class="btn-delete-card" onclick="confirmDelete('${uid}',event)"><i class="fas fa-trash"></i></button>
       </div>`;
     grid.appendChild(card);
   });
@@ -955,6 +985,19 @@ function currentFilteredUids(){
 }
 
 function applySortFilter(uids){
+  const ONE_MONTH = 30 * 24 * 60 * 60 * 1000;
+  if(activeFilter==='inactive'){
+    const cutoff = Date.now() - ONE_MONTH;
+    return uids.filter(uid=>{
+      const u=allUsers[uid];
+      const last = u.lastLogin ? parseInt(u.lastLogin) : 0;
+      return last < cutoff;
+    }).sort((a,b)=>{
+      const la = parseInt(allUsers[a].lastLogin||0);
+      const lb = parseInt(allUsers[b].lastLogin||0);
+      return la - lb; // oldest login first
+    });
+  }
   if(activeFilter==='amount'){
     return [...uids].sort((a,b)=>{
       const wa=allUsers[a].wallet||{}, wb=allUsers[b].wallet||{};
@@ -977,13 +1020,13 @@ function applySortFilter(uids){
       return rb-ra;
     });
   }
-  return uids; // default order
+  return uids; // default
 }
 
 function setFilter(f){
   activeFilter=f;
-  ['fDefault','fAmount','fTxn','fReferral'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  const map={default:'fDefault',amount:'fAmount',txn:'fTxn',referral:'fReferral'};
+  ['fDefault','fAmount','fTxn','fReferral','fInactive'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  const map={default:'fDefault',amount:'fAmount',txn:'fTxn',referral:'fReferral',inactive:'fInactive'};
   document.getElementById(map[f]).classList.add('active');
   renderCards(currentFilteredUids());
 }
@@ -1067,6 +1110,45 @@ function loadReferrals(uid){
       <span class="ref-badge referred">Referred</span>
       <button class="ref-open-btn" onclick="openUser('${ruid}');closeModal()">View</button>`;
     grid.appendChild(row);
+  });
+}
+
+// ── DELETE ACCOUNT ──
+let deleteUid = null;
+function confirmDelete(uid, e){
+  if(e) e.stopPropagation();
+  deleteUid = uid;
+  const u = allUsers[uid]||{};
+  document.getElementById('deleteUserName').textContent = (u.name||uid) + ' (' + uid + ')';
+  document.getElementById('confirmDeleteBtn').disabled = false;
+  document.getElementById('confirmDeleteBtn').innerHTML = '<i class="fas fa-trash"></i> Delete';
+  document.getElementById('deleteModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDeleteModal(){
+  document.getElementById('deleteModal').classList.remove('open');
+  document.body.style.overflow = '';
+  deleteUid = null;
+}
+document.getElementById('deleteModal').addEventListener('click', e=>{
+  if(e.target === document.getElementById('deleteModal')) closeDeleteModal();
+});
+function executeDelete(){
+  if(!deleteUid) return;
+  const btn = document.getElementById('confirmDeleteBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting…';
+  db.ref('users/' + deleteUid).remove().then(()=>{
+    delete allUsers[deleteUid];
+    if(currentUid === deleteUid){ closeModal(); }
+    renderCards(currentFilteredUids());
+    renderStats();
+    closeDeleteModal();
+    showToast('Account deleted permanently', 'success');
+  }).catch(err=>{
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+    showToast('Error: ' + err.message, 'error');
   });
 }
 
