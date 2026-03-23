@@ -478,11 +478,11 @@
   </footer>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
-  // ── Session constants — must match login page exactly ──────────────
+  // ── Session ────────────────────────────────────────────────────────
   const SESSION_MS = 30 * 60 * 1000;
-
-  // ── Auth check ─────────────────────────────────────────────────────
   (function checkSession() {
     const savedUser = localStorage.getItem('adminUsername');
     const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
@@ -491,61 +491,56 @@
       document.getElementById('authGuard').classList.add('show');
       document.getElementById('mainContent').style.display = 'none';
     } else {
-      const name = localStorage.getItem('adminDisplayName') || savedUser;
-      document.getElementById('adminName').textContent = name;
+      document.getElementById('adminName').textContent =
+        localStorage.getItem('adminDisplayName') || savedUser;
     }
   })();
-
-  // Refresh session on any user activity
   ['click','keydown','touchstart'].forEach(ev =>
     document.addEventListener(ev, () => {
       if (localStorage.getItem('adminUsername'))
         localStorage.setItem('loginTime', Date.now().toString());
     }, { passive: true })
   );
-
   function doLogout() {
     ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime']
       .forEach(k => localStorage.removeItem(k));
     window.location.href = 'index.html';
   }
 
-  // ── User database ──────────────────────────────────────────────────
-  const USERS = {
-    "0FVP2F": {
-      name: "Amir",
-      email: "hansdaamir87@gmail.com",
-      phone: "8016344683",
-      fcmToken: "ctaUoCLTQ6ewcPWbvkZQFG:APA91bGgMmYCd17unfvj3aE8hiwINZnxbGwVZTPPC59SkCAjZ1FgAMx2nP-ki_JvTXlud3I1q9gGjQKlYjVYCYIeDrB-97UjNrdrUkO0OSCRxcLsL8P6MEM",
-      status: "active"
-    }
-    // "USERID2": { name: "...", email: "...", fcmToken: "...", status: "active" },
+  // ── Firebase (same XOR config as other admin pages) ────────────────
+  const _e=(s,k)=>s.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^k[i%k.length].charCodeAt(0))).join('');
+  const _k='aB3xQ9mZ';
+  const _cfg={
+    a:"\x20\x0b\x49\x19\x02\x40\x29\x6d\x11\x03\x40\x1c\x08\x48\x06\x10\x1b\x06\x51\x2b\x22\x50\x55\x22\x03\x0e\x40\x01\x63\x61\x58\x29\x51\x20\x54\x28\x61\x0d\x5d",
+    b:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x23\x43\x08\x7f\x5a\x02\x37",
+    c:"\x09\x36\x47\x08\x22\x03\x42\x75\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4c\x26\x56\x1e\x30\x4c\x01\x2e\x4c\x30\x47\x1c\x33\x17\x0b\x33\x13\x27\x51\x19\x22\x5c\x04\x35\x4f\x21\x5c\x15",
+    d:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34",
+    e:"\x00\x37\x41\x19\x7c\x5b\x0c\x2e\x15\x2e\x56\x55\x3c\x58\x04\x34\x4f\x24\x5a\x0a\x34\x5b\x0c\x29\x04\x31\x47\x17\x23\x58\x0a\x3f\x4f\x23\x43\x08",
+    f:"\x56\x74\x00\x4f\x66\x00\x54\x63\x51\x70\x0b\x41",
+    g:"\x50\x78\x04\x4e\x62\x0e\x5a\x63\x58\x7b\x03\x4a\x69\x00\x57\x2d\x04\x20\x09\x4d\x32\x58\x0c\x6d\x03\x21\x0b\x4e\x60\x5c\x55\x6a\x03\x74\x55\x48\x33\x09\x5f\x38\x51"
   };
+  firebase.initializeApp({
+    apiKey:_e(_cfg.a,_k), authDomain:_e(_cfg.b,_k), databaseURL:_e(_cfg.c,_k),
+    projectId:_e(_cfg.d,_k), storageBucket:_e(_cfg.e,_k),
+    messagingSenderId:_e(_cfg.f,_k), appId:_e(_cfg.g,_k)
+  });
+  const db = firebase.database();
 
   // ── State ──────────────────────────────────────────────────────────
   let currentMode  = 'userid';
   let resolvedUser = null;
+  let allUsersCache = {};   // filled from Firebase on load
   let sendHistory  = JSON.parse(localStorage.getItem('ab_push_history') || '[]');
 
-  document.getElementById('allUsersCount').textContent =
-    Object.keys(USERS).length + ' registered user(s)';
-
-  renderHistory();
-
-  document.getElementById('notifTitle').addEventListener('input', function() {
-    document.getElementById('titleCount').textContent = this.value.length + '/100';
-  });
-  document.getElementById('notifBody').addEventListener('input', function() {
-    document.getElementById('bodyCount').textContent = this.value.length + '/500';
-  });
-
-  // ── Mode switching ─────────────────────────────────────────────────
+  // ── Helpers (declared FIRST so auto-fill can call them) ────────────
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
   function setMode(mode) {
     currentMode  = mode;
     resolvedUser = null;
     ['userIdField','allUsersField','tokenField','topicField']
       .forEach(id => document.getElementById(id).classList.add('hidden'));
-    ({ userid:'userIdField', all:'allUsersField', device:'tokenField', topic:'topicField' });
     const fieldMap = { userid:'userIdField', all:'allUsersField', device:'tokenField', topic:'topicField' };
     document.getElementById(fieldMap[mode]).classList.remove('hidden');
     ['modeUserId','modeAll','modeDevice','modeTopic']
@@ -555,117 +550,28 @@
     hideResult();
     document.getElementById('userChip').className = 'user-chip hidden';
   }
-
-  // ── User ID lookup ─────────────────────────────────────────────────
   function lookupUser(val) {
     const chip = document.getElementById('userChip');
     const uid  = val.trim().toUpperCase();
     if (!uid) { chip.className = 'user-chip hidden'; resolvedUser = null; return; }
-    const user = USERS[uid];
-    if (user) {
-      resolvedUser = user;
+    // Show searching indicator while cache is loading
+    if (Object.keys(allUsersCache).length === 0) {
       chip.className = 'user-chip found';
-      chip.innerHTML = `✅ <strong>${esc(user.name)}</strong> · ${esc(user.email)} · <em>${esc(user.status)}</em>`;
+      chip.innerHTML = `⏳ Loading user data…`;
+      return;
+    }
+    const user = allUsersCache[uid];
+    if (user) {
+      resolvedUser = { ...user, uid };
+      chip.className = 'user-chip found';
+      chip.innerHTML = `✅ <strong>${esc(user.name||uid)}</strong> · ${esc(user.phone||user.email||'—')} · <em>${esc(user.status||'active')}</em>`;
     } else {
       resolvedUser = null;
       chip.className = 'user-chip notfound';
-      chip.innerHTML = `❌ User <strong>${esc(uid)}</strong> not found`;
+      chip.innerHTML = `❌ User <strong>${esc(uid)}</strong> not found in Firebase`;
     }
   }
-
-  // ── Send ───────────────────────────────────────────────────────────
-  async function sendPush() {
-    const title   = document.getElementById('notifTitle').value.trim();
-    const body    = document.getElementById('notifBody').value.trim();
-    const image   = document.getElementById('notifImage').value.trim();
-    const dataRaw = document.getElementById('notifData').value.trim();
-
-    if (!title) return showResult('error','❌','Title is required.');
-    if (!body)  return showResult('error','❌','Message body is required.');
-
-    let customData = {};
-    if (dataRaw) {
-      try { customData = JSON.parse(dataRaw); }
-      catch { return showResult('error','❌','Custom Data JSON is invalid.'); }
-    }
-
-    // ALL USERS
-    if (currentMode === 'all') {
-      const users = Object.entries(USERS).filter(([,u]) => u.fcmToken);
-      if (!users.length) return showResult('error','❌','No users with FCM tokens found.');
-      setLoading(true); hideResult(); setBadge('BROADCASTING...','#e02020');
-      showProgress(0, users.length);
-      let ok = 0, fail = 0;
-      for (let i = 0; i < users.length; i++) {
-        const [, u] = users[i];
-        try {
-          const res = await fetch('/.netlify/functions/send-push', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ target: u.fcmToken, title, body, image, data: customData })
-          });
-          const r = await res.json();
-          if (res.ok && r.success) ok++; else fail++;
-        } catch { fail++; }
-        showProgress(i + 1, users.length);
-      }
-      hideProgress(); setLoading(false);
-      const allOk = fail === 0;
-      showResult(allOk ? 'success' : 'error', allOk ? '✅' : '⚠️',
-        `Broadcast done — ✅ ${ok} sent, ❌ ${fail} failed out of ${users.length}.`);
-      addHistory(allOk, title, body, 'All Users (' + users.length + ')');
-      setBadge(allOk ? '● READY' : '● PARTIAL', allOk ? '#2ecc87' : '#ff4757');
-      if (!allOk) setTimeout(() => setBadge('● READY','#2ecc87'), 4000);
-      return;
-    }
-
-    // SINGLE
-    let target, modeLabel;
-    if (currentMode === 'userid') {
-      if (!resolvedUser)          return showResult('error','❌','Enter a valid User ID first.');
-      if (!resolvedUser.fcmToken) return showResult('error','❌','This user has no FCM token.');
-      target = resolvedUser.fcmToken; modeLabel = 'User: ' + resolvedUser.name;
-    } else if (currentMode === 'device') {
-      target = document.getElementById('fcmToken').value.trim();
-      if (!target) return showResult('error','❌','Please enter a device FCM token.');
-      modeLabel = 'FCM Token';
-    } else {
-      const topic = document.getElementById('fcmTopic').value.trim();
-      if (!topic) return showResult('error','❌','Please enter a topic name.');
-      target = '/topics/' + topic; modeLabel = 'Topic: ' + topic;
-    }
-
-    setLoading(true); hideResult(); setBadge('SENDING...','#e02020');
-    try {
-      const res = await fetch('/.netlify/functions/send-push', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target, title, body, image, data: customData })
-      });
-      const result = await res.json();
-      if (res.ok && result.success) {
-        showResult('success','✅','Sent! ID: ' + (result.messageId || 'OK'));
-        addHistory(true, title, body, modeLabel);
-        setBadge('● READY','#2ecc87');
-      } else {
-        const msg = result.error?.message || result.error || JSON.stringify(result);
-        showResult('error','❌','Failed: ' + msg);
-        addHistory(false, title, body, modeLabel);
-        setBadge('● ERROR','#ff4757');
-        setTimeout(() => setBadge('● READY','#2ecc87'), 3000);
-      }
-    } catch (err) {
-      showResult('error','❌','Network error: ' + err.message);
-      setBadge('● ERROR','#ff4757');
-      setTimeout(() => setBadge('● READY','#2ecc87'), 3000);
-    }
-    setLoading(false);
-  }
-
-  // ── Helpers ────────────────────────────────────────────────────────
-  function setLoading(on) {
-    document.getElementById('btnText').classList.toggle('hidden', on);
-    document.getElementById('btnLoader').classList.toggle('hidden', !on);
-    document.getElementById('sendBtn').disabled = on;
-  }
+  function hideResult() { document.getElementById('resultBox').className = 'result-box hidden'; }
   function showResult(type, icon, text) {
     const box = document.getElementById('resultBox');
     box.className = 'result-box ' + type;
@@ -673,10 +579,14 @@
     document.getElementById('resultText').textContent = text;
     box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  function hideResult() { document.getElementById('resultBox').className = 'result-box hidden'; }
   function setBadge(text, color) {
     const b = document.getElementById('statusBadge');
     b.textContent = text; b.style.color = color; b.style.borderColor = color + '55';
+  }
+  function setLoading(on) {
+    document.getElementById('btnText').classList.toggle('hidden', on);
+    document.getElementById('btnLoader').classList.toggle('hidden', !on);
+    document.getElementById('sendBtn').disabled = on;
   }
   function showProgress(done, total) {
     document.getElementById('progressWrap').classList.add('visible');
@@ -711,8 +621,124 @@
   function clearHistory() {
     sendHistory = []; localStorage.removeItem('ab_push_history'); renderHistory();
   }
-  function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  // ── Load all users from Firebase ───────────────────────────────────
+  // This replaces the hardcoded USERS object — works for ALL user IDs
+  db.ref('users').once('value').then(snap => {
+    allUsersCache = snap.val() || {};
+    const count = Object.values(allUsersCache).filter(u => u && u.fcmToken).length;
+    document.getElementById('allUsersCount').textContent =
+      count + ' user(s) with FCM token';
+
+    // ── Auto-fill from ?uid= param — runs AFTER cache is ready ──────
+    const uid = new URLSearchParams(window.location.search).get('uid');
+    if (uid) {
+      setMode('userid');
+      document.getElementById('inputUserId').value = uid.toUpperCase();
+      lookupUser(uid);
+    }
+  }).catch(() => {
+    document.getElementById('allUsersCount').textContent = 'Failed to load users';
+  });
+
+  renderHistory();
+
+  document.getElementById('notifTitle').addEventListener('input', function() {
+    document.getElementById('titleCount').textContent = this.value.length + '/100';
+  });
+  document.getElementById('notifBody').addEventListener('input', function() {
+    document.getElementById('bodyCount').textContent = this.value.length + '/500';
+  });
+
+  // ── Mode switching (also triggered by toggle buttons) ──────────────
+  // (setMode already declared above)
+
+  // ── Send ───────────────────────────────────────────────────────────
+  async function sendPush() {
+    const title   = document.getElementById('notifTitle').value.trim();
+    const body    = document.getElementById('notifBody').value.trim();
+    const image   = document.getElementById('notifImage').value.trim();
+    const dataRaw = document.getElementById('notifData').value.trim();
+
+    if (!title) return showResult('error','❌','Title is required.');
+    if (!body)  return showResult('error','❌','Message body is required.');
+
+    let customData = {};
+    if (dataRaw) {
+      try { customData = JSON.parse(dataRaw); }
+      catch { return showResult('error','❌','Custom Data JSON is invalid.'); }
+    }
+
+    // ALL USERS broadcast
+    if (currentMode === 'all') {
+      const users = Object.entries(allUsersCache).filter(([,u]) => u && u.fcmToken);
+      if (!users.length) return showResult('error','❌','No users with FCM tokens found.');
+      setLoading(true); hideResult(); setBadge('BROADCASTING...','#e02020');
+      showProgress(0, users.length);
+      let ok = 0, fail = 0;
+      for (let i = 0; i < users.length; i++) {
+        const [, u] = users[i];
+        try {
+          const res = await fetch('/.netlify/functions/send-push', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target: u.fcmToken, title, body, image, data: customData })
+          });
+          const r = await res.json();
+          if (res.ok && r.success) ok++; else fail++;
+        } catch { fail++; }
+        showProgress(i + 1, users.length);
+      }
+      hideProgress(); setLoading(false);
+      const allOk = fail === 0;
+      showResult(allOk ? 'success' : 'error', allOk ? '✅' : '⚠️',
+        `Broadcast done — ✅ ${ok} sent, ❌ ${fail} failed out of ${users.length}.`);
+      addHistory(allOk, title, body, 'All Users (' + users.length + ')');
+      setBadge(allOk ? '● READY' : '● PARTIAL', allOk ? '#2ecc87' : '#ff4757');
+      if (!allOk) setTimeout(() => setBadge('● READY','#2ecc87'), 4000);
+      return;
+    }
+
+    // SINGLE target
+    let target, modeLabel;
+    if (currentMode === 'userid') {
+      if (!resolvedUser)          return showResult('error','❌','Enter a valid User ID first.');
+      if (!resolvedUser.fcmToken) return showResult('error','❌','This user has no FCM token registered.');
+      target = resolvedUser.fcmToken;
+      modeLabel = 'User: ' + (resolvedUser.name || resolvedUser.uid);
+    } else if (currentMode === 'device') {
+      target = document.getElementById('fcmToken').value.trim();
+      if (!target) return showResult('error','❌','Please enter a device FCM token.');
+      modeLabel = 'FCM Token';
+    } else {
+      const topic = document.getElementById('fcmTopic').value.trim();
+      if (!topic) return showResult('error','❌','Please enter a topic name.');
+      target = '/topics/' + topic; modeLabel = 'Topic: ' + topic;
+    }
+
+    setLoading(true); hideResult(); setBadge('SENDING...','#e02020');
+    try {
+      const res = await fetch('/.netlify/functions/send-push', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target, title, body, image, data: customData })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        showResult('success','✅','Sent! ID: ' + (result.messageId || 'OK'));
+        addHistory(true, title, body, modeLabel);
+        setBadge('● READY','#2ecc87');
+      } else {
+        const msg = result.error?.message || result.error || JSON.stringify(result);
+        showResult('error','❌','Failed: ' + msg);
+        addHistory(false, title, body, modeLabel);
+        setBadge('● ERROR','#ff4757');
+        setTimeout(() => setBadge('● READY','#2ecc87'), 3000);
+      }
+    } catch (err) {
+      showResult('error','❌','Network error: ' + err.message);
+      setBadge('● ERROR','#ff4757');
+      setTimeout(() => setBadge('● READY','#2ecc87'), 3000);
+    }
+    setLoading(false);
   }
 </script>
 </body>
