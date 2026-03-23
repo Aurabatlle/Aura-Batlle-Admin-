@@ -3,212 +3,328 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aura Battle — Admin Push Panel</title>
+  <title>Aura Battle — Push Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getDatabase, ref, get, child } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-
-    // ── Replace with your Firebase config ──────────────────────────────────
-    const firebaseConfig = {
-      apiKey:            "YOUR_API_KEY",
-      authDomain:        "YOUR_PROJECT.firebaseapp.com",
-      databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-      projectId:         "YOUR_PROJECT",
-      storageBucket:     "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId:             "YOUR_APP_ID"
-    };
-    // ───────────────────────────────────────────────────────────────────────
-
-    const app = initializeApp(firebaseConfig);
-    const db  = getDatabase(app);
-
-    window._fbGetUserToken = async (userId) => {
-      const snap = await get(child(ref(db), `users/${userId}`));
-      if (!snap.exists()) throw new Error(`User "${userId}" not found.`);
-      const data = snap.val();
-      if (!data.fcmToken) throw new Error(`User "${userId}" has no FCM token.`);
-      return { token: data.fcmToken, name: data.name || userId, status: data.status };
-    };
-
-    window._fbGetAllTokens = async () => {
-      const snap = await get(ref(db, 'users'));
-      if (!snap.exists()) throw new Error('No users found.');
-      const tokens = [];
-      snap.forEach(c => {
-        const u = c.val();
-        if (u.fcmToken && u.status !== 'banned') tokens.push({ token: u.fcmToken, name: u.name || c.key });
-      });
-      if (!tokens.length) throw new Error('No active users with FCM tokens found.');
-      return tokens;
-    };
-  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:       #080808;
-      --surface:  #101010;
-      --surface2: #181818;
-      --border:   #2a2a2a;
-      --accent:   #e02020;
-      --accent2:  #ff4444;
-      --accent3:  #c00000;
-      --text:     #f0f0f0;
-      --muted:    #666666;
-      --success:  #22cc77;
-      --error:    #ff3333;
+      --bg: #080608;
+      --surface: #100a0a;
+      --surface2: #160c0c;
+      --border: #2a1010;
+      --accent: #e02020;
+      --accent2: #ff4444;
+      --text: #f0e8e8;
+      --muted: #7a5050;
+      --success: #2ecc87;
+      --error: #ff4757;
       --font-head: 'Syne', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-mono); min-height: 100vh; overflow-x: hidden; }
-
-    #authOverlay {
-      position: fixed; inset: 0; z-index: 9999; background: #000;
-      display: flex; align-items: center; justify-content: center;
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    #authOverlay.hidden { display: none; }
-
     .bg-grid {
       position: fixed; inset: 0; z-index: 0;
-      background-image: linear-gradient(rgba(200,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(200,0,0,0.04) 1px, transparent 1px);
-      background-size: 40px 40px; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(220,30,30,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220,30,30,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
     }
     .bg-glow {
       position: fixed; inset: 0; z-index: 0;
-      background: radial-gradient(ellipse 55% 45% at 75% 15%, rgba(200,0,0,0.12), transparent), radial-gradient(ellipse 40% 40% at 5% 85%, rgba(150,0,0,0.08), transparent);
+      background:
+        radial-gradient(ellipse 60% 40% at 70% 20%, rgba(200,20,20,0.09), transparent),
+        radial-gradient(ellipse 40% 50% at 10% 80%, rgba(180,10,10,0.06), transparent);
       pointer-events: none;
     }
-    .wrapper { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 28px 20px 60px; }
-    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+
+    /* ── Auth guard overlay ── */
+    #authGuard {
+      display: none;
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--bg);
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px;
+      font-family: var(--font-head); font-size: 1rem;
+      color: var(--error);
+    }
+    #authGuard.show { display: flex; }
+    #authGuard .g-icon { font-size: 2.5rem; }
+    #authGuard p { color: var(--muted); font-size: 0.75rem; margin-top: 4px; }
+    #authGuard a {
+      margin-top: 10px; padding: 10px 28px;
+      background: linear-gradient(135deg, #b00000, #ff3333);
+      color: #fff; border-radius: 8px; text-decoration: none;
+      font-family: var(--font-head); font-weight: 700; font-size: 0.85rem;
+      box-shadow: 0 0 20px rgba(220,30,30,0.3);
+    }
+
+    .wrapper {
+      position: relative; z-index: 1;
+      max-width: 980px; margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 40px; padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
     .logo { display: flex; align-items: center; gap: 14px; }
-    .logo-icon { font-size: 2.4rem; filter: drop-shadow(0 0 14px rgba(220,0,0,0.8)); animation: pulse 2.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100% { filter: drop-shadow(0 0 10px rgba(220,0,0,0.6)); } 50% { filter: drop-shadow(0 0 28px rgba(255,60,60,1)); } }
-    .logo-title { font-family: var(--font-head); font-weight: 800; font-size: 1.5rem; letter-spacing: 0.15em; color: var(--accent2); }
+    .logo-icon {
+      font-size: 2.4rem;
+      filter: drop-shadow(0 0 14px rgba(220,30,30,0.8));
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { filter: drop-shadow(0 0 12px rgba(220,30,30,0.6)); }
+      50%      { filter: drop-shadow(0 0 28px rgba(220,30,30,1)); }
+    }
+    .logo-title {
+      font-family: var(--font-head); font-weight: 800;
+      font-size: 1.5rem; letter-spacing: 0.15em; color: var(--accent2);
+    }
     .logo-sub { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
     .header-right { display: flex; align-items: center; gap: 12px; }
-    .status-badge { font-size: 0.68rem; letter-spacing: 0.12em; color: var(--success); border: 1px solid rgba(34,204,119,0.35); padding: 6px 14px; border-radius: 4px; background: rgba(34,204,119,0.06); transition: color 0.3s, border-color 0.3s; }
-    .logout-btn { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px; cursor: pointer; transition: color 0.2s, border-color 0.2s; letter-spacing: 0.06em; }
+    .admin-badge {
+      font-size: 0.65rem; color: var(--muted);
+      border: 1px solid var(--border); padding: 5px 12px; border-radius: 4px;
+      background: var(--surface); letter-spacing: 0.08em;
+    }
+    .admin-badge span { color: var(--accent2); }
+    .logout-btn {
+      font-size: 0.62rem; font-family: var(--font-mono);
+      color: var(--muted); background: none;
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 5px 12px; cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
     .logout-btn:hover { color: var(--error); border-color: var(--error); }
-    main { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
+    .status-badge {
+      font-size: 0.68rem; letter-spacing: 0.12em; color: var(--success);
+      border: 1px solid rgba(46,204,135,0.3); padding: 6px 14px; border-radius: 4px;
+      background: rgba(46,204,135,0.05); transition: color 0.3s, border-color 0.3s;
+    }
+    main {
+      display: grid; grid-template-columns: 1.2fr 1fr;
+      gap: 20px; align-items: start;
+    }
     @media (max-width: 700px) { main { grid-template-columns: 1fr; } }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; animation: fadeUp 0.45s ease both; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 28px; animation: fadeUp 0.5s ease both;
+    }
     #historyCard { animation-delay: 0.12s; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+    }
     .card-header h2 { font-family: var(--font-head); font-weight: 700; font-size: 1.05rem; }
-    .tag { font-size: 0.62rem; padding: 3px 10px; border-radius: 4px; background: rgba(224,32,32,0.12); border: 1px solid rgba(224,32,32,0.35); color: var(--accent2); letter-spacing: 0.08em; }
-    .red-line { height: 2px; background: linear-gradient(90deg, var(--accent3), transparent); margin-bottom: 20px; border-radius: 2px; }
+    .tag {
+      font-size: 0.62rem; padding: 3px 10px; border-radius: 4px;
+      background: rgba(220,30,30,0.12); border: 1px solid rgba(220,30,30,0.35);
+      color: var(--accent2); letter-spacing: 0.08em;
+    }
     .field { margin-bottom: 16px; position: relative; }
     .field.hidden { display: none; }
-    label { display: block; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 7px; }
-    .optional { color: #444; text-transform: none; font-size: 0.62rem; }
-    input, textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--font-mono); font-size: 0.8rem; padding: 10px 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; resize: vertical; }
-    input:focus, textarea:focus { border-color: rgba(220,0,0,0.55); box-shadow: 0 0 0 3px rgba(200,0,0,0.09); }
-    input::placeholder, textarea::placeholder { color: #333; }
+    label {
+      display: block; font-size: 0.65rem; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 7px;
+    }
+    .optional { color: #4a2525; text-transform: none; font-size: 0.62rem; }
+    input, textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-family: var(--font-mono);
+      font-size: 0.8rem; padding: 10px 13px; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; resize: vertical;
+    }
+    input:focus, textarea:focus {
+      border-color: rgba(220,30,30,0.55);
+      box-shadow: 0 0 0 3px rgba(220,30,30,0.08);
+    }
+    input::placeholder, textarea::placeholder { color: #3a1818; }
+
+    .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .toggle-btn {
+      flex: 1; min-width: 0; padding: 9px 6px;
+      font-family: var(--font-mono); font-size: 0.68rem;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--surface2); color: var(--muted);
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .toggle-btn.active {
+      border-color: rgba(220,30,30,0.55);
+      background: rgba(220,30,30,0.1);
+      color: var(--accent2);
+    }
+
+    /* User chip */
+    .user-chip {
+      margin-top: 8px; padding: 8px 12px; border-radius: 6px;
+      font-size: 0.7rem; display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); background: var(--surface2);
+    }
+    .user-chip.hidden { display: none; }
+    .user-chip.found  { border-color: rgba(46,204,135,0.35); background: rgba(46,204,135,0.06); color: var(--success); }
+    .user-chip.notfound { border-color: rgba(255,71,87,0.35); background: rgba(255,71,87,0.06); color: var(--error); }
+
+    /* Broadcast banner */
+    .broadcast-banner {
+      padding: 12px 14px; border-radius: 8px;
+      background: rgba(220,30,30,0.08); border: 1px solid rgba(220,30,30,0.25);
+      font-size: 0.73rem; color: var(--accent2);
+      display: flex; align-items: center; gap: 8px;
+    }
+
     .char-count { position: absolute; right: 10px; bottom: 8px; font-size: 0.58rem; color: var(--muted); }
     .hint { font-size: 0.62rem; color: var(--muted); margin-top: 5px; display: block; }
-    .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
-    .toggle-btn { flex: 1; min-width: 80px; padding: 9px; font-family: var(--font-mono); font-size: 0.72rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface2); color: var(--muted); cursor: pointer; transition: all 0.2s; }
-    .toggle-btn.active { border-color: rgba(220,0,0,0.55); background: rgba(200,0,0,0.1); color: var(--accent2); }
-    #userInfoBanner { margin-bottom: 14px; padding: 10px 14px; background: rgba(200,0,0,0.07); border: 1px solid rgba(200,0,0,0.25); border-radius: 8px; font-size: 0.74rem; display: none; }
-    #userInfoBanner.show { display: block; }
-    #userInfoBanner .ui-name { color: var(--accent2); font-weight: 600; }
-    #userInfoBanner .ui-status { float: right; font-size: 0.62rem; color: var(--muted); }
-    #bulkProgress { margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; font-size: 0.74rem; display: none; }
-    #bulkProgress.show { display: block; }
-    .progress-bar-wrap { background: var(--border); border-radius: 4px; height: 6px; margin-top: 10px; overflow: hidden; }
-    .progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; border-radius: 4px; }
-    .send-btn { width: 100%; margin-top: 10px; padding: 14px; background: linear-gradient(135deg, var(--accent3) 0%, var(--accent2) 100%); color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.05em; border: none; border-radius: 8px; cursor: pointer; transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 20px rgba(200,0,0,0.3); }
-    .send-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(200,0,0,0.45); }
+
+    .send-btn {
+      width: 100%; margin-top: 10px; padding: 14px;
+      background: linear-gradient(135deg, #b00000 0%, #ff3333 100%);
+      color: #fff; font-family: var(--font-head); font-weight: 700;
+      font-size: 0.95rem; letter-spacing: 0.05em;
+      border: none; border-radius: 8px; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 0 20px rgba(220,30,30,0.3);
+    }
+    .send-btn:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(220,30,30,0.5); }
     .send-btn:active { transform: translateY(0); }
-    .send-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
-    .btn-loader { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.25); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-loader {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .result-box { margin-top: 14px; padding: 13px; border-radius: 8px; display: flex; align-items: flex-start; gap: 10px; font-size: 0.76rem; line-height: 1.5; word-break: break-all; }
+
+    .result-box {
+      margin-top: 14px; padding: 13px; border-radius: 8px;
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.76rem; line-height: 1.5; word-break: break-all;
+    }
     .result-box.hidden { display: none; }
-    .result-box.success { background: rgba(34,204,119,0.08); border: 1px solid rgba(34,204,119,0.25); color: var(--success); }
-    .result-box.error   { background: rgba(255,51,51,0.08);  border: 1px solid rgba(255,51,51,0.25);  color: var(--error); }
+    .result-box.success { background: rgba(46,204,135,0.08); border: 1px solid rgba(46,204,135,0.25); color: var(--success); }
+    .result-box.error   { background: rgba(255,71,87,0.08);  border: 1px solid rgba(255,71,87,0.25);  color: var(--error); }
     .result-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
-    .clear-btn { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+
+    /* Progress bar */
+    .progress-wrap { margin-top: 10px; display: none; }
+    .progress-wrap.visible { display: block; }
+    .progress-bar-bg {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 4px; height: 6px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; background: linear-gradient(90deg, #b00000, #ff3333);
+      border-radius: 4px; width: 0%; transition: width 0.3s;
+    }
+    .progress-label { font-size: 0.62rem; color: var(--muted); margin-top: 5px; }
+
+    .clear-btn {
+      font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted);
+      background: none; border: 1px solid var(--border); border-radius: 4px;
+      padding: 4px 10px; cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    }
     .clear-btn:hover { color: var(--error); border-color: var(--error); }
+
     .empty-state { color: var(--muted); font-size: 0.72rem; text-align: center; padding: 32px 0; }
     .history-item { padding: 12px 0; border-bottom: 1px solid var(--border); animation: fadeUp 0.3s ease both; }
     .history-item:last-child { border-bottom: none; }
     .history-status { font-size: 0.62rem; letter-spacing: 0.08em; margin-bottom: 4px; }
     .history-status.ok  { color: var(--success); }
     .history-status.err { color: var(--error); }
-    .history-title { font-family: var(--font-head); font-weight: 700; font-size: 0.83rem; margin-bottom: 2px; }
-    .history-body  { font-size: 0.7rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .history-time  { font-size: 0.58rem; color: #404040; margin-top: 4px; }
-    .history-target { font-size: 0.6rem; color: #555; margin-top: 2px; }
-    footer { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.62rem; color: #404040; letter-spacing: 0.08em; }
+    .history-title { font-size: 0.78rem; font-weight: 600; color: var(--text); }
+    .history-body  { font-size: 0.7rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-mode  { font-size: 0.6rem; color: var(--accent2); margin-top: 3px; }
+    .history-time  { font-size: 0.6rem; color: #3a1818; margin-top: 4px; }
+
+    footer {
+      margin-top: 40px; display: flex; justify-content: space-between;
+      font-size: 0.62rem; color: #3a1818; padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
-
-<div id="authOverlay">
-  <div style="text-align:center;color:#555;font-family:monospace;font-size:0.8rem;">
-    <div style="font-size:2rem;margin-bottom:12px;filter:drop-shadow(0 0 14px #c00)">⚡</div>
-    Checking session…
-  </div>
-</div>
-
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
 
-<div class="wrapper">
+<!-- Auth guard — shown if session missing/expired -->
+<div id="authGuard">
+  <div class="g-icon">🔒</div>
+  <strong>Session Expired or Not Logged In</strong>
+  <p>You must be logged in as admin to access this panel.</p>
+  <a href="index.html">Go to Login</a>
+</div>
+
+<div class="wrapper" id="mainContent">
   <header>
     <div class="logo">
-      <span class="logo-icon">⚡</span>
+      <span class="logo-icon">🔴</span>
       <div>
         <div class="logo-title">AURA BATTLE</div>
-        <div class="logo-sub">Admin · Push Notification Panel</div>
+        <div class="logo-sub">Push Notification Panel</div>
       </div>
     </div>
     <div class="header-right">
+      <div class="admin-badge">Admin: <span id="adminName">—</span></div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
       <div class="status-badge" id="statusBadge">● READY</div>
-      <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
   </header>
 
   <main>
+    <!-- Send Card -->
     <section class="card">
       <div class="card-header">
         <h2>Send Notification</h2>
         <span class="tag">FCM v1</span>
       </div>
-      <div class="red-line"></div>
 
+      <!-- Mode toggle -->
       <div class="field">
         <label>Send Mode</label>
         <div class="toggle-group">
-          <button class="toggle-btn" id="modeDevice" onclick="setMode('device')">📱 FCM Token</button>
-          <button class="toggle-btn active" id="modeUser"   onclick="setMode('user')">🆔 User ID</button>
-          <button class="toggle-btn" id="modeTopic"  onclick="setMode('topic')">📡 Topic</button>
-          <button class="toggle-btn" id="modeAll"    onclick="setMode('all')">🌐 All Users</button>
+          <button class="toggle-btn active" id="modeUserId" onclick="setMode('userid')">👤 User ID</button>
+          <button class="toggle-btn"        id="modeAll"    onclick="setMode('all')">📢 All Users</button>
+          <button class="toggle-btn"        id="modeDevice" onclick="setMode('device')">📱 FCM Token</button>
+          <button class="toggle-btn"        id="modeTopic"  onclick="setMode('topic')">📡 Topic</button>
         </div>
       </div>
 
-      <!-- FCM raw token -->
+      <!-- User ID -->
+      <div class="field" id="userIdField">
+        <label for="inputUserId">User ID</label>
+        <input type="text" id="inputUserId" placeholder="e.g. 0FVP2F" oninput="lookupUser(this.value)" autocomplete="off"/>
+        <div class="user-chip hidden" id="userChip"></div>
+      </div>
+
+      <!-- All Users -->
+      <div class="field hidden" id="allUsersField">
+        <div class="broadcast-banner">
+          📢 &nbsp;Will send to <strong id="allUsersCount">all registered users</strong> individually via their FCM tokens.
+        </div>
+      </div>
+
+      <!-- FCM Token -->
       <div class="field hidden" id="tokenField">
         <label for="fcmToken">FCM Device Token</label>
-        <textarea id="fcmToken" rows="3" placeholder="Paste the device FCM token here…"></textarea>
-      </div>
-
-      <!-- User ID -->
-      <div class="field" id="userField">
-        <label for="userId">User ID</label>
-        <input type="text" id="userId" placeholder="e.g. 0FVP2F" oninput="onUserIdInput()" autocomplete="off"/>
-        <span class="hint">Fetches FCM token from Firebase automatically</span>
-      </div>
-
-      <div id="userInfoBanner">
-        <span class="ui-status" id="uiStatus"></span>
-        <span class="ui-name" id="uiName"></span> — token resolved ✓
+        <textarea id="fcmToken" rows="3" placeholder="Paste the device FCM token here..."></textarea>
       </div>
 
       <!-- Topic -->
@@ -218,43 +334,41 @@
         <span class="hint">Sends to /topics/{name}</span>
       </div>
 
-      <!-- All users warning -->
-      <div class="field hidden" id="allField">
-        <div style="padding:10px 14px;background:rgba(200,0,0,0.08);border:1px solid rgba(200,0,0,0.3);border-radius:8px;font-size:0.74rem;color:#cc4444;line-height:1.6;">
-          ⚠️ Broadcasts to <strong>every active user</strong> with an FCM token.<br>Use with caution — this cannot be undone.
-        </div>
-      </div>
-
+      <!-- Title -->
       <div class="field">
         <label for="notifTitle">Title</label>
         <input type="text" id="notifTitle" placeholder="e.g. New Aura Battle!" maxlength="100"/>
         <span class="char-count" id="titleCount">0/100</span>
       </div>
 
+      <!-- Body -->
       <div class="field">
         <label for="notifBody">Message</label>
-        <textarea id="notifBody" rows="4" placeholder="Your notification message…" maxlength="500"></textarea>
+        <textarea id="notifBody" rows="4" placeholder="Your notification message..." maxlength="500"></textarea>
         <span class="char-count" id="bodyCount">0/500</span>
       </div>
 
+      <!-- Image -->
       <div class="field">
         <label for="notifImage">Image URL <span class="optional">optional</span></label>
         <input type="url" id="notifImage" placeholder="https://example.com/image.png"/>
       </div>
 
+      <!-- Custom Data -->
       <div class="field">
         <label for="notifData">Custom Data JSON <span class="optional">optional</span></label>
         <input type="text" id="notifData" placeholder='{"screen":"battle","id":"123"}'/>
       </div>
 
       <button class="send-btn" id="sendBtn" onclick="sendPush()">
-        <span id="btnText">⚡ Send Push Notification</span>
+        <span id="btnText">🔴 Send Push Notification</span>
         <div class="btn-loader hidden" id="btnLoader"></div>
       </button>
 
-      <div id="bulkProgress">
-        <span id="bulkLabel">Preparing…</span>
-        <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      <!-- Progress (broadcast) -->
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">Sending…</div>
       </div>
 
       <div class="result-box hidden" id="resultBox">
@@ -263,53 +377,85 @@
       </div>
     </section>
 
+    <!-- History Card -->
     <section class="card" id="historyCard">
       <div class="card-header">
         <h2>Send History</h2>
         <button class="clear-btn" onclick="clearHistory()">Clear All</button>
       </div>
-      <div id="historyList"><div class="empty-state">No notifications sent yet.</div></div>
+      <div id="historyList">
+        <div class="empty-state">No notifications sent yet.</div>
+      </div>
     </section>
   </main>
 
   <footer>
-    <span>Aura Battle Admin Panel · aura-battle-main</span>
+    <span>Aura Battle Push Panel · aura-battle-main</span>
     <span>Firebase Cloud Messaging HTTP v1</span>
   </footer>
 </div>
 
 <script>
-  // ── Session guard ──────────────────────────────────────────────────────────
-  (function() {
-    if (!sessionStorage.getItem('ab_admin_session')) {
-      location.replace('/index.html?return=' + encodeURIComponent(location.href));
+  // ── Session constants — must match login page exactly ──────────────────
+  const SESSION_MS = 30 * 60 * 1000; // 30 minutes, same as login page
+
+  // ── Auth check on load ─────────────────────────────────────────────────
+  (function checkSession() {
+    const savedUser = localStorage.getItem('adminUsername');
+    const loginTime = parseInt(localStorage.getItem('loginTime') || '0');
+    const isValid   = savedUser && (Date.now() - loginTime) < SESSION_MS;
+
+    if (!isValid) {
+      // Show guard, hide content
+      document.getElementById('authGuard').classList.add('show');
+      document.getElementById('mainContent').style.display = 'none';
     } else {
-      document.getElementById('authOverlay').classList.add('hidden');
+      // Show admin name in header
+      const displayName = localStorage.getItem('adminDisplayName') || savedUser;
+      document.getElementById('adminName').textContent = displayName;
     }
   })();
 
-  function logout() {
-    sessionStorage.removeItem('ab_admin_session');
-    location.replace('/index.html');
+  // Refresh session timestamp on any activity so it doesn't expire mid-use
+  document.addEventListener('click', refreshSession);
+  document.addEventListener('keydown', refreshSession);
+  function refreshSession() {
+    if (localStorage.getItem('adminUsername')) {
+      localStorage.setItem('loginTime', Date.now().toString());
+    }
   }
 
-  // ── State ──────────────────────────────────────────────────────────────────
-  let currentMode   = 'user';
-  let resolvedToken = null;
-  let sendHistory   = JSON.parse(localStorage.getItem('ab_push_history') || '[]');
+  // ── Logout ─────────────────────────────────────────────────────────────
+  function doLogout() {
+    ['adminUsername','adminDisplayName','adminRole','adminEmail','loginTime']
+      .forEach(k => localStorage.removeItem(k));
+    window.location.href = 'index.html';
+  }
+
+  // ── User database ──────────────────────────────────────────────────────
+  // Add more users here as they register in Firebase
+  const USERS = {
+    "0FVP2F": {
+      name: "Amir",
+      email: "hansdaamir87@gmail.com",
+      phone: "8016344683",
+      fcmToken: "ctaUoCLTQ6ewcPWbvkZQFG:APA91bGgMmYCd17unfvj3aE8hiwINZnxbGwVZTPPC59SkCAjZ1FgAMx2nP-ki_JvTXlud3I1q9gGjQKlYjVYCYIeDrB-97UjNrdrUkO0OSCRxcLsL8P6MEM",
+      status: "active"
+    }
+    // Add more users below:
+    // "USERID2": { name: "...", email: "...", fcmToken: "...", status: "active" },
+  };
+
+  // ── State ──────────────────────────────────────────────────────────────
+  let currentMode  = 'userid';
+  let resolvedUser = null;
+  let sendHistory  = JSON.parse(localStorage.getItem('ab_push_history') || '[]');
+
+  document.getElementById('allUsersCount').textContent =
+    Object.keys(USERS).length + ' registered user(s)';
+
   renderHistory();
 
-  // ── URL param: ?userId=XXXX auto-fills and resolves ────────────────────────
-  (function() {
-    const p = new URLSearchParams(location.search);
-    const uid = p.get('userId') || p.get('userid') || p.get('user');
-    if (uid) {
-      document.getElementById('userId').value = uid;
-      setTimeout(() => resolveUserId(uid), 900);
-    }
-  })();
-
-  // ── Char counters ──────────────────────────────────────────────────────────
   document.getElementById('notifTitle').addEventListener('input', function() {
     document.getElementById('titleCount').textContent = this.value.length + '/100';
   });
@@ -317,157 +463,155 @@
     document.getElementById('bodyCount').textContent = this.value.length + '/500';
   });
 
-  // ── Mode switcher ──────────────────────────────────────────────────────────
+  // ── Mode switching ─────────────────────────────────────────────────────
   function setMode(mode) {
-    currentMode = mode;
-    resolvedToken = null;
-    document.getElementById('userInfoBanner').classList.remove('show');
-    const map = { device:'tokenField', user:'userField', topic:'topicField', all:'allField' };
-    Object.entries(map).forEach(([m,id]) => document.getElementById(id).classList.toggle('hidden', m !== mode));
-    ['modeDevice','modeUser','modeTopic','modeAll'].forEach(id => document.getElementById(id).classList.remove('active'));
-    const key = 'mode' + mode.charAt(0).toUpperCase() + mode.slice(1);
-    document.getElementById(key).classList.add('active');
-    document.getElementById('bulkProgress').classList.remove('show');
+    currentMode  = mode;
+    resolvedUser = null;
+    ['userIdField','allUsersField','tokenField','topicField'].forEach(id =>
+      document.getElementById(id).classList.add('hidden')
+    );
+    const fieldMap = { userid:'userIdField', all:'allUsersField', device:'tokenField', topic:'topicField' };
+    document.getElementById(fieldMap[mode]).classList.remove('hidden');
+
+    ['modeUserId','modeAll','modeDevice','modeTopic'].forEach(id =>
+      document.getElementById(id).classList.remove('active')
+    );
+    const btnMap = { userid:'modeUserId', all:'modeAll', device:'modeDevice', topic:'modeTopic' };
+    document.getElementById(btnMap[mode]).classList.add('active');
+
     hideResult();
+    document.getElementById('userChip').className = 'user-chip hidden';
   }
 
-  // ── User ID lookup ─────────────────────────────────────────────────────────
-  let lookupTimer = null;
-  function onUserIdInput() {
-    resolvedToken = null;
-    document.getElementById('userInfoBanner').classList.remove('show');
-    clearTimeout(lookupTimer);
-    const uid = document.getElementById('userId').value.trim();
-    if (uid.length >= 4) lookupTimer = setTimeout(() => resolveUserId(uid), 600);
-  }
+  // ── User ID lookup ─────────────────────────────────────────────────────
+  function lookupUser(val) {
+    const chip = document.getElementById('userChip');
+    const uid  = val.trim().toUpperCase();
+    if (!uid) { chip.className = 'user-chip hidden'; resolvedUser = null; return; }
 
-  async function resolveUserId(uid) {
-    if (!window._fbGetUserToken) return;
-    try {
-      const { token, name, status } = await window._fbGetUserToken(uid);
-      resolvedToken = token;
-      document.getElementById('uiName').textContent   = name;
-      document.getElementById('uiStatus').textContent = (status || 'active').toUpperCase() + ' ';
-      document.getElementById('userInfoBanner').classList.add('show');
-    } catch(e) {
-      resolvedToken = null;
-      document.getElementById('userInfoBanner').classList.remove('show');
+    const user = USERS[uid];
+    if (user) {
+      resolvedUser = user;
+      chip.className = 'user-chip found';
+      chip.innerHTML = `✅ <strong>${esc(user.name)}</strong> &nbsp;·&nbsp; ${esc(user.email)} &nbsp;·&nbsp; <em>${esc(user.status)}</em>`;
+    } else {
+      resolvedUser = null;
+      chip.className = 'user-chip notfound';
+      chip.innerHTML = `❌ User ID <strong>${esc(uid)}</strong> not found in database`;
     }
   }
 
-  // ── Send ───────────────────────────────────────────────────────────────────
+  // ── Send ───────────────────────────────────────────────────────────────
   async function sendPush() {
     const title   = document.getElementById('notifTitle').value.trim();
     const body    = document.getElementById('notifBody').value.trim();
     const image   = document.getElementById('notifImage').value.trim();
     const dataRaw = document.getElementById('notifData').value.trim();
 
-    if (!title) return showResult('error','❌','Title is required.');
-    if (!body)  return showResult('error','❌','Message body is required.');
+    if (!title) return showResult('error', '❌', 'Title is required.');
+    if (!body)  return showResult('error', '❌', 'Message body is required.');
 
     let customData = {};
     if (dataRaw) {
       try { customData = JSON.parse(dataRaw); }
-      catch(e) { return showResult('error','❌','Custom Data JSON is invalid.'); }
+      catch(e) { return showResult('error', '❌', 'Custom Data JSON is invalid.'); }
     }
 
-    hideResult();
-    document.getElementById('bulkProgress').classList.remove('show');
-
-    // All users broadcast
+    // ── ALL USERS broadcast ────────────────────────────────────────────
     if (currentMode === 'all') {
-      setLoading(true);
-      setBadge('LOADING...','#e02020');
-      let tokens;
-      try { tokens = await window._fbGetAllTokens(); }
-      catch(e) { showResult('error','❌',e.message); setLoading(false); setBadge('● ERROR','#ff3333'); setTimeout(()=>setBadge('● READY','#22cc77'),3000); return; }
+      const users = Object.entries(USERS).filter(([,u]) => u.fcmToken);
+      if (!users.length) return showResult('error', '❌', 'No users with FCM tokens found.');
 
-      const total = tokens.length;
+      setLoading(true); hideResult(); setBadge('BROADCASTING...', '#e02020');
+      showProgress(0, users.length);
+
       let ok = 0, fail = 0;
-      const bulk = document.getElementById('bulkProgress');
-      const bar  = document.getElementById('progressBar');
-      const lbl  = document.getElementById('bulkLabel');
-      bulk.classList.add('show');
-
-      for (let i = 0; i < total; i++) {
-        lbl.textContent = `Sending ${i+1}/${total} — ${tokens[i].name}`;
-        bar.style.width = ((i/total)*100)+'%';
+      for (let i = 0; i < users.length; i++) {
+        const [uid, u] = users[i];
         try {
-          const r = await callApi(tokens[i].token, title, body, image, customData);
-          const j = await r.json();
-          (r.ok && j.success) ? ok++ : fail++;
+          const res = await fetch('/.netlify/functions/send-push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target: u.fcmToken, title, body, image, data: customData })
+          });
+          const r = await res.json();
+          if (res.ok && r.success) ok++; else fail++;
         } catch { fail++; }
+        showProgress(i + 1, users.length);
       }
-      bar.style.width = '100%';
-      lbl.textContent = `Done — ${ok} sent, ${fail} failed`;
-      showResult('success','✅',`Broadcast complete: ${ok}/${total} delivered.`);
-      addHistory(fail===0, title, body, 'ALL USERS');
-      setBadge('● READY','#22cc77');
-      setLoading(false);
+
+      hideProgress(); setLoading(false);
+      const allOk = fail === 0;
+      showResult(allOk ? 'success' : 'error',
+        allOk ? '✅' : '⚠️',
+        `Broadcast done — ✅ ${ok} sent, ❌ ${fail} failed out of ${users.length} user(s).`
+      );
+      addHistory(allOk, title, body, 'All Users (' + users.length + ')');
+      setBadge(allOk ? '● READY' : '● PARTIAL', allOk ? '#2ecc87' : '#ff4757');
+      if (!allOk) setTimeout(() => setBadge('● READY', '#2ecc87'), 4000);
       return;
     }
 
-    // Single target
-    let target;
-    if (currentMode === 'device') {
+    // ── SINGLE target ──────────────────────────────────────────────────
+    let target, modeLabel;
+
+    if (currentMode === 'userid') {
+      if (!resolvedUser)          return showResult('error', '❌', 'Enter a valid User ID first.');
+      if (!resolvedUser.fcmToken) return showResult('error', '❌', 'This user has no FCM token registered.');
+      target    = resolvedUser.fcmToken;
+      modeLabel = 'User: ' + resolvedUser.name;
+
+    } else if (currentMode === 'device') {
       target = document.getElementById('fcmToken').value.trim();
-      if (!target) return showResult('error','❌','Please enter an FCM token.');
-    } else if (currentMode === 'user') {
-      const uid = document.getElementById('userId').value.trim();
-      if (!uid) return showResult('error','❌','Please enter a User ID.');
-      if (!resolvedToken) {
-        try { const d = await window._fbGetUserToken(uid); resolvedToken = d.token; }
-        catch(e) { return showResult('error','❌',e.message); }
-      }
-      target = resolvedToken;
+      if (!target) return showResult('error', '❌', 'Please enter a device FCM token.');
+      modeLabel = 'FCM Token';
+
     } else {
       const topic = document.getElementById('fcmTopic').value.trim();
-      if (!topic) return showResult('error','❌','Please enter a topic name.');
-      target = '/topics/' + topic;
+      if (!topic) return showResult('error', '❌', 'Please enter a topic name.');
+      target    = '/topics/' + topic;
+      modeLabel = 'Topic: ' + topic;
     }
 
-    setLoading(true);
-    setBadge('SENDING...','#e02020');
+    setLoading(true); hideResult(); setBadge('SENDING...', '#e02020');
+
     try {
-      const res = await callApi(target, title, body, image, customData);
+      const res = await fetch('/.netlify/functions/send-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target, title, body, image, data: customData })
+      });
       const result = await res.json();
+
       if (res.ok && result.success) {
-        showResult('success','✅','Sent! Message ID: ' + (result.messageId || 'OK'));
-        const histTarget = currentMode === 'user' ? '🆔 ' + document.getElementById('userId').value.trim() : target.slice(0,24)+'…';
-        addHistory(true, title, body, histTarget);
-        setBadge('● READY','#22cc77');
+        showResult('success', '✅', 'Sent! Message ID: ' + (result.messageId || 'OK'));
+        addHistory(true, title, body, modeLabel);
+        setBadge('● READY', '#2ecc87');
       } else {
         const msg = result.error?.message || result.error || JSON.stringify(result);
-        showResult('error','❌','Failed: ' + msg);
-        addHistory(false, title, body, '—');
-        setBadge('● ERROR','#ff3333');
-        setTimeout(()=>setBadge('● READY','#22cc77'),3000);
+        showResult('error', '❌', 'Failed: ' + msg);
+        addHistory(false, title, body, modeLabel);
+        setBadge('● ERROR', '#ff4757');
+        setTimeout(() => setBadge('● READY', '#2ecc87'), 3000);
       }
-    } catch(err) {
-      showResult('error','❌','Network error: ' + err.message);
-      setBadge('● ERROR','#ff3333');
-      setTimeout(()=>setBadge('● READY','#22cc77'),3000);
+    } catch (err) {
+      showResult('error', '❌', 'Network error: ' + err.message);
+      setBadge('● ERROR', '#ff4757');
+      setTimeout(() => setBadge('● READY', '#2ecc87'), 3000);
     }
+
     setLoading(false);
   }
 
-  function callApi(target, title, body, image, data) {
-    return fetch('/.netlify/functions/send-push', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ target, title, body, image, data })
-    });
-  }
-
-  // ── UI helpers ─────────────────────────────────────────────────────────────
+  // ── Helpers ────────────────────────────────────────────────────────────
   function setLoading(on) {
     document.getElementById('btnText').classList.toggle('hidden', on);
     document.getElementById('btnLoader').classList.toggle('hidden', !on);
     document.getElementById('sendBtn').disabled = on;
   }
   function showResult(type, icon, text) {
-    const b = document.getElementById('resultBox');
-    b.className = 'result-box ' + type;
+    const box = document.getElementById('resultBox');
+    box.className = 'result-box ' + type;
     document.getElementById('resultIcon').textContent = icon;
     document.getElementById('resultText').textContent = text;
   }
@@ -476,28 +620,43 @@
     const b = document.getElementById('statusBadge');
     b.textContent = text; b.style.color = color; b.style.borderColor = color + '55';
   }
-
-  // ── History ────────────────────────────────────────────────────────────────
-  function addHistory(success, title, body, target) {
-    sendHistory.unshift({ success, title, body, target, time: new Date().toLocaleString() });
-    if (sendHistory.length > 50) sendHistory.pop();
+  function showProgress(done, total) {
+    document.getElementById('progressWrap').classList.add('visible');
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = `Sending ${done} / ${total} (${pct}%)`;
+  }
+  function hideProgress() {
+    document.getElementById('progressWrap').classList.remove('visible');
+    document.getElementById('progressFill').style.width = '0%';
+  }
+  function addHistory(success, title, body, mode) {
+    sendHistory.unshift({ success, title, body, mode: mode || '', time: new Date().toLocaleString() });
+    if (sendHistory.length > 30) sendHistory.pop();
     localStorage.setItem('ab_push_history', JSON.stringify(sendHistory));
     renderHistory();
   }
   function renderHistory() {
     const list = document.getElementById('historyList');
-    if (!sendHistory.length) { list.innerHTML = '<div class="empty-state">No notifications sent yet.</div>'; return; }
+    if (!sendHistory.length) {
+      list.innerHTML = '<div class="empty-state">No notifications sent yet.</div>'; return;
+    }
     list.innerHTML = sendHistory.map(h => `
       <div class="history-item">
-        <div class="history-status ${h.success?'ok':'err'}">${h.success?'● SENT':'● FAILED'}</div>
+        <div class="history-status ${h.success ? 'ok' : 'err'}">${h.success ? '● SENT' : '● FAILED'}</div>
         <div class="history-title">${esc(h.title)}</div>
         <div class="history-body">${esc(h.body)}</div>
-        ${h.target?`<div class="history-target">→ ${esc(h.target)}</div>`:''}
+        ${h.mode ? `<div class="history-mode">→ ${esc(h.mode)}</div>` : ''}
         <div class="history-time">${h.time}</div>
-      </div>`).join('');
+      </div>
+    `).join('');
   }
-  function clearHistory() { sendHistory=[]; localStorage.removeItem('ab_push_history'); renderHistory(); }
-  function esc(s) { if(!s)return''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function clearHistory() {
+    sendHistory = []; localStorage.removeItem('ab_push_history'); renderHistory();
+  }
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
 </script>
 </body>
 </html>
