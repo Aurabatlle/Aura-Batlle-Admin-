@@ -183,6 +183,53 @@
         .empty-icon { font-size:48px; margin-bottom:14px; opacity:.4; }
         .empty-title { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; color:var(--dim); margin-bottom:6px; }
         .empty-sub { font-size:13px; color:var(--muted); }
+
+        /* ── Full-screen Players Panel ── */
+        .fs-overlay { display:none; position:fixed; inset:0; background:var(--bg); z-index:600; flex-direction:column; overflow:hidden; }
+        .fs-overlay.show { display:flex; animation:fsFadeIn .25s ease both; }
+        @keyframes fsFadeIn { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+        .fs-header { display:flex; align-items:center; gap:12px; padding:14px 18px; background:rgba(13,13,15,.97); border-bottom:1px solid var(--border); backdrop-filter:blur(14px); flex-shrink:0; }
+        .fs-back { width:36px;height:36px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:15px;cursor:pointer;flex-shrink:0; }
+        .fs-title-block { flex:1; min-width:0; }
+        .fs-title { font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .fs-sub { font-size:11px;color:var(--muted);margin-top:1px; }
+        .fs-count-badge { background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);color:var(--purple);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:1px;white-space:nowrap; }
+        .fs-tabs { display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0; }
+        .fs-tab { flex:1;padding:12px 8px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s; }
+        .fs-tab.active { color:var(--purple);border-bottom-color:var(--purple); }
+        .fs-body { flex:1;overflow-y:auto;padding:16px; }
+        .fs-body::-webkit-scrollbar { width:3px; }
+        .fs-body::-webkit-scrollbar-thumb { background:var(--border);border-radius:2px; }
+        /* solo rows */
+        .fsp-item { display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:12px;padding:11px 14px;margin-bottom:8px;border:1px solid var(--border); }
+        .fsp-num { font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--muted);width:26px;text-align:center;flex-shrink:0; }
+        .fsp-avatar { width:36px;height:36px;border-radius:50%;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--purple);flex-shrink:0; }
+        .fsp-info { flex:1;min-width:0; }
+        .fsp-ign { font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--gold);letter-spacing:.5px; }
+        .fsp-uid { font-size:11px;color:#7878a8;font-family:'Rajdhani',sans-serif;letter-spacing:1px;margin-top:3px;display:flex;align-items:center;gap:4px; }
+        .fsp-uid-lbl { font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px; }
+        /* BR team cards */
+        .fst-card { background:var(--surface2);border-radius:14px;overflow:hidden;margin-bottom:12px;border:1px solid var(--border); }
+        .fst-header { display:flex;align-items:center;gap:10px;padding:11px 16px;background:rgba(139,92,246,.07);border-bottom:1px solid var(--border); }
+        .fst-num { font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--muted);background:var(--surface3);border:1px solid var(--border);padding:2px 9px;border-radius:8px;flex-shrink:0; }
+        .fst-name { font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--text);flex:1; }
+        .fst-leader { font-size:10px;color:#7878a8;font-family:'Rajdhani',sans-serif;letter-spacing:.5px;background:var(--surface3);border:1px solid var(--border);padding:2px 8px;border-radius:6px;flex-shrink:0; }
+        .fst-members { padding:10px 14px 12px;display:flex;flex-direction:column;gap:7px; }
+        .fst-member-row { display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface3);border-radius:9px; }
+        .fst-spot { font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;flex-shrink:0; }
+        .fst-ign { font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px;flex:1; }
+        .fst-uid { font-size:10px;color:#7878a8;font-family:'Rajdhani',sans-serif;letter-spacing:.5px;background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;flex-shrink:0; }
+        /* CS/LW slot cards */
+        .fss-card { background:var(--surface2);border-radius:14px;overflow:hidden;margin-bottom:12px;border:1px solid var(--border); }
+        .fss-header { display:flex;align-items:center;gap:10px;padding:11px 16px;background:rgba(230,57,70,.07);border-bottom:1px solid var(--border); }
+        .fss-team-lbl { font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--red); }
+        .fss-count { font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--muted);flex:1; }
+        .fss-multi { font-size:10px;color:var(--gold);background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.25);padding:2px 9px;border-radius:10px; }
+        .fss-rows { padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px; }
+        .fss-row { display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface3);border-radius:9px; }
+        .fss-spot { font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--red);width:30px;flex-shrink:0; }
+        .fss-ign { font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--gold);flex:1; }
+        .fss-uid { font-size:10px;color:#7878a8;font-family:'Rajdhani',sans-serif;letter-spacing:.5px;background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;flex-shrink:0; }
         .toast { position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:11px 18px; font-size:13px; z-index:999; opacity:0; transition:all .28s; pointer-events:none; white-space:nowrap; max-width:88vw; text-align:center; }
         .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
         .toast.error   { border-color:rgba(230,57,70,.45); color:#ff8a91; }
@@ -201,7 +248,7 @@
 
 <div class="tab-bar">
     <div class="tab active" id="tab-upcoming" onclick="switchTab('upcoming')">⏳ Upcoming<span class="tab-badge" id="badge-upcoming">0</span></div>
-    <div class="tab" id="tab-ongoing"   onclick="switchTab('ongoing')">🔴 Live<span class="tab-badge" id="badge-ongoing">0</span></div>
+    <div class="tab" id="tab-ongoing"         onclick="switchTab('ongoing')">🔴 Live<span class="tab-badge" id="badge-ongoing">0</span></div>
 </div>
 
 <div class="main">
@@ -269,6 +316,7 @@
                     <select id="editEntryType">
                         <option value="Solo">Solo</option>
                         <option value="Duo">Duo</option>
+                        <option value="Trio">Trio</option>
                         <option value="Squad">Squad</option>
                         <option value="6v6">6v6</option>
                     </select>
@@ -292,10 +340,11 @@
                     <select id="editPrizeType">
                         <option value="kill">Per Kill</option>
                         <option value="rank">Rank Prize</option>
+                        <option value="winner_only">Winner Only</option>
                     </select>
                 </div>
             </div>
-            <!-- Prize section — switches between Kill and Rank based on prizeType -->
+            <!-- Prize section — switches between Kill, Rank, Winner Only -->
             <div id="prizeKillSection" class="field">
                 <label>Per Kill Gold</label>
                 <input type="number" id="editPerKillGold" placeholder="0" min="0">
@@ -306,6 +355,10 @@
                     <button type="button" onclick="addRankPrizeRow()" style="background:rgba(139,92,246,.12);color:var(--purple);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Rank</button>
                 </div>
                 <div id="rankPrizeRows"></div>
+            </div>
+            <div id="prizeWinnerSection" style="display:none;" class="field">
+                <label>Winner Prize Pool (Gold)</label>
+                <input type="number" id="editWinnerPrizePool" placeholder="0" min="0">
             </div>
             <div class="field"><label>Hoster Username</label><input type="text" id="editHosterUsername" placeholder="hoster username" autocomplete="off"></div>
             <div class="field"><label>Description</label><textarea id="editDescription" placeholder="Match description…"></textarea></div>
@@ -351,17 +404,29 @@
     </div>
 </div>
 
-<!-- ══ Players Sheet ══ -->
-<div class="sh-overlay" id="playersSheet">
-    <div class="sheet">
-        <div class="sh-stripe"></div><div class="sh-handle"></div>
-        <div class="sh-head">
-            <div><div class="sh-title" id="playersSheetTitle">👥 Players</div><div class="sh-subtitle" id="playersSheetSub"></div></div>
-            <button class="sh-x" onclick="closeSheet('playersSheet')"><i class="fas fa-times"></i></button>
+<!-- ══ Full-Screen Players Panel ══ -->
+<div class="fs-overlay" id="playersPanel">
+    <div class="fs-header">
+        <button class="fs-back" onclick="closePlayersPanel()"><i class="fas fa-arrow-left"></i></button>
+        <div class="fs-title-block">
+            <div class="fs-title" id="fsPanelTitle">👥 Players</div>
+            <div class="fs-sub" id="fsPanelSub"></div>
         </div>
-        <div class="sh-body" id="playersSheetBody"><div style="text-align:center;padding:30px;color:var(--muted);">Loading…</div></div>
+        <div class="fs-count-badge" id="fsPanelCount">—</div>
+    </div>
+    <!-- tabs — shown only for CS/LW -->
+    <div class="fs-tabs" id="fsPanelTabs" style="display:none;">
+        <div class="fs-tab active" id="fsTab-all"   onclick="fsSwitchTab('all')">All Teams</div>
+        <div class="fs-tab"        id="fsTab-team1" onclick="fsSwitchTab('team1')">Team 1</div>
+        <div class="fs-tab"        id="fsTab-team2" onclick="fsSwitchTab('team2')">Team 2</div>
+    </div>
+    <div class="fs-body" id="fsPanelBody">
+        <div style="text-align:center;padding:60px;color:var(--muted);">Loading…</div>
     </div>
 </div>
+
+<!-- ══ Players Sheet (OLD — kept for sheet overlay; hidden in favour of panel) ══ -->
+<div class="sh-overlay" id="playersSheet" style="display:none!important"></div>
 
 <!-- ══ Start Sheet ══ -->
 <div class="sh-overlay" id="startSheet">
@@ -524,7 +589,6 @@ function renderAll(){
             matches = matches.filter(m => (m.date||'') === filterDate);
         }
         if(filterTime){
-            // Match times within ±30 minutes of selected time
             matches = matches.filter(m => {
                 if(!m.time) return false;
                 const [fh,fm] = filterTime.split(':').map(Number);
@@ -558,8 +622,8 @@ function renderAll(){
         const el = document.getElementById('list-'+tab);
         if(!el) return;
 
+        const labels = {upcoming:'No upcoming matches',ongoing:'No live matches'};
         if(!matches.length){
-            const labels = {upcoming:'No upcoming matches',ongoing:'No live matches'};
             el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">${labels[tab]||'No matches'}</div></div>`;
             return;
         }
@@ -601,7 +665,7 @@ function buildCard(m){
         actionBtns += `<button class="mc-btn btn-room" onclick="openRoomSheet('${m.matchId}')"><i class="fas fa-key"></i> Room</button>`;
         actionBtns += `<button class="mc-btn btn-stream" onclick="openStreamSheet('${m.matchId}')"><i class="fab fa-youtube"></i> Stream</button>`;
     }
-    actionBtns += `<button class="mc-btn btn-players" onclick="openPlayersSheet('${m.matchId}','${esc(m.title||'')}','${esc(m.entryType||'')}')"><i class="fas fa-users"></i> ${isSolo?'Players':'Teams'}</button>`;
+    actionBtns += `<button class="mc-btn btn-players" onclick="openPlayersSheet('${m.matchId}','${esc(m.title||'')}','${esc(m.entryType||'')}','${esc(m.matchType||'')}')"><i class="fas fa-users"></i> ${isSolo?'Players':'Teams'}</button>`;
 
     if(isUpcoming){
         actionBtns += `<button class="mc-btn btn-start" ${startDisabled} onclick="openStartSheet('${m.matchId}')"><i class="fas fa-play"></i> Start</button>`;
@@ -646,12 +710,42 @@ function buildCard(m){
 }
 
 function loadPlayerCount(m){
-    const isSolo = (m.entryType||'').toLowerCase() === 'solo';
-    const ref    = isSolo ? `matches/${m.matchId}/players` : `matches/${m.matchId}/teams`;
-    db.ref(ref).on('value', snap => {
-        const el = document.getElementById('player-count-'+m.matchId);
-        if(el) el.textContent = snap.exists() ? snap.numChildren() : '0';
-    });
+    const isSolo   = (m.entryType||'').toLowerCase() === 'solo';
+    const isCSorLW = m.matchType === 'CS' || m.matchType === 'LW';
+    const countEl  = document.getElementById('player-count-'+m.matchId);
+    if(!countEl) return;
+
+    if(isCSorLW){
+        // CS/LW: count s{N} keys per player in slots + extraSpots
+        db.ref(`matches/${m.matchId}/slots`).on('value', snap => {
+            const el = document.getElementById('player-count-'+m.matchId);
+            if(!el) return;
+            let total = 0;
+            snap.forEach(slotSnap => {
+                slotSnap.child('players').forEach(playerSnap => {
+                    playerSnap.forEach(field => {
+                        if(/^s\d+$/.test(field.key)) total++;
+                    });
+                    total += playerSnap.child('extraSpots').numChildren();
+                });
+            });
+            el.textContent = total;
+        });
+    } else if(isSolo){
+        db.ref(`matches/${m.matchId}/players`).on('value', snap => {
+            const el = document.getElementById('player-count-'+m.matchId);
+            if(el) el.textContent = snap.exists() ? snap.numChildren() : '0';
+        });
+    } else {
+        // BR multi: sum members across all teams
+        db.ref(`matches/${m.matchId}/teams`).on('value', snap => {
+            const el = document.getElementById('player-count-'+m.matchId);
+            if(!el) return;
+            let total = 0;
+            snap.forEach(t => { total += t.child('members').numChildren(); });
+            el.textContent = total;
+        });
+    }
 }
 
 // ── Edit match sheet ───────────────────────────────────────────────────────────
@@ -672,6 +766,7 @@ window.openEditSheet = function(matchId){
     document.getElementById('editMap').value           = m.map          || '';
     document.getElementById('editPrizeType').value     = m.prizeType    || 'kill';
     document.getElementById('editPerKillGold').value   = m.perKillGold  || 0;
+    document.getElementById('editWinnerPrizePool').value = m.winnerPrizePool || 0;
     document.getElementById('editHosterUsername').value= m.hosterUsername|| '';
     document.getElementById('editDescription').value   = m.description  || '';
 
@@ -695,8 +790,9 @@ window.openEditSheet = function(matchId){
 };
 
 window.togglePrizeSection = function(type){
-    document.getElementById('prizeKillSection').style.display  = type === 'kill' ? '' : 'none';
-    document.getElementById('prizeRankSection').style.display  = type === 'rank' ? '' : 'none';
+    document.getElementById('prizeKillSection').style.display   = type === 'kill'         ? '' : 'none';
+    document.getElementById('prizeRankSection').style.display   = type === 'rank'         ? '' : 'none';
+    document.getElementById('prizeWinnerSection').style.display = type === 'winner_only'  ? '' : 'none';
 };
 
 // Auto-toggle when prizeType dropdown changes
@@ -754,21 +850,22 @@ window.saveEdit = async function(){
         }
 
         const updates = {
-            title:          document.getElementById('editTitle').value.trim(),
-            date:           document.getElementById('editDate').value,
-            time:           document.getElementById('editTime').value,
-            status:         document.getElementById('editStatus').value,
-            matchType:      document.getElementById('editMatchType').value,
-            entryType:      document.getElementById('editEntryType').value,
-            entryMode:      document.getElementById('editEntryMode').value,
-            entryFee:       parseInt(document.getElementById('editEntryFee').value) || 0,
-            spots:          parseInt(document.getElementById('editSpots').value)    || 0,
-            map:            document.getElementById('editMap').value.trim(),
+            title:           document.getElementById('editTitle').value.trim(),
+            date:            document.getElementById('editDate').value,
+            time:            document.getElementById('editTime').value,
+            status:          document.getElementById('editStatus').value,
+            matchType:       document.getElementById('editMatchType').value,
+            entryType:       document.getElementById('editEntryType').value,
+            entryMode:       document.getElementById('editEntryMode').value,
+            entryFee:        parseInt(document.getElementById('editEntryFee').value) || 0,
+            spots:           parseInt(document.getElementById('editSpots').value)    || 0,
+            map:             document.getElementById('editMap').value.trim(),
             prizeType,
-            perKillGold:    prizeType === 'kill' ? (parseInt(document.getElementById('editPerKillGold').value) || 0) : 0,
-            rankPrizes:     rankPrizes,
-            hosterUsername: document.getElementById('editHosterUsername').value.trim(),
-            description:    document.getElementById('editDescription').value.trim(),
+            perKillGold:     prizeType === 'kill'        ? (parseInt(document.getElementById('editPerKillGold').value)      || 0) : 0,
+            winnerPrizePool: prizeType === 'winner_only' ? (parseInt(document.getElementById('editWinnerPrizePool').value)  || 0) : 0,
+            rankPrizes:      rankPrizes,
+            hosterUsername:  document.getElementById('editHosterUsername').value.trim(),
+            description:     document.getElementById('editDescription').value.trim(),
         };
         if(!updates.title){ sheetMsg('editMsg','Title cannot be empty.','error'); return; }
         await db.ref('matches').child(matchId).update(updates);
@@ -838,60 +935,188 @@ window.clearStreamLink = async function(){
     } catch(e){ sheetMsg('streamMsg','Error: '+e.message,'error'); }
 };
 
-// ── Players sheet ──────────────────────────────────────────────────────────────
-window.openPlayersSheet = function(matchId, title, entryType){
-    const isSolo = (entryType||'').toLowerCase() === 'solo';
-    document.getElementById('playersSheetTitle').textContent = isSolo ? `👥 ${title}` : `⚔️ ${title}`;
-    document.getElementById('playersSheetSub').textContent   = isSolo ? 'All joined players' : 'All joined teams';
-    document.getElementById('playersSheetBody').innerHTML    = '<div style="text-align:center;padding:30px;color:var(--muted);">Loading…</div>';
-    document.getElementById('playersSheet').classList.add('show');
+// ── Full-screen Players Panel ──────────────────────────────────────────────────
+let _fsMatchId='', _fsMatchType='', _fsEntryType='', _fsSlotsSnap=null, _fsTeamsSnap=null, _fsPlayersSnap=null;
 
-    const ref = isSolo ? `matches/${matchId}/players` : `matches/${matchId}/teams`;
-    db.ref(ref).once('value', snap => {
-        const body = document.getElementById('playersSheetBody');
-        if(!snap.exists() || !snap.hasChildren()){
-            body.innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);">${isSolo?'No players':'No teams'} yet.</div>`;
-            return;
-        }
-        if(isSolo){
-            const players = []; snap.forEach(c => players.push(c.val()));
-            body.innerHTML = players.map((p,i) => `
-                <div class="full-player-item">
-                    <div class="fp-num">${i+1}</div>
-                    <div class="fp-avatar">${(p.inGameName||'?').charAt(0).toUpperCase()}</div>
-                    <div class="fp-info">
-                        <div class="fp-ign-label">IN-GAME NAME</div>
-                        <div class="fp-name">🎮 ${esc(p.inGameName||'—')}</div>
-                        <div class="fp-uid"><span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">UID</span> ${esc(p.userId||'—')}</div>
-                    </div>
-                </div>`).join('');
-        } else {
-            let idx=1, html='';
-            snap.forEach(child => {
-                const t = child.val();
-                const rawMembers = Object.entries(t.members||{});
-                const memberRows = rawMembers.map(([uid,ign]) => `
-                    <div class="tfm-row">
-                        <span class="tfm-ign">🎮 ${esc(ign)}</span>
-                        <div class="tfm-uid-wrap">
-                            <span class="tfm-uid-label">UID</span>
-                            <span class="tfm-uid">${esc(uid)}</span>
-                        </div>
-                    </div>`).join('');
-                html += `<div class="team-full-card">
-                    <div class="team-full-header">
-                        <span class="tfc-num">#${idx}</span>
-                        <span class="tfc-name">${esc(t.teamName||'Unnamed Team')}</span>
-                        <span class="tfc-count">${rawMembers.length} player${rawMembers.length!==1?'s':''}</span>
-                    </div>
-                    <div class="team-full-members">${memberRows}</div>
-                </div>`;
-                idx++;
-            });
-            body.innerHTML = html;
-        }
-    });
+window.openPlayersSheet = function(matchId, title, entryType, matchType){
+    _fsMatchId     = matchId;
+    _fsEntryType   = entryType;
+    _fsMatchType   = matchType || '';
+    const isCSorLW = _fsMatchType === 'CS' || _fsMatchType === 'LW';
+    const isSolo   = (entryType||'').toLowerCase() === 'solo';
+
+    document.getElementById('fsPanelTitle').textContent = `${isCSorLW ? '⚔️' : isSolo ? '👥' : '⚔️'} ${title}`;
+    document.getElementById('fsPanelSub').textContent   = isCSorLW ? 'CS/LW Slot Teams' : isSolo ? 'Solo Players' : 'BR Teams';
+    document.getElementById('fsPanelBody').innerHTML    = '<div style="text-align:center;padding:60px;color:var(--muted);">Loading…</div>';
+    document.getElementById('fsPanelCount').textContent = '…';
+    document.getElementById('fsPanelTabs').style.display = isCSorLW ? 'flex' : 'none';
+
+    // reset CS/LW tab
+    ['all','team1','team2'].forEach(t => document.getElementById('fsTab-'+t)?.classList.remove('active'));
+    document.getElementById('fsTab-all')?.classList.add('active');
+
+    document.getElementById('playersPanel').classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    if(isCSorLW){
+        db.ref(`matches/${matchId}/slots`).once('value', snap => {
+            _fsSlotsSnap = snap; renderFsPanelCSLW('all');
+        });
+    } else if(isSolo){
+        db.ref(`matches/${matchId}/players`).once('value', snap => {
+            _fsPlayersSnap = snap; renderFsPanelSolo();
+        });
+    } else {
+        db.ref(`matches/${matchId}/teams`).once('value', snap => {
+            _fsTeamsSnap = snap; renderFsPanelBR();
+        });
+    }
 };
+
+window.closePlayersPanel = function(){
+    document.getElementById('playersPanel').classList.remove('show');
+    document.body.style.overflow = '';
+};
+
+window.fsSwitchTab = function(tab){
+    ['all','team1','team2'].forEach(t => document.getElementById('fsTab-'+t)?.classList.remove('active'));
+    document.getElementById('fsTab-'+tab)?.classList.add('active');
+    renderFsPanelCSLW(tab);
+};
+
+// ── Solo players ──────────────────────────────────────────────────────────────
+function renderFsPanelSolo(){
+    const body = document.getElementById('fsPanelBody');
+    const snap = _fsPlayersSnap;
+    if(!snap || !snap.exists() || !snap.hasChildren()){
+        body.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted);">No players joined yet.</div>';
+        document.getElementById('fsPanelCount').textContent = '0 players';
+        return;
+    }
+    const players = []; snap.forEach(c => players.push(c.val()));
+    document.getElementById('fsPanelCount').textContent = players.length + ' player' + (players.length !== 1 ? 's' : '');
+    body.innerHTML = players.map((p, i) => `
+        <div class="fsp-item">
+            <div class="fsp-num">${i+1}</div>
+            <div class="fsp-avatar">${(p.inGameName||'?').charAt(0).toUpperCase()}</div>
+            <div class="fsp-info">
+                <div class="fsp-ign">🎮 ${esc(p.inGameName||'—')}</div>
+                <div class="fsp-uid"><span class="fsp-uid-lbl">UID</span> ${esc(p.userId||'—')}</div>
+            </div>
+        </div>`).join('');
+}
+
+// ── BR Multi teams ────────────────────────────────────────────────────────────
+function renderFsPanelBR(){
+    const body = document.getElementById('fsPanelBody');
+    const snap = _fsTeamsSnap;
+    if(!snap || !snap.exists() || !snap.hasChildren()){
+        body.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted);">No teams joined yet.</div>';
+        document.getElementById('fsPanelCount').textContent = '0';
+        return;
+    }
+    let html = '', totalPlayers = 0;
+    snap.forEach(child => {
+        const t        = child.val();
+        const tKey     = child.key;
+        const tName    = t.teamName || 'Unnamed Team';
+        const leaderId = t.leaderId || '—';
+        const members  = t.members  || {};
+        const spots    = Object.keys(members).sort((a,b) => Number(a) - Number(b));
+        totalPlayers  += spots.length;
+
+        const memberRows = spots.map(sn => `
+            <div class="fst-member-row">
+                <span class="fst-spot">P${sn}</span>
+                <span class="fst-ign">🎮 ${esc(members[sn]||'—')}</span>
+                ${sn === '1'
+                    ? `<span class="fst-uid">${esc(leaderId)}</span>`
+                    : `<span style="font-size:10px;color:var(--muted);font-family:'Rajdhani',sans-serif;padding:2px 8px;flex-shrink:0;">member</span>`}
+            </div>`).join('');
+
+        html += `
+        <div class="fst-card">
+            <div class="fst-header">
+                <span class="fst-num">Team #${esc(tKey)}</span>
+                <span class="fst-name">${esc(tName)}</span>
+                <span class="fst-leader" title="Leader UID">${esc(leaderId)}</span>
+            </div>
+            <div class="fst-members">${memberRows || '<div style="padding:10px;color:var(--muted);font-size:13px;">No members</div>'}</div>
+        </div>`;
+    });
+    document.getElementById('fsPanelCount').textContent = totalPlayers + ' players';
+    body.innerHTML = html;
+}
+
+// ── CS / LW slots ─────────────────────────────────────────────────────────────
+function renderFsPanelCSLW(filter){
+    const body = document.getElementById('fsPanelBody');
+    const snap = _fsSlotsSnap;
+    if(!snap || !snap.exists() || !snap.hasChildren()){
+        body.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted);">No teams joined yet.</div>';
+        document.getElementById('fsPanelCount').textContent = '0';
+        return;
+    }
+
+    // Collect team 1 and team 2 data
+    const teams = { '1': null, '2': null };
+    snap.forEach(slotSnap => {
+        const s    = slotSnap.val();
+        const tNum = String(s.teamNumber || slotSnap.key);
+        if(tNum === '1' || tNum === '2') teams[tNum] = s;
+    });
+
+    const teamNums  = filter === 'team1' ? ['1'] : filter === 'team2' ? ['2'] : ['1','2'];
+    let   totalSpots = 0;
+    let   html       = '';
+
+    teamNums.forEach(tNum => {
+        const s          = teams[tNum];
+        const playersObj = (s && s.players) || {};
+        const allSpots   = [];
+
+        Object.entries(playersObj).forEach(([userId, pData]) => {
+            if(!pData || typeof pData !== 'object') return;
+            Object.entries(pData).forEach(([k, v]) => {
+                if(/^s(\d+)$/.test(k) && v)
+                    allSpots.push({ spot: parseInt(k.slice(1)), ign: v, userId });
+            });
+            const extras = pData.extraSpots || {};
+            Object.entries(extras).forEach(([k, ign]) => {
+                if(/^s(\d+)$/.test(k) && ign)
+                    allSpots.push({ spot: parseInt(k.slice(1)), ign, userId });
+            });
+        });
+
+        allSpots.sort((a, b) => a.spot - b.spot);
+        totalSpots += allSpots.length;
+
+        const uniqueUsers = [...new Set(allSpots.map(x => x.userId))];
+        const multiUser   = uniqueUsers.length > 1;
+
+        const rows = allSpots.length
+            ? allSpots.map(({ spot, ign, userId }) => `
+                <div class="fss-row">
+                    <span class="fss-spot">S${spot}</span>
+                    <span class="fss-ign">🎮 ${esc(ign)}</span>
+                    <span class="fss-uid">${esc(userId)}</span>
+                </div>`).join('')
+            : `<div style="color:var(--muted);font-size:13px;padding:10px 14px;">No players joined yet</div>`;
+
+        html += `
+        <div class="fss-card">
+            <div class="fss-header">
+                <span class="fss-team-lbl">Team ${tNum}</span>
+                <span class="fss-count">${allSpots.length} spot${allSpots.length !== 1 ? 's' : ''} filled</span>
+                ${multiUser ? `<span class="fss-multi">${uniqueUsers.length} joiners</span>` : ''}
+            </div>
+            <div class="fss-rows">${rows}</div>
+        </div>`;
+    });
+
+    document.getElementById('fsPanelCount').textContent = totalSpots + ' spot' + (totalSpots !== 1 ? 's' : '');
+    body.innerHTML = html;
+}
 
 // ── Start / End / Cancel ───────────────────────────────────────────────────────
 window.openStartSheet = function(matchId){
@@ -951,6 +1176,7 @@ window.confirmCancel = async function(){
 
         if(!isFree){
             const isSolo   = (match?.entryType||'').toLowerCase() === 'solo';
+            const isCSorLW = match?.matchType === 'CS' || match?.matchType === 'LW';
             const now      = new Date();
             const pad      = n => String(n).padStart(2,'0');
             const refDate  = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
@@ -960,7 +1186,17 @@ window.confirmCancel = async function(){
             if(isSolo){
                 const ps = await db.ref('matches/'+matchId+'/players').once('value');
                 ps.forEach(c => { const p=c.val(); const uid=p.userId||p.uid; if(uid) uids.push(uid); });
+            } else if(isCSorLW){
+                // CS/LW: collect unique userId keys from slots/{slot}/players
+                const ss = await db.ref('matches/'+matchId+'/slots').once('value');
+                const seen = new Set();
+                ss.forEach(slotSnap => {
+                    const sv = slotSnap.val();
+                    const players = sv?.players || {};
+                    Object.keys(players).forEach(uid => { if(uid && !seen.has(uid)){ seen.add(uid); uids.push(uid); } });
+                });
             } else {
+                // BR: one refund per team leader
                 const ts = await db.ref('matches/'+matchId+'/teams').once('value');
                 ts.forEach(c => { const t=c.val(); const uid=t.leaderId||t.leaderUid; if(uid) uids.push(uid); });
             }
