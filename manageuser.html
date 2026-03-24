@@ -342,10 +342,11 @@ body::after{content:'';position:fixed;bottom:-80px;right:-80px;width:300px;heigh
   <!-- ④ FILTER BAR -->
   <div class="filter-bar">
     <span class="filter-label"><i class="fas fa-sliders-h"></i> Sort:</span>
-    <button class="filter-chip active" id="fDefault" onclick="setFilter('default')"><i class="fas fa-clock"></i> Default</button>
+    <button class="filter-chip active" id="fDefault" onclick="setFilter('default')"><i class="fas fa-user-plus"></i> Newest First</button>
     <button class="filter-chip" id="fAmount" onclick="setFilter('amount')"><i class="fas fa-coins"></i> Most Balance</button>
     <button class="filter-chip" id="fTxn" onclick="setFilter('txn')"><i class="fas fa-receipt"></i> Most Txns</button>
     <button class="filter-chip" id="fReferral" onclick="setFilter('referral')"><i class="fas fa-user-plus"></i> Most Refs</button>
+    <button class="filter-chip" id="fLastLogin" onclick="setFilter('lastlogin')"><i class="fas fa-sign-in-alt"></i> Last Login</button>
     <button class="filter-chip" id="fInactive" onclick="setFilter('inactive')"><i class="fas fa-moon"></i> Inactive 1 Month</button>
   </div>
   <div class="users-grid" id="usersGrid">
@@ -1020,13 +1021,25 @@ function applySortFilter(uids){
       return rb-ra;
     });
   }
-  return uids; // default
+  if(activeFilter==='lastlogin'){
+    return [...uids].sort((a,b)=>{
+      const la=parseInt(allUsers[a].lastLogin||0);
+      const lb=parseInt(allUsers[b].lastLogin||0);
+      return lb-la; // most recently logged in first
+    });
+  }
+  // default: newest created user first (highest createdAt timestamp on top)
+  return [...uids].sort((a,b)=>{
+    const ca=parseInt(allUsers[a].createdAt||0);
+    const cb=parseInt(allUsers[b].createdAt||0);
+    return cb-ca;
+  });
 }
 
 function setFilter(f){
   activeFilter=f;
-  ['fDefault','fAmount','fTxn','fReferral','fInactive'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  const map={default:'fDefault',amount:'fAmount',txn:'fTxn',referral:'fReferral',inactive:'fInactive'};
+  ['fDefault','fAmount','fTxn','fReferral','fLastLogin','fInactive'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  const map={default:'fDefault',amount:'fAmount',txn:'fTxn',referral:'fReferral',lastlogin:'fLastLogin',inactive:'fInactive'};
   document.getElementById(map[f]).classList.add('active');
   renderCards(currentFilteredUids());
 }
